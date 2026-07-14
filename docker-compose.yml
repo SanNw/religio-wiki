@@ -11,7 +11,7 @@ services:
       - db_data:/var/lib/mysql
 
   mediawiki:
-    image: mediawiki:1.41
+    build: .
     restart: unless-stopped
     depends_on:
       - db

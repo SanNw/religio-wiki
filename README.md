@@ -45,9 +45,9 @@ passo de instalação abaixo):
   (claro/escuro/personalizado) na barra do usuário, persistido por leitor via
   `localStorage` — funciona também no modo anônimo.
 - **`LocalSettings-snippet.php`** → colar no final do `LocalSettings.php`:
-  leitura anônima liberada + edição exige conta (login com usuário/senha já
-  vem pronto de fábrica no MediaWiki), e o mapeamento categoria → classe CSS
-  que colore o `#firstHeading` por religião.
+  carrega as extensões de edição/citação, configura leitura anônima + edição
+  só por convite (ver "Quem pode editar" abaixo), e o mapeamento categoria →
+  classe CSS que colore o `#firstHeading` por religião.
 
 ### Cores por religião
 
@@ -72,6 +72,50 @@ correspondente e preencher a cor.
 - Self-host da fonte Noto Sans em vez de carregar do Google Fonts, se
   preferir não depender de CDN externo (o `common.css` já indica onde trocar).
 
+## Ferramentas de edição, criação e citação
+
+O tarball/imagem padrão do MediaWiki vem "pelado" — sem as extensões que a
+Wikipédia usa no dia a dia. O `Dockerfile` desta pasta builda uma imagem
+própria (`mediawiki:1.41` + extensões oficiais na mesma branch `REL1_41`,
+baixadas do espelho no GitHub) já com:
+
+| Ferramenta | Extensão | Equivalente na Wikipédia |
+|---|---|---|
+| Notas de rodapé / referências | `Cite` | `<ref>...</ref>` e `<references />` |
+| Lógica em templates | `ParserFunctions` | `{{#if:}}`, `{{#switch:}}` etc. |
+| Editor de wikitexto com barra | `WikiEditor` | barra clássica (negrito, link, assinatura...) |
+| Editor visual (WYSIWYG) | `VisualEditor` | editor visual da Wikipédia |
+| Formulário de campos de template | `TemplateData` | usado pelo VisualEditor para templates |
+| Templates de citação em Lua | `Scribunto` | base de `{{citar web}}`, `{{citar livro}}` (CS1) |
+| Upload de imagens + acervo do Commons | `$wgEnableUploads` / `$wgUseInstantCommons` (config nativa, sem extensão) | inserir imagens do Wikimedia Commons direto |
+
+Histórico de página, diffs, página de discussão, lista de páginas vigiadas,
+desfazer edição, pré-visualizar antes de salvar — isso tudo já é nativo do
+MediaWiki, sem precisar instalar nada.
+
+Como não é possível baixar o Docker Hub nem clonar os repositórios das
+extensões dentro deste sandbox (ver nota mais abaixo), o `Dockerfile` não foi
+testado ao vivo — a lista de extensões e a config de `VisualEditor`/`Scribunto`
+seguem a documentação oficial do mediawiki.org, mas confira
+`Special:Version` depois do primeiro `docker compose up` pra confirmar que
+tudo carregou.
+
+## Quem pode editar (acesso por convite)
+
+Configurado para funcionar como você pediu: **leitura é pública/anônima,
+edição é só de quem você escolher** — não existe cadastro público aberto.
+
+1. Como `Admin`, vá em **Special:CreateAccount** e crie uma conta para a
+   pessoa (defina uma senha provisória para ela trocar no primeiro acesso).
+2. Vá em **Special:UserRights**, digite o nome de usuário dela, marque o
+   grupo **`editor`** e salve.
+3. Pronto — só quem estiver no grupo `editor` (ou for `Admin`) consegue criar
+   e editar páginas e enviar imagens. Leitores anônimos e contas fora desse
+   grupo só leem.
+
+Para tirar o acesso de alguém, é o mesmo caminho: Special:UserRights,
+desmarcar `editor`.
+
 ## Passo a passo (primeira instalação)
 
 ```bash
@@ -84,7 +128,9 @@ cp .env.example .env
 # 2. Crie o arquivo LocalSettings.php vazio (necessário para o bind mount)
 touch LocalSettings.php
 
-# 3. Suba só o banco de dados primeiro
+# 3. Builde a imagem (baixa o MediaWiki oficial + as extensões, ver
+#    "Ferramentas de edição, criação e citação" acima) e suba o banco
+docker compose build
 docker compose up -d db
 
 # 4. Rode o instalador do MediaWiki via linha de comando
@@ -102,35 +148,48 @@ docker compose run --rm mediawiki php maintenance/install.php \
   "Religio Wiki" \
   Admin
 
-# 5. Suba o MediaWiki
+# 5. Cole o conteúdo de mediawiki-config/LocalSettings-snippet.php no final
+#    do LocalSettings.php gerado (extensões, permissões, cor por religião)
+
+# 6. Suba o MediaWiki
 docker compose up -d
 
-# 6. Acesse http://localhost:8080 e faça login como "Admin"
+# 7. Acesse http://localhost:8080 e faça login como "Admin"
 ```
 
-Nas próximas vezes, basta `docker compose up -d` (os passos 2 e 4 são só da
-primeira instalação, pois geram o `LocalSettings.php`).
+Nas próximas vezes, basta `docker compose up -d` (os passos 2, 4 e 5 são só
+da primeira instalação, pois geram/editam o `LocalSettings.php`).
 
 ## Estrutura
 
-- `docker-compose.yml` — serviços `db` (MariaDB) e `mediawiki` (imagem oficial).
+- `Dockerfile` — `mediawiki:1.41` oficial + extensões de edição/citação (ver
+  seção acima).
+- `docker-compose.yml` — serviços `db` (MariaDB) e `mediawiki` (builda a
+  partir do `Dockerfile`).
 - `.env` — senhas do banco (não versionado, veja `.env.example`).
-- `LocalSettings.php` — configuração gerada pelo instalador (não versionado,
-  contém chaves secretas; fica só na máquina onde a wiki roda).
+- `LocalSettings.php` — configuração gerada pelo instalador + o conteúdo de
+  `mediawiki-config/LocalSettings-snippet.php` (não versionado, contém
+  chaves secretas; fica só na máquina onde a wiki roda).
 
 ## Nota sobre este ambiente
 
 Este setup foi montado no sandbox do Claude Code, cuja política de rede
-bloqueia o Docker Hub e os servidores do Wikimedia — por isso não foi
-possível baixar as imagens e validar a subida completa aqui dentro. A
-configuração segue o modelo oficial documentado pela imagem `mediawiki` do
-Docker Hub; rode os passos acima na sua máquina ou servidor (onde o Docker
-Hub não está bloqueado) para validar.
+bloqueia o Docker Hub, os servidores do Wikimedia e o clone dos repositórios
+de extensão do GitHub — por isso não foi possível buildar a imagem nem
+validar a subida completa aqui dentro (nem o `docker-compose.yml`/`Dockerfile`
+originais, nem as extensões, nem os passos de permissão). Tudo segue a
+documentação oficial do mediawiki.org; rode os passos acima na sua máquina ou
+servidor (sem esse bloqueio) para validar de ponta a ponta.
 
 ## Próximos passos sugeridos
 
-- Definir extensões (ex.: `Cite` para referências, `ParserFunctions`) —
-  já vêm junto na imagem oficial, é só habilitar em `LocalSettings.php`.
+- Definir a cor de cabeçalho das 13 religiões que ainda faltam (ver seção
+  "Cores por religião" acima).
 - Ajustar `$wgSitename`, logo e paleta em `LocalSettings.php`/skin para
-  refletir a identidade do projeto.
-- Definir categorias iniciais (ex.: por religião, período histórico, região).
+  refletir a identidade visual do projeto quando for decidida.
+- Depois do primeiro deploy real, importar/adaptar os templates de citação
+  (`{{citar web}}`, `{{citar livro}}`) — o `Scribunto` já está habilitado
+  para suportá-los, mas os templates em si não vêm prontos, precisam ser
+  criados ou importados de outro wiki.
+- Decidir a lista inicial de pessoas com acesso de `editor` (ver "Quem pode
+  editar" acima).
