@@ -10,6 +10,24 @@ publicado, normalmente é licenciado como CC BY-SA (configurável).
 
 - Docker e Docker Compose (`docker compose version`)
 
+## Direção de design
+
+Referência principal: a própria Wikipédia — **hipertexto em primeiro lugar**,
+sem excessos, sem modernismo. Na prática, isso guia as próximas decisões de
+identidade visual:
+
+- Texto e links densos são o conteúdo principal; layout é pano de fundo, não
+  protagonista.
+- Sem cards, gradientes, sombras pesadas, animações decorativas ou UI "app
+  moderno" — chrome mínimo (é o que o skin Vector do MediaWiki já entrega por
+  padrão).
+- Cor entra pontualmente (cabeçalho por religião, links, tema) — não como
+  fundo de blocos ou elementos decorativos.
+- Tipografia funcional antes de expressiva: a Noto Sans já escolhida serve
+  bem esse propósito (neutra, legível, cobre as escritas necessárias) — não
+  trocar por fontes de identidade/display quando a identidade visual for
+  fechada, a menos que seja só para títulos.
+
 ## Identidade e configuração de conteúdo
 
 Configuração já pronta em `mediawiki-config/` (aplicar depois do passo a
