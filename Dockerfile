@@ -11,7 +11,7 @@ RUN apt-get update \
 WORKDIR /var/www/html/extensions
 
 RUN set -eux; \
-	for ext in Cite ParserFunctions WikiEditor VisualEditor TemplateData Scribunto; do \
+	for ext in Cite ParserFunctions WikiEditor VisualEditor TemplateData Scribunto PluggableAuth OpenIDConnect; do \
 		git clone --depth 1 --branch "${MW_BRANCH}" \
 			"https://github.com/wikimedia/mediawiki-extensions-${ext}.git" "${ext}"; \
 		rm -rf "${ext}/.git"; \

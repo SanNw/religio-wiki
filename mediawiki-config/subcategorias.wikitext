@@ -1,0 +1,66 @@
+# Subcategorias e artigos que ligam mais de uma religião
+
+Isso já é nativo do MediaWiki — **não precisa de nenhuma configuração**: uma
+página pode ter quantas categorias quiser (`[[Category:X]]`, uma por linha,
+em qualquer lugar do wikitext), e uma categoria pode ser subcategoria de
+outra do mesmo jeito. Quem estiver no grupo `editor` (ou for Admin) já
+consegue fazer isso normalmente, editando a página — é só um exemplo
+concreto de como usar, com os dois casos que você deu.
+
+## Caso 1: subcategoria de uma religião (ritual/instituição específica)
+
+```wikitext
+## Page: Category:Catolicismo
+Ramo do [[Cristianismo]] — liturgia, sacramentos e instituição eclesiástica
+da Igreja Católica.
+
+[[Category:Cristianismo]]
+```
+
+```wikitext
+## Page: Ritos da Igreja Católica
+Os '''ritos da Igreja Católica''' incluem os sete sacramentos...
+
+[[Category:Catolicismo]]
+```
+
+`Ritos da Igreja Católica` está em `Category:Catolicismo`, que por sua vez
+está dentro de `Category:Cristianismo` — então o artigo aparece nas duas
+categorias ao navegar (relação de subcategoria, exatamente como na
+Wikipédia).
+
+## Caso 2: um artigo citado por mais de uma religião
+
+```wikitext
+## Page: Jesus Cristo
+'''Jesus Cristo''' (ou Jesus de Nazaré) é a figura central do
+[[Cristianismo]], reconhecido como o Messias e o Filho de Deus. Também é
+uma figura relevante no [[Islã]], que o reconhece como profeta ('''Isa''',
+عيسى) — mas não como divindade.
+
+== Ver também ==
+{{Ver também|Cristianismo|Islã}}
+
+[[Category:Cristianismo]]
+[[Category:Islã]]
+[[Category:Figuras bíblicas e coránicas]]
+```
+
+Três categorias na mesma página: as duas religiões que o citam
+(`Cristianismo`, `Islã`) mais uma categoria temática cruzada
+(`Figuras bíblicas e coránicas`) que pode reunir outras figuras citadas por
+múltiplas tradições (Abraão, Moisés etc.) sem precisar duplicar conteúdo em
+cada religião.
+
+## Padrão geral
+
+- Categoria de religião (`Cristianismo`, `Islã`...) = pertence à
+  classificação em `categorias.wikitext`.
+- Subcategoria dentro de uma religião (`Catolicismo`, `Ortodoxia`,
+  `Sunismo`...) = recorte mais específico de uma religião só.
+- Categoria temática cruzada (`Figuras bíblicas e coránicas`, `Textos
+  sagrados`, `Práticas de meditação`...) = reúne artigos de religiões
+  diferentes que compartilham um tema, sem forçar hierarquia entre elas.
+
+Um artigo pode combinar quantas dessas quiser — é só colocar as tags
+`[[Category:...]]` correspondentes.

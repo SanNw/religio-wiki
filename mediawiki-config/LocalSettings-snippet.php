@@ -170,6 +170,52 @@ $wgReligioWikiLanguages = [
 	'it' => 'Italiano',
 ];
 
+// ---------- Login social (Google / Facebook / GitHub) ----------
+// O framework (PluggableAuth) e os conectores de Google/GitHub já são
+// baixados pelo Dockerfile — mas ficam DESATIVADOS até você preencher suas
+// próprias credenciais OAuth abaixo, porque isso não é algo que dê pra
+// gerar por aqui: cada provedor exige que você (o dono do projeto) crie um
+// "app" OAuth na respectiva plataforma e gere um Client ID + Client Secret:
+//   - Google:  https://console.cloud.google.com/apis/credentials
+//   - GitHub:  https://github.com/settings/developers ("OAuth Apps")
+//   - Facebook: precisa de um conector à parte (o Facebook não fala OpenID
+//     Connect padrão como Google/GitHub) — mais trabalho, considere deixar
+//     para depois; o botão já existe na interface, só não faz nada sem isso.
+// Sem essas credenciais, os botões "Continuar com Google/GitHub/Facebook"
+// no pop-up de login ficam visíveis, mas desabilitados — não é um bug, é a
+// falta dessa configuração (ver $wgRWSocialProviders logo abaixo).
+//
+// Depois de ter as credenciais, descomente as linhas abaixo e preencha:
+//
+// wfLoadExtension( 'PluggableAuth' );
+// wfLoadExtension( 'OpenIDConnect' );
+// $wgPluggableAuth_Config['Google'] = [
+// 	'plugin' => 'OpenIDConnect',
+// 	'data' => [
+// 		'providerURL' => 'https://accounts.google.com',
+// 		'clientID' => 'COLE_AQUI_O_CLIENT_ID_DO_GOOGLE',
+// 		'clientsecret' => 'COLE_AQUI_O_CLIENT_SECRET_DO_GOOGLE',
+// 	],
+// ];
+// $wgPluggableAuth_Config['GitHub'] = [
+// 	'plugin' => 'OpenIDConnect',
+// 	'data' => [
+// 		'providerURL' => 'https://github.com',
+// 		'clientID' => 'COLE_AQUI_O_CLIENT_ID_DO_GITHUB',
+// 		'clientsecret' => 'COLE_AQUI_O_CLIENT_SECRET_DO_GITHUB',
+// 	],
+// ];
+
+// Lista de provedores REALMENTE configurados acima — mantenha em sincronia
+// manualmente com o bloco comentado (ex.: ['google', 'github'] depois de
+// descomentar os dois). O common.js lê isso via mw.config para saber quais
+// botões sociais habilitar no pop-up de login.
+$wgRWSocialProviders = [];
+$wgHooks['ResourceLoaderGetConfigVars'][] = static function ( array &$vars ) {
+	global $wgRWSocialProviders;
+	$vars['wgRWSocialProviders'] = $wgRWSocialProviders;
+};
+
 // ---------- Idioma de conteúdo/interface ----------
 $wgLanguageCode = 'pt-br';
 

@@ -60,6 +60,14 @@ passo de instalação abaixo):
   (Bibliografia, Referências, Ligações externas).
 - **`pagina-idiomas.wikitext`** → conteúdo de `Religio Wiki:Idiomas`, a
   página de ajuda linkada em "+ Adicionar idioma" no seletor de idioma.
+- **`subcategorias.wikitext`** → exemplos de como ligar mais de uma religião
+  num artigo, ou criar subcategoria dentro de uma religião (nativo do
+  MediaWiki, sem configuração extra).
+
+Skills usadas nesta rodada, instaladas em `~/.claude/skills/`: `web-design-guidelines`
+(revisão de UI/responsividade) e `react-best-practices` (não aplicável ao
+stack deste projeto — Religio Wiki é MediaWiki/PHP/wikitext, sem React —
+mas instalada como pedido).
 
 ### Cores por religião
 
@@ -119,12 +127,15 @@ tudo carregou.
 
 ## Quem pode editar (acesso por convite) + criação de conta
 
-**Criar conta é livre e funcional** (`Special:CreateAccount`, qualquer
-visitante) — **editar continua fechado**, só de quem você escolher. São duas
-coisas separadas no MediaWiki: ter conta te coloca no grupo `user`, que
-não tem permissão de editar (`$wgGroupPermissions['user']['edit'] = false`);
-só quem for promovido manualmente ao grupo `editor` (ou for `Admin`)
-consegue criar/editar página ou enviar imagem.
+**Criar conta é livre e funcional** — tanto pela página nativa
+(`Special:CreateAccount`) quanto pelo **pop-up de login/cadastro no centro
+da tela** que agora abre ao clicar em "Entrar" em qualquer página (ver
+"Login e cadastro" abaixo) — **editar continua fechado**, só de quem você
+escolher. São duas coisas separadas no MediaWiki: ter conta te coloca no
+grupo `user`, que não tem permissão de editar
+(`$wgGroupPermissions['user']['edit'] = false`); só quem for promovido
+manualmente ao grupo `editor` (ou for `Admin`) consegue criar/editar página
+ou enviar imagem.
 
 Por que reabri a criação de conta em vez de deixar 100% fechada (como
 estava antes): sem conta, o leitor não consegue salvar preferências (tema,
@@ -201,9 +212,10 @@ categorias").
 
 Quatro coisas novas em todo artigo, seguindo o padrão da Wikipédia:
 
-- **Idiomas** (acima de "Neste artigo"): lista Português (original) + os
-  idiomas configurados. Um detalhe importante: a Wikipédia de verdade liga
-  **wikis inteiramente separados** por idioma (pt.wikipedia.org,
+- **Idiomas** (acima de "Neste artigo", em **estilo collapse**: começa
+  fechado, um clique no cabeçalho abre/fecha): lista Português (original) +
+  os idiomas configurados. Um detalhe importante: a Wikipédia de verdade
+  liga **wikis inteiramente separados** por idioma (pt.wikipedia.org,
   en.wikipedia.org...); aqui é **um wiki só**, então "trocar de idioma" é
   navegar para uma sub-página do mesmo artigo (`Cristianismo/en`, por
   exemplo) — não existe conteúdo traduzido automaticamente, é preciso
@@ -218,7 +230,14 @@ Quatro coisas novas em todo artigo, seguindo o padrão da Wikipédia:
   (Pequeno/Padrão/Grande) e largura do conteúdo (Padrão/Largo), persistido
   por leitor via `localStorage` — como o menu de aparência da Wikipédia,
   mas separado do seletor de tema (claro/escuro/personalizado) que já
-  existia.
+  existia. **Corrigido dois bugs** que você reportou: (1) tamanho do texto
+  agora reescala o `<html>` inteiro (`font-size: 87.5%/112.5%`) em vez de só
+  um trecho isolado — antes só o parágrafo mudava um pouco e os títulos
+  ficavam do mesmo tamanho, dando a impressão de "não fazer nada"; (2)
+  "Largo" agora só alarga a coluna de leitura (`#content`/`.mw-body`) — a
+  versão anterior colapsava a grade inteira numa coluna só, o que esticava
+  elementos pensados pra ficar estreitos, como o botão "Ver diagrama de
+  categorias".
 - **Lápis de edição** (✏, ao lado do título): só aparece pra quem realmente
   pode editar aquela página — o hook `OutputPageBodyAttributes` marca
   `body.rw-can-edit` no servidor checando a permissão de verdade
@@ -238,6 +257,82 @@ todo artigo — documentado em `templates.wikitext` ("Esqueleto padrão de
 artigo"). É convenção editorial, não algo que o software force sozinho;
 `Referências` usa `{{references}}`/`<references />` (extensão `Cite`, já
 habilitada) pra listar as notas de rodapé do corpo do texto.
+
+## Responsivo / versão mobile
+
+O skin legacy Vector (o que a instalação usa) não foi desenhado pra tela
+pequena — essas regras (seção 14 do `common.css`) adaptam o que dá:
+
+- Abaixo de 851px, a barra lateral fixa (`#mw-panel`) some e vira um menu
+  hambúrguer (☰, canto superior esquerdo, `common.js` "Menu hambúrguer") —
+  abre como painel deslizante por cima do conteúdo, com fundo escurecido
+  atrás; fecha ao clicar fora, apertar Esc, ou clicar num link do menu.
+- Na página principal, "Artigo em destaque" e "Imagem do dia" (lado a lado
+  no desktop) empilham em coluna única abaixo de 720px — isso já existia
+  desde a primeira versão da página principal.
+- Abaixo de 600px: título do artigo com fonte menor, cabeçalho da página
+  principal empilha em vez de ficar lado a lado com o contador de artigos,
+  a grade de valores da doação vira 2 colunas em vez de 3, e o infobox para
+  de flutuar ao lado do texto (ocupa a largura toda, no fluxo normal) —
+  senão ele fica apertado demais numa tela de celular.
+
+**Isso não é o mesmo que a Wikipédia tem de verdade no celular** — a
+Wikipédia usa a extensão `MobileFrontend`, com um skin próprio (Minerva)
+feito do zero pra mobile, algo bem mais completo do que adaptar o Vector
+com CSS. O que fiz aqui deixa o Vector *utilizável* em tela pequena; se no
+futuro quiser uma experiência mobile realmente nativa (like a Wikipédia
+em m.wikipedia.org), aí vale a pena avaliar instalar o MobileFrontend — é
+um projeto à parte, não incluído nesta rodada.
+
+## Login e cadastro
+
+Pop-up centralizado (`common.css` seção 15, `common.js` "Pop-up de login /
+criar conta") que abre ao clicar em "Entrar" (ou "Criar conta", quando
+visível) em qualquer página — no lugar de ir pra uma página cheia à parte.
+Duas abas, Entrar/Criar conta, cada uma com:
+
+- **Login/cadastro por usuário e senha, de verdade funcional**: usa as APIs
+  nativas do MediaWiki feitas exatamente pra isso —
+  `action=clientlogin` e `action=createaccount` (é a mesma API que os
+  apps oficiais da Wikipédia usam pra logar sem sair da tela). Não é uma
+  simulação: se as credenciais estiverem certas, cria a conta / loga de
+  verdade, sem sair do pop-up.
+- **Google / Facebook / GitHub**: os botões existem na interface, mas
+  ficam **desabilitados até você configurar cada provedor** —
+  `LocalSettings-snippet.php` já tem o framework (`PluggableAuth` +
+  `OpenIDConnect`, baixados pelo `Dockerfile`) com um bloco comentado
+  pronto pra Google e GitHub, faltando só suas credenciais OAuth
+  (Client ID + Client Secret), que só você consegue gerar — são chaves
+  ligadas à sua conta em cada plataforma:
+  - Google: [console.cloud.google.com/apis/credentials](https://console.cloud.google.com/apis/credentials)
+  - GitHub: [github.com/settings/developers](https://github.com/settings/developers) → "OAuth Apps"
+  - Facebook: precisa de um conector diferente (Facebook não fala o
+    protocolo padrão que Google/GitHub falam) — deixei só o botão
+    desabilitado por enquanto, configurar isso é mais trabalho, considere
+    deixar para depois.
+
+  Depois de gerar as credenciais, é descomentar o bloco em
+  `LocalSettings-snippet.php`, colar Client ID/Secret, e adicionar o
+  provedor em `$wgRWSocialProviders` (ex.: `['google', 'github']`) — o
+  pop-up habilita o botão correspondente sozinho.
+
+Não testável ao vivo neste sandbox (mesma limitação de rede de sempre) —
+o fluxo de `clientlogin`/`createaccount` segue a documentação oficial da
+API do MediaWiki, mas confira no seu deploy real.
+
+## Subcategorias e artigos que ligam mais de uma religião
+
+Já é nativo, sem precisar de nada extra: qualquer página pode ter várias
+`[[Category:...]]`, e uma categoria pode ser subcategoria de outra do mesmo
+jeito — quem estiver no grupo `editor` (ou for Admin) já consegue fazer
+isso hoje, editando a página. `subcategorias.wikitext` documenta com os
+dois exemplos que você deu:
+
+- **Ritos da Igreja Católica** → subcategoria `Catolicismo`, que por sua vez
+  é subcategoria de `Cristianismo`.
+- **Jesus Cristo** → categorizado em `Cristianismo` **e** `Islã` ao mesmo
+  tempo (mais uma categoria temática cruzada, `Figuras bíblicas e
+  coránicas`), já que as duas religiões o citam.
 
 ## Passo a passo (primeira instalação)
 
@@ -320,8 +415,17 @@ servidor (sem esse bloqueio) para validar de ponta a ponta.
   verdade (as sub-páginas em `pagina-principal.wikitext` têm só exemplo).
 - Escolher e configurar um meio de pagamento real para a página de doação
   (ver aviso em "Doação" acima) — nenhuma cobrança funciona ainda.
-- Validar ao vivo (fora deste sandbox) o seletor de idioma — depende da API
-  nativa do MediaWiki (`action=query`) respondendo do jeito esperado, não
-  testável aqui.
+- Validar ao vivo (fora deste sandbox) o seletor de idioma, o menu
+  hambúrguer e o pop-up de login/cadastro — todos dependem de APIs nativas
+  do MediaWiki (`action=query`, `action=clientlogin`, `action=createaccount`)
+  ou de elementos do DOM do skin (`#mw-panel`, `#pt-login`) respondendo do
+  jeito esperado, não testável aqui.
 - Decidir se quer voltar a fechar a criação de conta 100% (ver "Quem pode
   editar" acima) ou manter aberta como ficou agora.
+- Gerar as credenciais OAuth do Google e/ou GitHub se quiser login social
+  funcionando de verdade (ver "Login e cadastro" acima) — e decidir se vale
+  a pena investir no conector do Facebook depois.
+- Se quiser uma experiência mobile mais completa (tipo a Wikipédia no
+  celular), avaliar a extensão MobileFrontend — o que foi feito agora deixa
+  o Vector usável em tela pequena, não é a mesma coisa (ver "Responsivo /
+  versão mobile" acima).

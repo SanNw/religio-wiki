@@ -561,11 +561,17 @@ body.religion-judaismo #firstHeading { background-color: ???; color: #fff; }
 	font-weight: 700;
 }
 
-/* Escala de texto do conteúdo do artigo (não afeta chrome do site) */
-html[data-rw-textsize="small"] .mw-body-content { font-size: 0.9em; }
-html[data-rw-textsize="large"] .mw-body-content { font-size: 1.18em; }
+/* Escala de texto — no tamanho da raiz (<html>), não só num elemento
+   isolado. É a forma robusta de fazer isso: qualquer tamanho de fonte
+   definido em rem (títulos, sidebar, etc.) escala junto automaticamente,
+   em vez de só escalar o texto corrido e deixar títulos/UI do mesmo
+   tamanho (o que dava a impressão de "não fazer nada" quando só o
+   parágrafo mudava um pouco). */
+html[data-rw-textsize="small"] { font-size: 87.5%; }
+html[data-rw-textsize="large"] { font-size: 112.5%; }
 
-/* Largura do conteúdo */
+/* Largura do conteúdo — só a coluna de leitura fica mais larga; a barra
+   lateral (#mw-panel) e o cabeçalho não são afetados, então nada estica. */
 html[data-rw-width="wide"] #content,
 html[data-rw-width="wide"] .mw-body { max-width: none !important; }
 
@@ -579,15 +585,39 @@ html[data-rw-width="wide"] .mw-body { max-width: none !important; }
 	margin-bottom: 14px;
 	border: 1px solid var(--rw-border);
 	background: var(--rw-bg-elevated);
-	padding: 10px 14px;
 	font-size: 0.82rem;
 }
-.rw-lang-switcher h2 {
+/* Cabeçalho clicável (estilo collapse/accordion) — fechado por padrão,
+   ver common.js "Seletor de idioma do artigo". */
+.rw-lang-toggle {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	width: 100%;
+	font: inherit;
 	font-size: 0.72rem;
 	text-transform: uppercase;
 	letter-spacing: 0.05em;
 	color: var(--rw-text-muted);
-	margin: 0 0 8px;
+	background: none;
+	border: none;
+	padding: 10px 14px;
+	cursor: pointer;
+	text-align: left;
+}
+.rw-lang-toggle .rw-lang-chevron {
+	transition: transform 0.15s ease;
+	font-size: 0.9em;
+}
+.rw-lang-switcher.open .rw-lang-toggle .rw-lang-chevron {
+	transform: rotate(180deg);
+}
+.rw-lang-body {
+	display: none;
+	padding: 0 14px 10px;
+}
+.rw-lang-switcher.open .rw-lang-body {
+	display: block;
 }
 .rw-lang-list { list-style: none; margin: 0; padding: 0; }
 .rw-lang-list li { padding: 2px 0; }
@@ -673,4 +703,242 @@ body.rw-can-edit .rw-edit-pencil { display: inline; }
 .thumbinner {
 	border-color: var(--rw-border) !important;
 	background: var(--rw-bg-elevated) !important;
+}
+
+/* ---------- 14. Responsivo / menu hambúrguer ---------- */
+/* Skin legacy Vector não é responsivo de fábrica (foi desenhado antes de
+   telas pequenas serem prioridade) — essas regras adaptam a barra lateral
+   fixa (#mw-panel) e o cabeçalho pra telas estreitas. Se no futuro quiser
+   uma experiência mobile mais completa/nativa, considere a extensão oficial
+   MobileFrontend (skin "Minerva") — é um projeto à parte, essas regras não
+   substituem isso, só tornam o Vector atual utilizável em tela pequena. */
+
+#rw-hamburger {
+	display: none;
+	position: fixed;
+	top: 10px;
+	left: 10px;
+	z-index: 160;
+	font: inherit;
+	font-size: 1.1rem;
+	line-height: 1;
+	padding: 6px 10px;
+	border: 1px solid var(--rw-border);
+	background: var(--rw-bg-elevated);
+	color: var(--rw-text);
+	cursor: pointer;
+	border-radius: 3px;
+	touch-action: manipulation;
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+}
+
+#rw-sidebar-overlay {
+	display: none;
+	position: fixed;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.4);
+	z-index: 150;
+}
+
+@media (max-width: 851px) {
+	#rw-hamburger { display: inline-flex; }
+
+	#mw-panel {
+		display: none;
+		position: fixed;
+		top: 0;
+		left: 0;
+		bottom: 0;
+		width: min(80vw, 300px);
+		z-index: 200;
+		overflow-y: auto;
+		background: var(--rw-bg-elevated);
+		border-right: 1px solid var(--rw-border);
+		padding: 16px;
+		overscroll-behavior: contain;
+	}
+	#mw-panel.rw-sidebar-open {
+		display: block;
+	}
+	#rw-sidebar-overlay.rw-sidebar-open {
+		display: block;
+	}
+	#content,
+	#footer {
+		margin-left: 0 !important;
+	}
+	#p-search,
+	.rw-search {
+		max-width: none;
+	}
+}
+
+@media (max-width: 600px) {
+	#firstHeading,
+	.firstHeading {
+		font-size: 1.5rem;
+	}
+	.rw-home-hero {
+		flex-direction: column;
+		align-items: flex-start;
+	}
+	.rw-home-stat {
+		text-align: left;
+	}
+	.rw-donate-amounts {
+		grid-template-columns: repeat(2, 1fr);
+	}
+	.rw-infobox {
+		float: none;
+		width: auto;
+		margin: 0 0 16px;
+	}
+}
+
+/* ---------- 15. Pop-up de login / criar conta ---------- */
+#rw-auth-overlay {
+	display: none;
+	position: fixed;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.45);
+	z-index: 300;
+	align-items: center;
+	justify-content: center;
+	padding: 16px;
+	overflow: auto;
+}
+#rw-auth-overlay.open {
+	display: flex;
+}
+.rw-auth-modal {
+	background: var(--rw-bg);
+	color: var(--rw-text);
+	border: 1px solid var(--rw-border);
+	width: 100%;
+	max-width: 360px;
+	padding: 22px 24px 24px;
+	position: relative;
+	overscroll-behavior: contain;
+}
+.rw-auth-close {
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	font: inherit;
+	font-size: 0.85rem;
+	border: 1px solid var(--rw-border);
+	background: var(--rw-bg-elevated);
+	color: var(--rw-text);
+	padding: 3px 9px;
+	cursor: pointer;
+	border-radius: 3px;
+}
+.rw-auth-tabs {
+	display: flex;
+	gap: 6px;
+	margin-bottom: 16px;
+}
+.rw-auth-tabs button {
+	flex: 1;
+	font: inherit;
+	font-size: 0.88rem;
+	padding: 8px 4px;
+	border: 1px solid var(--rw-border);
+	background: var(--rw-bg-elevated);
+	color: var(--rw-text);
+	cursor: pointer;
+	border-radius: 3px;
+}
+.rw-auth-tabs button[aria-selected="true"] {
+	background: var(--rw-link);
+	border-color: var(--rw-link);
+	color: var(--rw-bg-elevated);
+	font-weight: 700;
+}
+.rw-auth-social {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	margin-bottom: 16px;
+}
+.rw-auth-social button {
+	font: inherit;
+	font-size: 0.88rem;
+	padding: 9px 12px;
+	border: 1px solid var(--rw-border);
+	background: var(--rw-bg-elevated);
+	color: var(--rw-text);
+	cursor: pointer;
+	border-radius: 3px;
+	text-align: left;
+}
+.rw-auth-social button:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+.rw-auth-divider {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin: 4px 0 16px;
+	font-size: 0.75rem;
+	color: var(--rw-text-muted);
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+}
+.rw-auth-divider::before,
+.rw-auth-divider::after {
+	content: "";
+	flex: 1;
+	border-top: 1px solid var(--rw-border);
+}
+.rw-auth-field {
+	display: block;
+	margin-bottom: 12px;
+	font-size: 0.85rem;
+}
+.rw-auth-field span {
+	display: block;
+	margin-bottom: 4px;
+	color: var(--rw-text-muted);
+	font-size: 0.78rem;
+}
+.rw-auth-field input {
+	width: 100%;
+	font: inherit;
+	padding: 8px 10px;
+	border: 1px solid var(--rw-border);
+	background: var(--rw-bg-elevated);
+	color: var(--rw-text);
+	border-radius: 3px;
+}
+.rw-auth-submit {
+	width: 100%;
+	font: inherit;
+	font-weight: 700;
+	padding: 9px 12px;
+	border: 1px solid var(--rw-link);
+	background: var(--rw-link);
+	color: var(--rw-bg-elevated);
+	cursor: pointer;
+	border-radius: 3px;
+	margin-top: 4px;
+}
+.rw-auth-submit:disabled {
+	opacity: 0.6;
+	cursor: wait;
+}
+.rw-auth-error {
+	color: #B42318;
+	font-size: 0.8rem;
+	margin: 0 0 10px;
+}
+:root[data-theme="dark"] .rw-auth-error {
+	color: #F87171;
+}
+.rw-auth-note {
+	font-size: 0.72rem;
+	color: var(--rw-text-muted);
+	margin-top: 12px;
+	line-height: 1.5;
 }

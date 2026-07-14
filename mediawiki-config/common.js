@@ -412,11 +412,31 @@
 		var base = baseTitle( mw.config.get( 'wgPageName' ) );
 		var currentCode = mw.config.get( 'wgPageName' ) === base ? 'pt' : mw.config.get( 'wgPageName' ).split( '/' ).pop();
 
+		// Estilo collapse: fechado por padrão, some dos olhos até o leitor
+		// pedir; abre com o próprio idioma atual sempre visível no rótulo.
 		var box = document.createElement( 'div' );
 		box.className = 'rw-lang-switcher';
-		var h2 = document.createElement( 'h2' );
-		h2.textContent = 'Idiomas';
-		box.appendChild( h2 );
+
+		var toggle = document.createElement( 'button' );
+		toggle.type = 'button';
+		toggle.className = 'rw-lang-toggle';
+		toggle.setAttribute( 'aria-expanded', 'false' );
+		var toggleLabel = document.createElement( 'span' );
+		toggleLabel.textContent = 'Idiomas';
+		var chevron = document.createElement( 'span' );
+		chevron.className = 'rw-lang-chevron';
+		chevron.textContent = '▾';
+		toggle.appendChild( toggleLabel );
+		toggle.appendChild( chevron );
+		toggle.addEventListener( 'click', function () {
+			var isOpen = box.classList.toggle( 'open' );
+			toggle.setAttribute( 'aria-expanded', String( isOpen ) );
+		} );
+		box.appendChild( toggle );
+
+		var body = document.createElement( 'div' );
+		body.className = 'rw-lang-body';
+		box.appendChild( body );
 
 		var list = document.createElement( 'ul' );
 		list.className = 'rw-lang-list';
@@ -468,8 +488,8 @@
 				addLink.className = 'rw-lang-add';
 				addLink.href = mw.util.getUrl( 'Religio Wiki:Idiomas' );
 				addLink.textContent = '+ Adicionar idioma';
-				box.appendChild( list );
-				box.appendChild( addLink );
+				body.appendChild( list );
+				body.appendChild( addLink );
 			} );
 		} );
 
@@ -620,6 +640,358 @@
 		link.title = 'Editar esta página';
 		link.textContent = '✏️';
 		heading.appendChild( link );
+	}
+
+	if ( document.readyState === 'loading' ) {
+		document.addEventListener( 'DOMContentLoaded', mount );
+	} else {
+		mount();
+	}
+}() );
+
+/* ===== Menu hambúrguer (barra lateral em tela estreita) ===== */
+( function () {
+	'use strict';
+
+	function mount() {
+		var panel = document.getElementById( 'mw-panel' );
+		if ( !panel ) {
+			return;
+		}
+
+		var overlay = document.createElement( 'div' );
+		overlay.id = 'rw-sidebar-overlay';
+		document.body.appendChild( overlay );
+
+		var btn = document.createElement( 'button' );
+		btn.type = 'button';
+		btn.id = 'rw-hamburger';
+		btn.setAttribute( 'aria-label', 'Abrir menu de navegação' );
+		btn.setAttribute( 'aria-expanded', 'false' );
+		btn.textContent = '☰';
+		document.body.appendChild( btn );
+
+		function close() {
+			panel.classList.remove( 'rw-sidebar-open' );
+			overlay.classList.remove( 'rw-sidebar-open' );
+			btn.setAttribute( 'aria-expanded', 'false' );
+		}
+		function toggle() {
+			var isOpen = panel.classList.toggle( 'rw-sidebar-open' );
+			overlay.classList.toggle( 'rw-sidebar-open', isOpen );
+			btn.setAttribute( 'aria-expanded', String( isOpen ) );
+		}
+		btn.addEventListener( 'click', toggle );
+		overlay.addEventListener( 'click', close );
+		document.addEventListener( 'keydown', function ( e ) {
+			if ( e.key === 'Escape' ) {
+				close();
+			}
+		} );
+		// Fecha ao navegar por um link do menu (evita ficar aberto na próxima página).
+		panel.addEventListener( 'click', function ( e ) {
+			if ( e.target.tagName === 'A' ) {
+				close();
+			}
+		} );
+	}
+
+	if ( document.readyState === 'loading' ) {
+		document.addEventListener( 'DOMContentLoaded', mount );
+	} else {
+		mount();
+	}
+}() );
+
+/* ===== Pop-up de login / criar conta ===== */
+( function () {
+	'use strict';
+
+	// mw.config.get('wgRWSocialProviders') é exposto pelo hook
+	// ResourceLoaderGetConfigVars em LocalSettings-snippet.php, conforme o
+	// que estiver de fato configurado (PluggableAuth + conector de cada
+	// provedor) — sem isso configurado, os botões ficam desabilitados.
+	var SOCIAL_PROVIDERS = [
+		{ id: 'google', label: 'Continuar com Google' },
+		{ id: 'facebook', label: 'Continuar com Facebook' },
+		{ id: 'github', label: 'Continuar com GitHub' }
+	];
+
+	var overlay = null;
+	var loginPanel, createPanel, loginError, createError, loginSubmit, createSubmit;
+
+	function apiCall( tokenType, action, extraParams ) {
+		return mw.loader.using( 'mediawiki.api' ).then( function () {
+			var api = new mw.Api();
+			return api.getToken( tokenType ).then( function ( token ) {
+				var params = Object.assign( {
+					action: action,
+					format: 'json'
+				}, extraParams );
+				params[ tokenType === 'login' ? 'logintoken' : 'createtoken' ] = token;
+				return api.post( params );
+			} );
+		} );
+	}
+
+	function buildField( labelText, type, name ) {
+		var label = document.createElement( 'label' );
+		label.className = 'rw-auth-field';
+		var span = document.createElement( 'span' );
+		span.textContent = labelText;
+		var input = document.createElement( 'input' );
+		input.type = type;
+		input.name = name;
+		input.autocomplete = type === 'password' ? 'current-password' : 'username';
+		label.appendChild( span );
+		label.appendChild( input );
+		return { label: label, input: input };
+	}
+
+	function buildSocialButtons() {
+		var wrap = document.createElement( 'div' );
+		wrap.className = 'rw-auth-social';
+		var configured = ( typeof mw !== 'undefined' && mw.config.get( 'wgRWSocialProviders' ) ) || [];
+
+		SOCIAL_PROVIDERS.forEach( function ( p ) {
+			var btn = document.createElement( 'button' );
+			btn.type = 'button';
+			btn.textContent = p.label;
+			if ( configured.indexOf( p.id ) === -1 ) {
+				btn.disabled = true;
+				btn.title = 'Não configurado ainda — ver PluggableAuth em LocalSettings.php';
+			} else {
+				btn.addEventListener( 'click', function () {
+					location.href = mw.util.getUrl( 'Special:UserLogin', {
+						returnto: mw.config.get( 'wgPageName' )
+					} );
+				} );
+			}
+			wrap.appendChild( btn );
+		} );
+		return wrap;
+	}
+
+	function buildLoginPanel() {
+		var panel = document.createElement( 'div' );
+		panel.id = 'rw-auth-login';
+
+		panel.appendChild( buildSocialButtons() );
+		var divider = document.createElement( 'div' );
+		divider.className = 'rw-auth-divider';
+		divider.textContent = 'ou com usuário e senha';
+		panel.appendChild( divider );
+
+		loginError = document.createElement( 'p' );
+		loginError.className = 'rw-auth-error';
+		loginError.style.display = 'none';
+		panel.appendChild( loginError );
+
+		var user = buildField( 'Nome de usuário', 'text', 'username' );
+		var pass = buildField( 'Senha', 'password', 'password' );
+		panel.appendChild( user.label );
+		panel.appendChild( pass.label );
+
+		loginSubmit = document.createElement( 'button' );
+		loginSubmit.type = 'button';
+		loginSubmit.className = 'rw-auth-submit';
+		loginSubmit.textContent = 'Entrar';
+		loginSubmit.addEventListener( 'click', function () {
+			loginError.style.display = 'none';
+			if ( !user.input.value || !pass.input.value ) {
+				loginError.textContent = 'Preencha usuário e senha.';
+				loginError.style.display = 'block';
+				return;
+			}
+			loginSubmit.disabled = true;
+			apiCall( 'login', 'clientlogin', {
+				username: user.input.value,
+				password: pass.input.value,
+				loginreturnurl: location.href
+			} ).done( function ( data ) {
+				var status = data.clientlogin && data.clientlogin.status;
+				if ( status === 'PASS' ) {
+					location.reload();
+				} else {
+					loginSubmit.disabled = false;
+					loginError.textContent = ( data.clientlogin && data.clientlogin.message ) ||
+						'Não foi possível entrar. Confira usuário e senha, ou use Special:UserLogin diretamente.';
+					loginError.style.display = 'block';
+				}
+			} ).fail( function () {
+				loginSubmit.disabled = false;
+				loginError.textContent = 'Erro de conexão com o servidor. Tente novamente.';
+				loginError.style.display = 'block';
+			} );
+		} );
+		panel.appendChild( loginSubmit );
+
+		return panel;
+	}
+
+	function buildCreatePanel() {
+		var panel = document.createElement( 'div' );
+		panel.id = 'rw-auth-create';
+		panel.style.display = 'none';
+
+		panel.appendChild( buildSocialButtons() );
+		var divider = document.createElement( 'div' );
+		divider.className = 'rw-auth-divider';
+		divider.textContent = 'ou crie com usuário e senha';
+		panel.appendChild( divider );
+
+		createError = document.createElement( 'p' );
+		createError.className = 'rw-auth-error';
+		createError.style.display = 'none';
+		panel.appendChild( createError );
+
+		var user = buildField( 'Nome de usuário', 'text', 'username' );
+		var pass = buildField( 'Senha', 'password', 'password' );
+		var retype = buildField( 'Confirme a senha', 'password', 'retype' );
+		var email = buildField( 'E-mail (opcional)', 'email', 'email' );
+		[ user, pass, retype, email ].forEach( function ( f ) { panel.appendChild( f.label ); } );
+
+		createSubmit = document.createElement( 'button' );
+		createSubmit.type = 'button';
+		createSubmit.className = 'rw-auth-submit';
+		createSubmit.textContent = 'Criar conta';
+		createSubmit.addEventListener( 'click', function () {
+			createError.style.display = 'none';
+			if ( !user.input.value || !pass.input.value ) {
+				createError.textContent = 'Preencha usuário e senha.';
+				createError.style.display = 'block';
+				return;
+			}
+			if ( pass.input.value !== retype.input.value ) {
+				createError.textContent = 'As senhas não coincidem.';
+				createError.style.display = 'block';
+				return;
+			}
+			createSubmit.disabled = true;
+			apiCall( 'createaccount', 'createaccount', {
+				username: user.input.value,
+				password: pass.input.value,
+				retype: retype.input.value,
+				email: email.input.value,
+				createreturnurl: location.href
+			} ).done( function ( data ) {
+				var status = data.createaccount && data.createaccount.status;
+				if ( status === 'PASS' ) {
+					location.reload();
+				} else {
+					createSubmit.disabled = false;
+					createError.textContent = ( data.createaccount && data.createaccount.message ) ||
+						'Não foi possível criar a conta. Tente Special:CreateAccount diretamente.';
+					createError.style.display = 'block';
+				}
+			} ).fail( function () {
+				createSubmit.disabled = false;
+				createError.textContent = 'Erro de conexão com o servidor. Tente novamente.';
+				createError.style.display = 'block';
+			} );
+		} );
+		panel.appendChild( createSubmit );
+
+		return panel;
+	}
+
+	function setTab( tab, tabButtons ) {
+		var isLogin = tab === 'login';
+		loginPanel.style.display = isLogin ? 'block' : 'none';
+		createPanel.style.display = isLogin ? 'none' : 'block';
+		tabButtons.login.setAttribute( 'aria-selected', String( isLogin ) );
+		tabButtons.create.setAttribute( 'aria-selected', String( !isLogin ) );
+	}
+
+	function buildOverlay() {
+		var ov = document.createElement( 'div' );
+		ov.id = 'rw-auth-overlay';
+
+		var modal = document.createElement( 'div' );
+		modal.className = 'rw-auth-modal';
+		modal.setAttribute( 'role', 'dialog' );
+		modal.setAttribute( 'aria-modal', 'true' );
+
+		var closeBtn = document.createElement( 'button' );
+		closeBtn.type = 'button';
+		closeBtn.className = 'rw-auth-close';
+		closeBtn.textContent = 'Fechar ✕';
+		closeBtn.addEventListener( 'click', function () { close(); } );
+		modal.appendChild( closeBtn );
+
+		var tabs = document.createElement( 'div' );
+		tabs.className = 'rw-auth-tabs';
+		var loginTab = document.createElement( 'button' );
+		loginTab.type = 'button';
+		loginTab.textContent = 'Entrar';
+		var createTab = document.createElement( 'button' );
+		createTab.type = 'button';
+		createTab.textContent = 'Criar conta';
+		var tabButtons = { login: loginTab, create: createTab };
+		loginTab.addEventListener( 'click', function () { setTab( 'login', tabButtons ); } );
+		createTab.addEventListener( 'click', function () { setTab( 'create', tabButtons ); } );
+		tabs.appendChild( loginTab );
+		tabs.appendChild( createTab );
+		modal.appendChild( tabs );
+
+		loginPanel = buildLoginPanel();
+		createPanel = buildCreatePanel();
+		modal.appendChild( loginPanel );
+		modal.appendChild( createPanel );
+
+		var note = document.createElement( 'p' );
+		note.className = 'rw-auth-note';
+		note.textContent = 'Sua conta não dá direito de editar por padrão — só quem for ' +
+			'adicionado ao grupo "editor" por um administrador consegue criar/editar página.';
+		modal.appendChild( note );
+
+		ov.appendChild( modal );
+
+		function close() {
+			ov.classList.remove( 'open' );
+		}
+		ov.addEventListener( 'click', function ( e ) {
+			if ( e.target === ov ) { close(); }
+		} );
+		document.addEventListener( 'keydown', function ( e ) {
+			if ( e.key === 'Escape' ) { close(); }
+		} );
+
+		ov.rwOpen = function ( tab ) {
+			setTab( tab || 'login', tabButtons );
+			ov.classList.add( 'open' );
+		};
+
+		return ov;
+	}
+
+	function openModal( tab ) {
+		if ( !overlay ) {
+			overlay = buildOverlay();
+			document.body.appendChild( overlay );
+		}
+		overlay.rwOpen( tab );
+	}
+
+	function mount() {
+		if ( typeof mw === 'undefined' ) {
+			return;
+		}
+		var loginLi = document.getElementById( 'pt-login' );
+		var createLi = document.getElementById( 'pt-createaccount' );
+		[ [ loginLi, 'login' ], [ createLi, 'create' ] ].forEach( function ( pair ) {
+			var li = pair[ 0 ];
+			if ( !li ) {
+				return;
+			}
+			var a = li.tagName === 'A' ? li : li.querySelector( 'a' );
+			if ( a ) {
+				a.addEventListener( 'click', function ( e ) {
+					e.preventDefault();
+					openModal( pair[ 1 ] );
+				} );
+			}
+		} );
 	}
 
 	if ( document.readyState === 'loading' ) {
