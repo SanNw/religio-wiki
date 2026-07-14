@@ -321,15 +321,17 @@ body.religion-judaismo #firstHeading { background-color: ???; color: #fff; }
 
 .rw-donate-tabs {
 	display: flex;
+	flex-wrap: wrap;
 	gap: 6px;
 	margin-bottom: 14px;
 }
 
 .rw-donate-tabs button {
-	flex: 1;
+	flex: 1 1 auto;
+	min-width: max-content;
 	font: inherit;
 	font-size: 0.85rem;
-	padding: 7px 4px;
+	padding: 7px 8px;
 	border: 1px solid var(--rw-border);
 	background: var(--rw-bg);
 	color: var(--rw-text);
@@ -466,12 +468,17 @@ body.religion-judaismo #firstHeading { background-color: ???; color: #fff; }
 	color: var(--rw-text-muted);
 	margin-bottom: 4px;
 }
-.rw-appearance-options { display: flex; gap: 4px; }
+/* flex-wrap + min-width:max-content: com 3 botões ("Pequeno"/"Padrão"/
+   "Grande") numa coluna estreita, ou eles quebram linha, ou o texto do
+   botão nunca é cortado — nunca as duas coisas erradas ao mesmo tempo
+   (texto cortado ou estourando o contêiner). */
+.rw-appearance-options { display: flex; flex-wrap: wrap; gap: 4px; }
 .rw-appearance-options button {
-	flex: 1;
+	flex: 1 1 auto;
+	min-width: max-content;
 	font: inherit;
 	font-size: 0.78rem;
-	padding: 4px 6px;
+	padding: 4px 8px;
 	border: 1px solid var(--rw-border);
 	background: var(--rw-bg);
 	color: var(--rw-text);
@@ -814,14 +821,16 @@ li.rw-collapse-item.open > ul {
 }
 .rw-auth-tabs {
 	display: flex;
+	flex-wrap: wrap;
 	gap: 6px;
 	margin-bottom: 16px;
 }
 .rw-auth-tabs button {
-	flex: 1;
+	flex: 1 1 auto;
+	min-width: max-content;
 	font: inherit;
 	font-size: 0.88rem;
-	padding: 8px 4px;
+	padding: 8px 10px;
 	border: 1px solid var(--rw-border);
 	background: var(--rw-bg-elevated);
 	color: var(--rw-text);
