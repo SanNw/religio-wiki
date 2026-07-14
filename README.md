@@ -56,7 +56,10 @@ passo de instalação abaixo):
 - **`sidebar.wikitext`** → conteúdo de `MediaWiki:Sidebar` (navegação +
   categorias na lateral).
 - **`templates.wikitext`** → templates iniciais de artigo (infobox, ver
-  também, citação necessária, desambiguação).
+  também, citação necessária, desambiguação) + o esqueleto padrão de seções
+  (Bibliografia, Referências, Ligações externas).
+- **`pagina-idiomas.wikitext`** → conteúdo de `Religio Wiki:Idiomas`, a
+  página de ajuda linkada em "+ Adicionar idioma" no seletor de idioma.
 
 ### Cores por religião
 
@@ -114,18 +117,33 @@ seguem a documentação oficial do mediawiki.org, mas confira
 `Special:Version` depois do primeiro `docker compose up` pra confirmar que
 tudo carregou.
 
-## Quem pode editar (acesso por convite)
+## Quem pode editar (acesso por convite) + criação de conta
 
-Configurado para funcionar como você pediu: **leitura é pública/anônima,
-edição é só de quem você escolher** — não existe cadastro público aberto.
+**Criar conta é livre e funcional** (`Special:CreateAccount`, qualquer
+visitante) — **editar continua fechado**, só de quem você escolher. São duas
+coisas separadas no MediaWiki: ter conta te coloca no grupo `user`, que
+não tem permissão de editar (`$wgGroupPermissions['user']['edit'] = false`);
+só quem for promovido manualmente ao grupo `editor` (ou for `Admin`)
+consegue criar/editar página ou enviar imagem.
 
-1. Como `Admin`, vá em **Special:CreateAccount** e crie uma conta para a
-   pessoa (defina uma senha provisória para ela trocar no primeiro acesso).
-2. Vá em **Special:UserRights**, digite o nome de usuário dela, marque o
-   grupo **`editor`** e salve.
+Por que reabri a criação de conta em vez de deixar 100% fechada (como
+estava antes): sem conta, o leitor não consegue salvar preferências (tema,
+watchlist) nem comentar em página de discussão — e nada disso dá acesso de
+edição, então não enfraquece o controle que você pediu. Se quiser voltar a
+fechar completamente (nem conta pode ser criada por conta própria), é uma
+linha só: `$wgGroupPermissions['*']['createaccount'] = false;` em
+`LocalSettings-snippet.php` — aí só um admin cria conta pra alguém via
+Special:CreateAccount.
+
+Passo a passo pra dar (ou tirar) acesso de edição:
+
+1. A pessoa cria a própria conta em **Special:CreateAccount** (ou, se você
+   preferir a versão fechada acima, você cria pra ela).
+2. Como `Admin`, vá em **Special:UserRights**, digite o nome de usuário dela,
+   marque o grupo **`editor`** e salve.
 3. Pronto — só quem estiver no grupo `editor` (ou for `Admin`) consegue criar
-   e editar páginas e enviar imagens. Leitores anônimos e contas fora desse
-   grupo só leem.
+   e editar páginas e enviar imagens. Contas comuns e leitores anônimos só
+   leem.
 
 Para tirar o acesso de alguém, é o mesmo caminho: Special:UserRights,
 desmarcar `editor`.
@@ -164,14 +182,62 @@ esse limite pra quem visitar a página (nota no rodapé do widget).
 
 ## Diagrama de categorias
 
-Botão **"Ver diagrama de categorias"** logo abaixo da barra lateral (depois
-da lista de Categorias) em toda página, injetado pelo `common.js`. Abre um
-pop-up com a árvore de classificação (os três grupos do diagrama que você
-enviou), no estilo da Religio Wiki — fundo/texto conforme o tema ativo,
-Cristianismo e Islã já com a cor definida, espaçamento uniforme entre os
-itens (a versão original desenhada à mão tinha espaços bem desiguais entre
-os grupos; aqui ficou uma grade regular). Sem extensão nova — é só CSS/JS
-(`common.css` seção 8, `common.js` "Pop-up do diagrama de categorias").
+Botão **"Ver diagrama de categorias"** logo abaixo do bloco "Categorias" da
+barra lateral e **acima** do bloco nativo "Ferramentas" (não no fim da
+lateral) — injetado pelo `common.js`, que agora procura especificamente o
+portlet de categorias (`#p-categorias-religiao-heading`) e insere o botão
+logo depois dele, antes de `#p-tb` (o "Ferramentas" nativo).
+
+O pop-up mostra o SVG que você enviou (mesma estrutura/coordenadas/textos),
+com as cores fixas do arquivo trocadas por classes que seguem os tokens da
+Religio Wiki — então ele já respeita tema claro/escuro/personalizado
+automaticamente, e Cristianismo/Islã saem coloridos com o vermelho/verde já
+definidos. Fonte trocada de Georgia/Helvetica (do arquivo original) para a
+Noto Sans do projeto. Sem extensão nova — é só CSS/JS (`common.css`,
+comentário "Diagrama em SVG"; `common.js`, "Pop-up do diagrama de
+categorias").
+
+## Ferramentas de leitura do artigo
+
+Quatro coisas novas em todo artigo, seguindo o padrão da Wikipédia:
+
+- **Idiomas** (acima de "Neste artigo"): lista Português (original) + os
+  idiomas configurados. Um detalhe importante: a Wikipédia de verdade liga
+  **wikis inteiramente separados** por idioma (pt.wikipedia.org,
+  en.wikipedia.org...); aqui é **um wiki só**, então "trocar de idioma" é
+  navegar para uma sub-página do mesmo artigo (`Cristianismo/en`, por
+  exemplo) — não existe conteúdo traduzido automaticamente, é preciso
+  escrever cada versão. O seletor já configurado (inglês, espanhol, francês,
+  italiano) mostra em itálico/esmaecido o idioma que ainda não tem
+  sub-página escrita, com um link "+ Adicionar idioma" apontando para
+  `Religio Wiki:Idiomas` (`pagina-idiomas.wikitext`), que explica como
+  traduzir um artigo e como configurar um idioma novo na lista. Ver
+  "Idiomas do artigo (convenção de sub-página)" em
+  `LocalSettings-snippet.php`.
+- **Aparência** (abaixo de "Neste artigo"): tamanho do texto
+  (Pequeno/Padrão/Grande) e largura do conteúdo (Padrão/Largo), persistido
+  por leitor via `localStorage` — como o menu de aparência da Wikipédia,
+  mas separado do seletor de tema (claro/escuro/personalizado) que já
+  existia.
+- **Lápis de edição** (✏, ao lado do título): só aparece pra quem realmente
+  pode editar aquela página — o hook `OutputPageBodyAttributes` marca
+  `body.rw-can-edit` no servidor checando a permissão de verdade
+  (`Title::quickUserCan('edit', ...)`), o `common.js` só mostra o ícone
+  quando essa classe está presente. Não é decorativo: o link já leva direto
+  pro modo de edição.
+- **Quem editou por último**: rodapé do artigo mostrando usuário + data da
+  última edição (`$wgMaxCredits`, nativo). O histórico completo, com todas
+  as edições e quem fez cada uma, já existia nativamente na aba
+  "Ver histórico" — isso só adiciona o resumo rápido no rodapé, como a
+  Wikipédia tem.
+
+## Esqueleto padrão de artigo
+
+Bibliografia, Referências e Ligações externas — nessa ordem, no fim de
+todo artigo — documentado em `templates.wikitext` ("Esqueleto padrão de
+artigo"). É convenção editorial, não algo que o software force sozinho;
+`Referências` usa `{{references}}`/`<references />` (extensão `Cite`, já
+habilitada) pra listar as notas de rodapé do corpo do texto.
 
 ## Passo a passo (primeira instalação)
 
@@ -254,3 +320,8 @@ servidor (sem esse bloqueio) para validar de ponta a ponta.
   verdade (as sub-páginas em `pagina-principal.wikitext` têm só exemplo).
 - Escolher e configurar um meio de pagamento real para a página de doação
   (ver aviso em "Doação" acima) — nenhuma cobrança funciona ainda.
+- Validar ao vivo (fora deste sandbox) o seletor de idioma — depende da API
+  nativa do MediaWiki (`action=query`) respondendo do jeito esperado, não
+  testável aqui.
+- Decidir se quer voltar a fechar a criação de conta 100% (ver "Quem pode
+  editar" acima) ou manter aberta como ficou agora.

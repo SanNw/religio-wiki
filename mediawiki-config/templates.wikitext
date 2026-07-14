@@ -1,5 +1,32 @@
 # Templates iniciais de artigo
 
+## Esqueleto padrão de artigo
+
+Convenção (não é imposta pelo software, é um padrão editorial — igual na
+Wikipédia): toda página de religião/tradição deve terminar com essas
+seções, nesta ordem, mesmo que alguma fique vazia no começo:
+
+```wikitext
+== Bibliografia ==
+Obras de referência sobre o tema (não necessariamente citadas inline com
+<ref>) — geralmente as fontes primárias e os comentadores clássicos da
+própria tradição, conforme a perspectiva ortodoxa adotada pelo projeto.
+* Autor. ''Título da obra''. Editora, ano.
+
+== Referências ==
+{{references}}
+<!-- gerado a partir das tags <ref>...</ref> usadas no corpo do texto -->
+
+== Ligações externas ==
+* [https://exemplo.org Nome do site/organização]
+```
+
+`{{references}}` é só uma forma abreviada de `<references />` (a extensão
+`Cite` já registra as duas). Se o artigo também tiver "Ver também" (ver
+`Template:Ver também` abaixo), ele entra **antes** de Bibliografia.
+
+---
+
 Ferramentas nativas do MediaWiki que **não precisam de nenhum template**
 (já funcionam assim que o wiki estiver no ar):
 

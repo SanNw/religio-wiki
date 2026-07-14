@@ -24,10 +24,20 @@ Categorias
 (sem essa página, o MediaWiki mostraria a chave crua "categorias-religiao-heading"
 como título da seção em vez de "Categorias".)
 
+## Page: MediaWiki:Toc
+```wikitext
+Neste artigo
+```
+Renomeia o cabeçalho do índice automático do artigo (o padrão é "Índice").
+O seletor de idioma e o painel "Aparência" (injetados pelo `common.js`) se
+posicionam em relação a esse índice — ver "Ferramentas de leitura do
+artigo" no README.
+
 ---
 
 O botão "Ver diagrama de categorias" (pop-up com o diagrama da classificação,
-proporções uniformes, cores das religiões já definidas) é injetado
-automaticamente pelo `common.js` logo abaixo do último bloco da barra
-lateral — não precisa de nada extra além do `common.js` já estar colado em
+espaçamento uniforme, cores das religiões já definidas, no estilo visual da
+Religio Wiki) é injetado automaticamente pelo `common.js` logo abaixo do
+bloco "Categorias" acima e antes do bloco nativo "Ferramentas" — não precisa
+de nada extra além do `common.js` já estar colado em
 `Special:MediaWiki:Common.js`.

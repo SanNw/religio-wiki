@@ -5,13 +5,19 @@
  */
 
 // ---------- Acesso: leitura pública/anônima, edição só por convite ----------
-// Qualquer pessoa lê sem login ("modo anônimo"). Ninguém edita por padrão —
-// nem anônimo, nem quem cria uma conta — só quem for colocado manualmente
-// no grupo "editor" por um admin. Registro público fica desligado: só um
-// admin cria conta pra alguém (ou a própria pessoa não consegue se cadastrar
-// sozinha). Ver "Quem pode editar" no README para o passo a passo.
+// Qualquer pessoa lê sem login ("modo anônimo") E pode criar a própria
+// conta livremente — mas ter conta não dá direito de editar. Edição
+// continua fechada: só quem for colocado manualmente no grupo "editor" por
+// um admin consegue criar/editar página. Ver "Quem pode editar" no README.
+//
+// Por que reabrir a criação de conta: conta e permissão de editar são
+// coisas separadas no MediaWiki. Deixar qualquer um criar conta não abre
+// brecha nenhuma para edição — quem cria conta cai automaticamente no
+// grupo "user", que continua com edit=false logo abaixo. Isso permite, por
+// exemplo, guardar preferências de leitura (tema, idioma) por pessoa sem
+// depender do admin cadastrar todo mundo manualmente.
 $wgGroupPermissions['*']['read'] = true;
-$wgGroupPermissions['*']['createaccount'] = false;
+$wgGroupPermissions['*']['createaccount'] = true;
 $wgGroupPermissions['*']['edit'] = false;
 $wgGroupPermissions['user']['edit'] = false;
 
@@ -121,6 +127,10 @@ $wgReligioWikiCategorySlugs = [
 	'Islã' => 'islam',
 ];
 
+// Também marca body.rw-can-edit quando quem está vendo a página tem
+// permissão de editar — o Common.css usa isso pra mostrar o ícone de lápis
+// (✏) ao lado do título só pra quem realmente pode editar (grupo "editor"
+// ou Admin), em vez de mostrar pra todo mundo.
 $wgHooks['OutputPageBodyAttributes'][] = static function ( $out, $sk, &$bodyAttrs ) use ( $wgReligioWikiCategorySlugs ) {
 	$classes = [];
 	foreach ( $out->getCategories() as $cat ) {
@@ -129,11 +139,36 @@ $wgHooks['OutputPageBodyAttributes'][] = static function ( $out, $sk, &$bodyAttr
 			$classes[] = 'religion-' . $wgReligioWikiCategorySlugs[ $catName ];
 		}
 	}
+	if ( $out->getTitle() && $out->getTitle()->quickUserCan( 'edit', $sk->getUser() ) ) {
+		$classes[] = 'rw-can-edit';
+	}
 	if ( $classes !== [] ) {
 		$existing = $bodyAttrs['class'] ?? '';
 		$bodyAttrs['class'] = trim( $existing . ' ' . implode( ' ', array_unique( $classes ) ) );
 	}
 };
+
+// ---------- Quem editou por último ----------
+// Mostra "Esta página foi editada pela última vez às [hora], em [data], por
+// [usuário]" no rodapé de cada artigo — nativo do MediaWiki, só precisa
+// desse número maior que zero. O histórico completo (todas as edições, com
+// autor e data de cada uma) já é nativo à parte, na aba "Ver histórico".
+$wgMaxCredits = 1;
+$wgShowCreditsIfMax = true;
+
+// ---------- Idiomas do artigo (convenção de sub-página) ----------
+// A Wikipédia de verdade liga wikis SEPARADOS por idioma (pt.wikipedia.org,
+// en.wikipedia.org...); aqui é um wiki só, então "trocar de idioma" é
+// navegar para uma sub-página "Título/en", "Título/es" etc. — ver o
+// seletor de idioma em common.js. Esta lista existe só como referência —
+// mantenha sincronizada com o array LANGUAGES no topo do bloco "Seletor de
+// idioma do artigo" em common.js ao adicionar um idioma novo.
+$wgReligioWikiLanguages = [
+	'en' => 'English',
+	'es' => 'Español',
+	'fr' => 'Français',
+	'it' => 'Italiano',
+];
 
 // ---------- Idioma de conteúdo/interface ----------
 $wgLanguageCode = 'pt-br';

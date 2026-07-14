@@ -129,81 +129,82 @@
 ( function () {
 	'use strict';
 
-	// Mesma estrutura de mediawiki-config/categorias.wikitext. Cores só
-	// preenchidas para o que já foi decidido (ver common.css, seção 3);
-	// o resto usa o ponto neutro até serem definidas.
-	var GROUPS = [
-		{
-			title: 'I. Xamanismos Hiperbóreos',
-			items: [
-				{ label: 'Taoismo' },
-				{ label: 'Confucionismo' },
-				{ label: 'Xintoísmo' },
-				{ label: 'Xamanismo Siberiano', related: true },
-				{ label: 'Bön', related: true },
-				{ label: 'Religião dos Povos Nativos Americanos', related: true }
-			]
-		},
-		{
-			title: 'II. Mitologias Arianas',
-			items: [
-				{ label: 'Hinduísmo' },
-				{ label: 'Budismo' },
-				{ label: 'Religião Greco-Romana (extinta)', related: true },
-				{ label: 'Religião Germano-Céltica Antiga (extinta)', related: true },
-				{ label: 'Jainismo', related: true },
-				{ label: 'Zoroastrismo', related: true }
-			]
-		},
-		{
-			title: 'III. Monoteísmos Semíticos',
-			items: [
-				{ label: 'Judaísmo' },
-				{ label: 'Cristianismo', color: '#DC2626' },
-				{ label: 'Islã', color: '#15803D' }
-			]
-		}
-	];
+	// SVG enviado pelo usuário, com as cores fixas trocadas por classes que
+	// seguem os tokens da Religio Wiki (tema claro/escuro/personalizado) —
+	// ver common.css, seções 8/13. Estrutura e coordenadas originais mantidas.
+	var DIAGRAM_SVG = '' +
+		'<svg viewBox="0 0 900 950" xmlns="http://www.w3.org/2000/svg">' +
+		'<rect width="900" height="950" class="rw-diagram-svg-bg"/>' +
+		'<text x="450" y="55" text-anchor="middle" font-size="26" class="rw-diagram-svg-title">Classificação das Religiões</text>' +
 
-	function buildDiagram() {
-		var wrap = document.createElement( 'div' );
-		wrap.className = 'rw-diagram-groups';
+		'<text x="450" y="105" text-anchor="middle" font-size="17" class="rw-diagram-svg-section">I. Os Xamanismos Hiperbóreos</text>' +
+		'<g class="rw-diagram-svg-line" stroke-width="1.5" fill="none">' +
+		'<line x1="450" y1="118" x2="450" y2="150"/>' +
+		'<line x1="140" y1="150" x2="740" y2="150"/>' +
+		'<line x1="140" y1="150" x2="140" y2="180"/>' +
+		'<line x1="290" y1="150" x2="290" y2="180"/>' +
+		'<line x1="450" y1="150" x2="450" y2="180"/>' +
+		'<line x1="740" y1="150" x2="740" y2="180"/>' +
+		'</g>' +
+		'<text x="140" y="200" text-anchor="middle" font-size="16" class="rw-diagram-svg-label">Taoísmo</text>' +
+		'<text x="290" y="200" text-anchor="middle" font-size="16" class="rw-diagram-svg-label">Confucionismo</text>' +
+		'<text x="740" y="200" text-anchor="middle" font-size="16" class="rw-diagram-svg-label">Xintoísmo</text>' +
+		'<line x1="140" y1="210" x2="140" y2="245" class="rw-diagram-svg-line" stroke-width="1.5"/>' +
+		'<text x="140" y="265" text-anchor="middle" font-size="15.5" class="rw-diagram-svg-label">Xamanismo Siberiano</text>' +
+		'<line x1="740" y1="210" x2="740" y2="245" class="rw-diagram-svg-line" stroke-width="1.5"/>' +
+		'<text x="740" y="263" text-anchor="middle" font-size="15.5" class="rw-diagram-svg-label">' +
+		'<tspan x="740" dy="0">Religião</tspan><tspan x="740" dy="20">Ameríndia</tspan>' +
+		'</text>' +
+		'<line x1="450" y1="180" x2="450" y2="330" class="rw-diagram-svg-line" stroke-width="1.5"/>' +
+		'<text x="450" y="350" text-anchor="middle" font-size="16" class="rw-diagram-svg-label">Bön (a religião pré-budista do Tibete)</text>' +
 
-		GROUPS.forEach( function ( group ) {
-			var col = document.createElement( 'div' );
-			col.className = 'rw-diagram-group';
+		'<text x="450" y="415" text-anchor="middle" font-size="17" class="rw-diagram-svg-section">II. As Mitologias Árias</text>' +
+		'<g class="rw-diagram-svg-line" stroke-width="1.5" fill="none">' +
+		'<line x1="450" y1="428" x2="450" y2="460"/>' +
+		'<line x1="230" y1="460" x2="670" y2="460"/>' +
+		'<line x1="230" y1="460" x2="230" y2="490"/>' +
+		'<line x1="670" y1="460" x2="670" y2="490"/>' +
+		'</g>' +
+		'<text x="230" y="510" text-anchor="middle" font-size="16" class="rw-diagram-svg-label">Hinduísmo</text>' +
+		'<text x="670" y="510" text-anchor="middle" font-size="16" class="rw-diagram-svg-label">Budismo</text>' +
+		'<g class="rw-diagram-svg-line" stroke-width="1.5" fill="none">' +
+		'<line x1="230" y1="520" x2="230" y2="545"/>' +
+		'<line x1="130" y1="545" x2="230" y2="545"/>' +
+		'<line x1="130" y1="545" x2="130" y2="565"/>' +
+		'</g>' +
+		'<text x="220" y="585" text-anchor="middle" font-size="15.5" class="rw-diagram-svg-label">Religião Greco-Romana*</text>' +
+		'<g class="rw-diagram-svg-line" stroke-width="1.5" fill="none">' +
+		'<line x1="670" y1="520" x2="670" y2="545"/>' +
+		'<line x1="600" y1="545" x2="670" y2="545"/>' +
+		'<line x1="600" y1="545" x2="600" y2="565"/>' +
+		'</g>' +
+		'<text x="600" y="585" text-anchor="middle" font-size="15.5" class="rw-diagram-svg-label">Antiga Religião Germano-Céltica*</text>' +
+		'<g class="rw-diagram-svg-line" stroke-width="1.5" fill="none">' +
+		'<line x1="230" y1="595" x2="230" y2="615"/>' +
+		'<line x1="185" y1="615" x2="230" y2="615"/>' +
+		'<line x1="185" y1="615" x2="185" y2="635"/>' +
+		'</g>' +
+		'<text x="200" y="655" text-anchor="middle" font-size="15.5" class="rw-diagram-svg-label">Jainismo</text>' +
+		'<g class="rw-diagram-svg-line" stroke-width="1.5" fill="none">' +
+		'<line x1="600" y1="595" x2="600" y2="615"/>' +
+		'<line x1="600" y1="615" x2="640" y2="615"/>' +
+		'<line x1="640" y1="615" x2="640" y2="635"/>' +
+		'</g>' +
+		'<text x="630" y="655" text-anchor="middle" font-size="15.5" class="rw-diagram-svg-label">Zoroastrismo (Parsismo)</text>' +
+		'<text x="600" y="695" text-anchor="middle" font-size="14" class="rw-diagram-svg-note">*extinta</text>' +
 
-			var h3 = document.createElement( 'h3' );
-			h3.textContent = group.title;
-			col.appendChild( h3 );
-
-			var list = document.createElement( 'div' );
-			list.className = 'rw-diagram-items';
-
-			group.items.forEach( function ( item ) {
-				var row = document.createElement( 'div' );
-				row.className = 'rw-diagram-item' + ( item.related ? ' rw-diagram-related' : '' );
-
-				var dot = document.createElement( 'span' );
-				dot.className = 'rw-diagram-dot';
-				if ( item.color ) {
-					dot.style.background = item.color;
-				}
-				row.appendChild( dot );
-
-				var label = document.createElement( 'span' );
-				label.textContent = item.label;
-				row.appendChild( label );
-
-				list.appendChild( row );
-			} );
-
-			col.appendChild( list );
-			wrap.appendChild( col );
-		} );
-
-		return wrap;
-	}
+		'<text x="450" y="770" text-anchor="middle" font-size="17" class="rw-diagram-svg-section">III. Os Monoteísmos Semíticos</text>' +
+		'<g class="rw-diagram-svg-line" stroke-width="1.5" fill="none">' +
+		'<line x1="450" y1="783" x2="450" y2="815"/>' +
+		'<line x1="180" y1="815" x2="720" y2="815"/>' +
+		'<line x1="180" y1="815" x2="180" y2="845"/>' +
+		'<line x1="450" y1="815" x2="450" y2="845"/>' +
+		'<line x1="720" y1="815" x2="720" y2="845"/>' +
+		'</g>' +
+		'<text x="180" y="865" text-anchor="middle" font-size="17" class="rw-diagram-svg-label">Judaísmo</text>' +
+		'<text x="450" y="865" text-anchor="middle" font-size="17" class="rw-diagram-svg-label rw-diagram-svg-christian">Cristianismo</text>' +
+		'<text x="720" y="865" text-anchor="middle" font-size="17" class="rw-diagram-svg-label rw-diagram-svg-islam">Islã</text>' +
+		'</svg>';
 
 	function buildOverlay() {
 		var overlay = document.createElement( 'div' );
@@ -229,10 +230,13 @@
 		subtitle.className = 'rw-diagram-subtitle';
 		subtitle.textContent = 'Estrutura de categorias da Religio Wiki, em três grandes grupos.';
 
+		var svgHolder = document.createElement( 'div' );
+		svgHolder.innerHTML = DIAGRAM_SVG;
+
 		modal.appendChild( closeBtn );
 		modal.appendChild( h2 );
 		modal.appendChild( subtitle );
-		modal.appendChild( buildDiagram() );
+		modal.appendChild( svgHolder );
 		overlay.appendChild( modal );
 
 		function close() {
@@ -256,11 +260,15 @@
 	}
 
 	function mount() {
-		var sidebarPortlets = document.querySelectorAll( '.mw-portlet, #mw-panel .portal' );
-		if ( sidebarPortlets.length === 0 ) {
+		// Insere logo depois do portlet "Categorias" (MediaWiki:Sidebar,
+		// id p-categorias-religiao-heading) e antes do portlet nativo
+		// "Ferramentas" (id p-tb) — não simplesmente no fim da lateral.
+		var categoriesPortlet = document.getElementById( 'p-categorias-religiao-heading' );
+		var toolsPortlet = document.getElementById( 'p-tb' );
+		var anchor = categoriesPortlet || toolsPortlet;
+		if ( !anchor ) {
 			return;
 		}
-		var lastPortlet = sidebarPortlets[ sidebarPortlets.length - 1 ];
 
 		var overlay = buildOverlay();
 		document.body.appendChild( overlay );
@@ -271,7 +279,201 @@
 		button.textContent = 'Ver diagrama de categorias';
 		button.addEventListener( 'click', function () { overlay.rwOpen(); } );
 
-		lastPortlet.parentNode.insertBefore( button, lastPortlet.nextSibling );
+		if ( categoriesPortlet ) {
+			categoriesPortlet.parentNode.insertBefore( button, categoriesPortlet.nextSibling );
+		} else {
+			toolsPortlet.parentNode.insertBefore( button, toolsPortlet );
+		}
+	}
+
+	if ( document.readyState === 'loading' ) {
+		document.addEventListener( 'DOMContentLoaded', mount );
+	} else {
+		mount();
+	}
+}() );
+
+/* ===== Painel "Aparência" (tamanho de texto / largura) ===== */
+( function () {
+	'use strict';
+
+	var TEXT_KEY = 'rw-textsize';
+	var WIDTH_KEY = 'rw-width';
+	var html = document.documentElement;
+
+	function apply() {
+		html.setAttribute( 'data-rw-textsize', localStorage.getItem( TEXT_KEY ) || 'standard' );
+		html.setAttribute( 'data-rw-width', localStorage.getItem( WIDTH_KEY ) || 'standard' );
+	}
+	apply();
+
+	function buildGroup( label, key, options, storageKey ) {
+		var group = document.createElement( 'div' );
+		group.className = 'rw-appearance-group';
+
+		var span = document.createElement( 'span' );
+		span.className = 'rw-appearance-group-label';
+		span.textContent = label;
+		group.appendChild( span );
+
+		var row = document.createElement( 'div' );
+		row.className = 'rw-appearance-options';
+		var current = localStorage.getItem( storageKey ) || options[ 0 ].id;
+		var buttons = {};
+
+		options.forEach( function ( opt ) {
+			var btn = document.createElement( 'button' );
+			btn.type = 'button';
+			btn.textContent = opt.label;
+			btn.setAttribute( 'aria-pressed', String( opt.id === current ) );
+			btn.addEventListener( 'click', function () {
+				localStorage.setItem( storageKey, opt.id );
+				html.setAttribute( key, opt.id );
+				Object.keys( buttons ).forEach( function ( id ) {
+					buttons[ id ].setAttribute( 'aria-pressed', String( id === opt.id ) );
+				} );
+			} );
+			buttons[ opt.id ] = btn;
+			row.appendChild( btn );
+		} );
+
+		group.appendChild( row );
+		return group;
+	}
+
+	function mount() {
+		var toc = document.getElementById( 'toc' );
+		if ( !toc ) {
+			return;
+		}
+
+		var panel = document.createElement( 'div' );
+		panel.className = 'rw-appearance-panel';
+
+		var h2 = document.createElement( 'h2' );
+		h2.textContent = 'Aparência';
+		panel.appendChild( h2 );
+
+		panel.appendChild( buildGroup( 'Texto', 'data-rw-textsize', [
+			{ id: 'small', label: 'Pequeno' },
+			{ id: 'standard', label: 'Padrão' },
+			{ id: 'large', label: 'Grande' }
+		], TEXT_KEY ) );
+
+		panel.appendChild( buildGroup( 'Largura', 'data-rw-width', [
+			{ id: 'standard', label: 'Padrão' },
+			{ id: 'wide', label: 'Largo' }
+		], WIDTH_KEY ) );
+
+		toc.parentNode.insertBefore( panel, toc.nextSibling );
+	}
+
+	if ( document.readyState === 'loading' ) {
+		document.addEventListener( 'DOMContentLoaded', mount );
+	} else {
+		mount();
+	}
+}() );
+
+/* ===== Seletor de idioma do artigo ===== */
+( function () {
+	'use strict';
+
+	// Convenção de sub-página (Título/en, Título/es...), não o sistema de
+	// interwiki multi-site da Wikipédia real (ver README). Lista base —
+	// $wgReligioWikiLanguages no LocalSettings controla o mesmo conjunto
+	// do lado do servidor; mantenha os dois sincronizados ao adicionar
+	// idioma novo.
+	var LANGUAGES = [
+		{ code: 'en', label: 'English' },
+		{ code: 'es', label: 'Español' },
+		{ code: 'fr', label: 'Français' },
+		{ code: 'it', label: 'Italiano' }
+	];
+
+	function baseTitle( pageName ) {
+		var parts = pageName.split( '/' );
+		var codes = LANGUAGES.map( function ( l ) { return l.code; } );
+		if ( parts.length > 1 && codes.indexOf( parts[ parts.length - 1 ] ) !== -1 ) {
+			parts.pop();
+		}
+		return parts.join( '/' );
+	}
+
+	function mount() {
+		if ( typeof mw === 'undefined' || !mw.config || mw.config.get( 'wgNamespaceNumber' ) !== 0 ) {
+			return; // só em artigos (namespace principal)
+		}
+		var toc = document.getElementById( 'toc' );
+		if ( !toc ) {
+			return;
+		}
+
+		var base = baseTitle( mw.config.get( 'wgPageName' ) );
+		var currentCode = mw.config.get( 'wgPageName' ) === base ? 'pt' : mw.config.get( 'wgPageName' ).split( '/' ).pop();
+
+		var box = document.createElement( 'div' );
+		box.className = 'rw-lang-switcher';
+		var h2 = document.createElement( 'h2' );
+		h2.textContent = 'Idiomas';
+		box.appendChild( h2 );
+
+		var list = document.createElement( 'ul' );
+		list.className = 'rw-lang-list';
+
+		var ptLi = document.createElement( 'li' );
+		var ptLink = document.createElement( 'a' );
+		ptLink.href = mw.util.getUrl( base );
+		ptLink.textContent = 'Português (original)';
+		if ( currentCode === 'pt' ) {
+			ptLink.className = 'rw-lang-current';
+		}
+		ptLi.appendChild( ptLink );
+		list.appendChild( ptLi );
+
+		mw.loader.using( 'mediawiki.api' ).then( function () {
+			var api = new mw.Api();
+			var titles = LANGUAGES.map( function ( l ) { return base + '/' + l.code; } );
+			api.get( {
+				action: 'query',
+				titles: titles.join( '|' ),
+				format: 'json'
+			} ).done( function ( data ) {
+				var existing = {};
+				if ( data.query && data.query.pages ) {
+					Object.keys( data.query.pages ).forEach( function ( id ) {
+						var page = data.query.pages[ id ];
+						if ( !page.missing ) {
+							existing[ page.title ] = true;
+						}
+					} );
+				}
+				LANGUAGES.forEach( function ( lang ) {
+					var title = base + '/' + lang.code;
+					var li = document.createElement( 'li' );
+					var a = document.createElement( 'a' );
+					a.href = mw.util.getUrl( title );
+					a.textContent = lang.label;
+					if ( lang.code === currentCode ) {
+						a.className = 'rw-lang-current';
+					} else if ( !existing[ title ] ) {
+						a.className = 'rw-lang-missing';
+						a.title = 'Ainda não existe — clique para criar a tradução';
+					}
+					li.appendChild( a );
+					list.appendChild( li );
+				} );
+
+				var addLink = document.createElement( 'a' );
+				addLink.className = 'rw-lang-add';
+				addLink.href = mw.util.getUrl( 'Religio Wiki:Idiomas' );
+				addLink.textContent = '+ Adicionar idioma';
+				box.appendChild( list );
+				box.appendChild( addLink );
+			} );
+		} );
+
+		toc.parentNode.insertBefore( box, toc );
 	}
 
 	if ( document.readyState === 'loading' ) {
@@ -391,6 +593,33 @@
 			'depende de conectar um meio de pagamento real (Pix, gateway de cartão/boleto, ' +
 			'PayPal etc.) a esta página, o que ainda não foi feito.';
 		host.appendChild( note );
+	}
+
+	if ( document.readyState === 'loading' ) {
+		document.addEventListener( 'DOMContentLoaded', mount );
+	} else {
+		mount();
+	}
+}() );
+
+/* ===== Ícone de lápis ao lado do título (quem pode editar) ===== */
+( function () {
+	'use strict';
+
+	function mount() {
+		if ( !document.body.classList.contains( 'rw-can-edit' ) ) {
+			return; // hook OutputPageBodyAttributes só marca isso pra quem tem edit
+		}
+		var heading = document.getElementById( 'firstHeading' );
+		if ( !heading || typeof mw === 'undefined' ) {
+			return;
+		}
+		var link = document.createElement( 'a' );
+		link.className = 'rw-edit-pencil';
+		link.href = mw.util.getUrl( mw.config.get( 'wgPageName' ), { action: 'edit' } );
+		link.title = 'Editar esta página';
+		link.textContent = '✏️';
+		heading.appendChild( link );
 	}
 
 	if ( document.readyState === 'loading' ) {

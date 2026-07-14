@@ -485,60 +485,147 @@ body.religion-judaismo #firstHeading { background-color: ???; color: #fff; }
 	border-radius: 3px;
 }
 
-.rw-diagram-groups {
-	display: grid;
-	grid-template-columns: repeat(3, 1fr);
-	gap: 28px;
+/* Diagrama em SVG (mesma estrutura enviada, restilizada com os tokens da
+   Religio Wiki em vez das cores fixas do arquivo original — assim segue o
+   tema claro/escuro/personalizado automaticamente). Ver common.js, seção
+   "Pop-up do diagrama de categorias", pelo <svg> completo. */
+.rw-diagram-modal svg {
+	width: 100%;
+	height: auto;
+	display: block;
 }
 
-@media (max-width: 680px) {
-	.rw-diagram-groups { grid-template-columns: 1fr; }
+.rw-diagram-svg-bg { fill: var(--rw-bg-elevated); }
+.rw-diagram-svg-title {
+	fill: var(--rw-text);
+	font-family: "Noto Sans", sans-serif;
+	font-weight: 700;
 }
-
-.rw-diagram-group {
-	border-top: 3px solid var(--rw-text-muted);
-	padding-top: 10px;
+.rw-diagram-svg-section {
+	fill: var(--rw-link);
+	font-family: "Noto Sans", sans-serif;
+	font-weight: 700;
 }
-
-.rw-diagram-group h3 {
-	font-size: 0.82rem;
-	margin: 0 0 10px;
-	line-height: 1.3;
+.rw-diagram-svg-line { stroke: var(--rw-text-muted); }
+.rw-diagram-svg-label {
+	fill: var(--rw-text);
+	font-family: "Noto Sans", sans-serif;
 }
-
-.rw-diagram-items {
-	display: flex;
-	flex-direction: column;
-	gap: 8px;
+.rw-diagram-svg-note {
+	fill: var(--rw-text-muted);
+	font-family: "Noto Sans", sans-serif;
+	font-style: italic;
 }
+.rw-diagram-svg-christian { fill: #DC2626; font-weight: 700; }
+.rw-diagram-svg-islam { fill: #15803D; font-weight: 700; }
 
-.rw-diagram-item {
-	display: flex;
-	align-items: center;
-	gap: 7px;
-	font-size: 0.85rem;
-	padding: 5px 8px;
-	background: var(--rw-bg-elevated);
+/* ---------- 9. Painel "Aparência" (tamanho de texto / largura) ---------- */
+/* Injetado abaixo de "Neste artigo" (TOC nativo, id="toc") por common.js. */
+.rw-appearance-panel {
+	margin-top: 14px;
 	border: 1px solid var(--rw-border);
+	background: var(--rw-bg-elevated);
+	padding: 10px 14px;
+	font-size: 0.82rem;
+}
+.rw-appearance-panel h2 {
+	font-size: 0.72rem;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	color: var(--rw-text-muted);
+	margin: 0 0 8px;
+}
+.rw-appearance-group { margin-bottom: 8px; }
+.rw-appearance-group:last-child { margin-bottom: 0; }
+.rw-appearance-group-label {
+	display: block;
+	font-size: 0.75rem;
+	color: var(--rw-text-muted);
+	margin-bottom: 4px;
+}
+.rw-appearance-options { display: flex; gap: 4px; }
+.rw-appearance-options button {
+	flex: 1;
+	font: inherit;
+	font-size: 0.78rem;
+	padding: 4px 6px;
+	border: 1px solid var(--rw-border);
+	background: var(--rw-bg);
+	color: var(--rw-text);
+	cursor: pointer;
 	border-radius: 3px;
 }
-
-.rw-diagram-item .rw-diagram-dot {
-	width: 9px;
-	height: 9px;
-	border-radius: 50%;
-	background: var(--rw-text-muted);
-	flex-shrink: 0;
+.rw-appearance-options button[aria-pressed="true"] {
+	border-color: var(--rw-link);
+	color: var(--rw-link);
+	font-weight: 700;
 }
 
-.rw-diagram-item.rw-diagram-related {
-	margin-left: 14px;
+/* Escala de texto do conteúdo do artigo (não afeta chrome do site) */
+html[data-rw-textsize="small"] .mw-body-content { font-size: 0.9em; }
+html[data-rw-textsize="large"] .mw-body-content { font-size: 1.18em; }
+
+/* Largura do conteúdo */
+html[data-rw-width="wide"] #content,
+html[data-rw-width="wide"] .mw-body { max-width: none !important; }
+
+/* ---------- 10. Seletor de idioma do artigo ---------- */
+/* Injetado acima de "Neste artigo" por common.js, a partir das sub-páginas
+   Título/en, Título/es, Título/fr, Título/it (ver $wgReligioWikiLanguages
+   em LocalSettings-snippet.php — convenção de sub-página, não é o sistema
+   de interwiki multi-site que a Wikipédia usa entre wikis separadas por
+   idioma; ver nota no README). */
+.rw-lang-switcher {
+	margin-bottom: 14px;
+	border: 1px solid var(--rw-border);
+	background: var(--rw-bg-elevated);
+	padding: 10px 14px;
+	font-size: 0.82rem;
+}
+.rw-lang-switcher h2 {
+	font-size: 0.72rem;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	color: var(--rw-text-muted);
+	margin: 0 0 8px;
+}
+.rw-lang-list { list-style: none; margin: 0; padding: 0; }
+.rw-lang-list li { padding: 2px 0; }
+.rw-lang-list a.rw-lang-current { font-weight: 700; color: var(--rw-text); pointer-events: none; }
+.rw-lang-list a.rw-lang-missing { color: var(--rw-text-muted); font-style: italic; }
+.rw-lang-add {
+	display: block;
+	margin-top: 6px;
+	padding-top: 6px;
+	border-top: 1px dashed var(--rw-border);
+	font-size: 0.78rem;
+}
+
+/* ---------- 11. Lápis de edição (admin/editor) ---------- */
+/* body.rw-can-edit é adicionado pelo hook OutputPageBodyAttributes quando
+   quem está vendo a página tem permissão de editar (ver
+   LocalSettings-snippet.php). */
+.rw-edit-pencil {
+	display: none;
+	margin-left: 8px;
+	font-size: 0.6em;
+	vertical-align: middle;
+	text-decoration: none;
+	opacity: 0.75;
+}
+.rw-edit-pencil:hover { opacity: 1; text-decoration: none; }
+body.rw-can-edit .rw-edit-pencil { display: inline; }
+
+/* ---------- 12. Crédito de última edição ---------- */
+.rw-last-edited {
+	margin-top: 2em;
+	padding-top: 8px;
+	border-top: 1px dashed var(--rw-border);
 	font-size: 0.78rem;
 	color: var(--rw-text-muted);
-	border-style: dashed;
 }
 
-/* ---------- 9. Infoboxes e templates de artigo ---------- */
+/* ---------- 13. Infoboxes e templates de artigo ---------- */
 .rw-infobox {
 	float: right;
 	width: 230px;

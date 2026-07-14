@@ -1,0 +1,40 @@
+# Página de ajuda: idiomas
+
+## Page: Religio Wiki:Idiomas
+```wikitext
+= Idiomas na Religio Wiki =
+
+Cada artigo pode ter versões em outros idiomas, como sub-páginas do artigo
+em português (o idioma original/padrão do projeto). O seletor "Idiomas",
+que aparece no topo de cada artigo, mostra automaticamente quais versões já
+existem e qual ainda falta.
+
+== Traduzir um artigo já existente ==
+Para o artigo '''Cristianismo''' em inglês, por exemplo, crie a página
+'''Cristianismo/en''' com o conteúdo traduzido. Assim que ela existir, o
+seletor de idioma do artigo em português passa a linkar direto pra ela (e
+vice-versa).
+
+Idiomas já configurados: inglês (<code>/en</code>), espanhol
+(<code>/es</code>), francês (<code>/fr</code>) e italiano (<code>/it</code>).
+
+== Adicionar um idioma novo à lista ==
+Isso é uma mudança de configuração, não uma edição de artigo — só quem tem
+acesso ao servidor (não ao wiki) consegue fazer:
+
+# Adicione o código e o nome do idioma em duas listas que precisam ficar
+  sincronizadas: <code>$wgReligioWikiLanguages</code> em
+  <code>LocalSettings.php</code>, e o array <code>LANGUAGES</code> no topo
+  do bloco "Seletor de idioma do artigo" em
+  <code>Special:MediaWiki:Common.js</code>.
+# Comece criando as sub-páginas traduzidas de verdade (ex.:
+  <code>Cristianismo/de</code> para alemão) — sem elas, o idioma aparece na
+  lista mas sempre como "ainda não existe".
+
+[[Categoria:Religio Wiki]]
+```
+
+Isso é uma convenção de sub-página dentro do mesmo wiki, não o sistema real
+de interwiki que liga wikis separados por idioma (como a Wikipédia faz
+entre pt.wikipedia.org, en.wikipedia.org etc.) — ver nota em
+"Ferramentas de leitura do artigo" no README.
