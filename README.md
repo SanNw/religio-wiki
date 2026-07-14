@@ -10,6 +10,50 @@ publicado, normalmente é licenciado como CC BY-SA (configurável).
 
 - Docker e Docker Compose (`docker compose version`)
 
+## Identidade e configuração de conteúdo
+
+Configuração já pronta em `mediawiki-config/` (aplicar depois do passo a
+passo de instalação abaixo):
+
+- **`categorias.wikitext`** — estrutura de categorias baseada na classificação
+  de religiões enviada (I. Xamanismos Hiperbóreos, II. Mitologias Arianas,
+  III. Monoteísmos Semíticos, com as religiões de cada grupo). Crie cada
+  `Category:<nome>` listada no arquivo.
+- **`common.css`** → colar em `Special:MediaWiki:Common.css`: fundo em tom de
+  papel pólen (`#FBF3E1`) no tema claro, tema escuro, tema personalizado
+  (leitor escolhe as cores), e fonte Noto Sans (+ variantes Arabic/Hebrew/
+  Greek/Devanagari) para cobrir transliterações e outras escritas.
+- **`common.js`** → colar em `Special:MediaWiki:Common.js`: seletor de tema
+  (claro/escuro/personalizado) na barra do usuário, persistido por leitor via
+  `localStorage` — funciona também no modo anônimo.
+- **`LocalSettings-snippet.php`** → colar no final do `LocalSettings.php`:
+  leitura anônima liberada + edição exige conta (login com usuário/senha já
+  vem pronto de fábrica no MediaWiki), e o mapeamento categoria → classe CSS
+  que colore o `#firstHeading` por religião.
+
+### Cores por religião
+
+Definidas: **Cristianismo = vermelho** (`#DC2626`), **Islã = verde**
+(`#15803D`). As demais estão como pendência em `common.css` (bloco comentado
+no final do arquivo) — baseado no diagrama, faltam: Taoismo, Confucionismo,
+Xamanismo Siberiano, Xintoísmo, Religião dos Povos Nativos Americanos, Bön,
+Hinduísmo, Budismo, Religião Greco-Romana, Religião Germano-Céltica Antiga,
+Jainismo, Zoroastrismo, Judaísmo. Quando decidir, é só descomentar a linha
+correspondente e preencher a cor.
+
+### Pendências
+
+- Identidade visual completa (logo, paleta fora das cores por religião já
+  definidas) — ainda não decidida.
+- Fonte da imagem parece seguir uma classificação específica (possivelmente
+  de uma obra/autor de referência); a árvore de subcategorias mais fina
+  (ex.: se Xamanismo Siberiano é subcategoria de Confucionismo, do grupo
+  inteiro, ou de ambos) ficou ambígua num diagrama desenhado à mão — o
+  `categorias.wikitext` documenta essa ambiguidade caso a caso; é só ajustar
+  as categorias depois de o wiki estar no ar.
+- Self-host da fonte Noto Sans em vez de carregar do Google Fonts, se
+  preferir não depender de CDN externo (o `common.css` já indica onde trocar).
+
 ## Passo a passo (primeira instalação)
 
 ```bash

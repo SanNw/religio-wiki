@@ -1,0 +1,140 @@
+# Estrutura de categorias — Religio Wiki
+
+Baseada na classificação enviada ("Classification of the Religions": Hyperborean
+Shamanisms / Aryan Mythologies / Semitic Monotheisms). As relações de
+sub-ramo mais finas do diagrama original (ex.: se Xamanismo Siberiano é
+subcategoria só de Confucionismo ou do grupo como um todo) ficaram ambíguas
+numa árvore desenhada à mão — abaixo cada religião entra como subcategoria
+direta do seu grupo, e as relações de parentesco mais próximas (indicadas
+com "relacionado a" no comentário) ficam fáceis de reorganizar depois
+editando a página de categoria (é só wikitext).
+
+Para aplicar: crie cada página abaixo em `Category:<nome>` no wiki (manualmente
+ou via `maintenance/importTextFiles.php`, um arquivo por categoria).
+
+---
+
+## Category:Classificação das religiões
+(categoria-raiz, sem conteúdo além do título)
+
+---
+
+## Category:I. Xamanismos Hiperbóreos
+```wikitext
+Primeiro dos três grandes grupos da classificação: xamanismos e religiões
+tradicionais do extremo norte e leste asiático, e tradições nativas
+associadas.
+
+[[Category:Classificação das religiões]]
+```
+
+## Category:Taoismo
+```wikitext
+[[Category:I. Xamanismos Hiperbóreos]]
+```
+
+## Category:Confucionismo
+```wikitext
+[[Category:I. Xamanismos Hiperbóreos]]
+```
+
+## Category:Xamanismo Siberiano
+```wikitext
+Relacionado a: Taoismo, Confucionismo.
+
+[[Category:I. Xamanismos Hiperbóreos]]
+```
+
+## Category:Xintoísmo
+```wikitext
+[[Category:I. Xamanismos Hiperbóreos]]
+```
+
+## Category:Religião dos Povos Nativos Americanos
+```wikitext
+Relacionado a: Xintoísmo.
+
+[[Category:I. Xamanismos Hiperbóreos]]
+```
+
+## Category:Bön
+```wikitext
+Religião pré-budista do Tibete.
+
+[[Category:I. Xamanismos Hiperbóreos]]
+```
+
+---
+
+## Category:II. Mitologias Arianas
+```wikitext
+Segundo grande grupo: tradições de origem indo-europeia ("ariana" no sentido
+linguístico/histórico do termo, não racial).
+
+[[Category:Classificação das religiões]]
+```
+
+## Category:Hinduísmo
+```wikitext
+[[Category:II. Mitologias Arianas]]
+```
+
+## Category:Budismo
+```wikitext
+[[Category:II. Mitologias Arianas]]
+```
+
+## Category:Religião Greco-Romana
+```wikitext
+Religião extinta.
+Relacionado a: Hinduísmo.
+
+[[Category:II. Mitologias Arianas]]
+```
+
+## Category:Religião Germano-Céltica Antiga
+```wikitext
+Religião extinta.
+Relacionado a: Budismo.
+
+[[Category:II. Mitologias Arianas]]
+```
+
+## Category:Jainismo
+```wikitext
+Relacionado a: Hinduísmo, Religião Greco-Romana.
+
+[[Category:II. Mitologias Arianas]]
+```
+
+## Category:Zoroastrismo
+```wikitext
+Também chamado de parsismo.
+Relacionado a: Budismo, Religião Germano-Céltica Antiga.
+
+[[Category:II. Mitologias Arianas]]
+```
+
+---
+
+## Category:III. Monoteísmos Semíticos
+```wikitext
+Terceiro grande grupo: as três tradições monoteístas de origem semítica.
+
+[[Category:Classificação das religiões]]
+```
+
+## Category:Judaísmo
+```wikitext
+[[Category:III. Monoteísmos Semíticos]]
+```
+
+## Category:Cristianismo
+```wikitext
+[[Category:III. Monoteísmos Semíticos]]
+```
+
+## Category:Islã
+```wikitext
+[[Category:III. Monoteísmos Semíticos]]
+```

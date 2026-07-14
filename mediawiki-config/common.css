@@ -1,0 +1,169 @@
+/*
+ * Religio Wiki — MediaWiki:Common.css
+ * Cole o conteúdo deste arquivo em Special:MediaWiki:Common.css (como
+ * administrador) depois de instalar o wiki. Ele controla:
+ *   1. Fonte sans-serif com cobertura ampla de escrita (latino com
+ *      diacríticos de transliteração, árabe, hebraico, grego, cirílico,
+ *      devanágari).
+ *   2. Fundo "papel pólen" no tema claro + tema escuro + tema personalizado.
+ *   3. Cor de cabeçalho por religião (via classe no <body>, ver
+ *      LocalSettings-snippet.php).
+ */
+
+/* ---------- 1. Fonte ---------- */
+/* Noto Sans cobre a maioria dos sistemas de escrita com um único visual
+   consistente. Self-host os arquivos woff2 se preferir não depender do
+   Google Fonts (ver README). */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700&family=Noto+Sans+Arabic:wght@400;600;700&family=Noto+Sans+Hebrew:wght@400;600;700&family=Noto+Sans+Greek:wght@400;600;700&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap');
+
+body,
+.mw-body,
+.vector-menu,
+input,
+textarea,
+select {
+	font-family: "Noto Sans", "Noto Sans Arabic", "Noto Sans Hebrew",
+		"Noto Sans Greek", "Noto Sans Devanagari", -apple-system,
+		"Segoe UI", sans-serif;
+}
+
+/* Trechos citados em escrita árabe/hebraica: use <span lang="ar" dir="rtl">
+   (ou lang="he") no wikitext para direção correta; a fonte já cobre o
+   glifo. */
+
+/* ---------- 2. Temas ---------- */
+:root,
+:root[data-theme="light"] {
+	--rw-bg: #FBF3E1;        /* papel pólen */
+	--rw-bg-elevated: #FFFDF7;
+	--rw-text: #241C15;      /* tinta */
+	--rw-text-muted: #5C5142;
+	--rw-border: #E2D5B8;
+	--rw-link: #92400E;
+}
+
+:root[data-theme="dark"] {
+	--rw-bg: #1B1712;
+	--rw-bg-elevated: #24201A;
+	--rw-text: #F1E6CF;
+	--rw-text-muted: #C9BBA0;
+	--rw-border: #3A3226;
+	--rw-link: #E0A868;
+}
+
+/* Tema "personalizado": mesmas variáveis, valores definidos via JS
+   (Common.js) a partir da escolha do leitor e persistidos em localStorage. */
+:root[data-theme="custom"] {
+	--rw-bg: var(--rw-custom-bg, #FBF3E1);
+	--rw-bg-elevated: var(--rw-custom-bg-elevated, #FFFDF7);
+	--rw-text: var(--rw-custom-text, #241C15);
+	--rw-text-muted: var(--rw-custom-text-muted, #5C5142);
+	--rw-border: var(--rw-custom-border, #E2D5B8);
+	--rw-link: var(--rw-custom-link, #92400E);
+}
+
+body {
+	background-color: var(--rw-bg);
+	color: var(--rw-text);
+}
+
+.mw-body,
+.vector-body {
+	background-color: var(--rw-bg);
+	color: var(--rw-text);
+}
+
+.mw-body-content a,
+#p-personal a {
+	color: var(--rw-link);
+}
+
+.vector-menu-content,
+.mw-portlet {
+	background-color: var(--rw-bg-elevated);
+	border-color: var(--rw-border);
+}
+
+/* ---------- 3. Cor de cabeçalho por religião ---------- */
+/* A classe no <body> (ex.: body.religion-cristianismo) é adicionada
+   automaticamente conforme a categoria do artigo — ver hook
+   OutputPageBodyAttributes em LocalSettings-snippet.php. */
+
+#firstHeading {
+	padding: 0.3em 0.6em;
+	border-radius: 4px;
+	transition: background-color 0.2s ease;
+}
+
+/* Definidas: */
+body.religion-cristianismo #firstHeading {
+	background-color: #DC2626; /* vermelho */
+	color: #fff;
+}
+
+body.religion-islam #firstHeading {
+	background-color: #15803D; /* verde */
+	color: #fff;
+}
+
+/* Pendentes — troque a cor quando definir (mantenha #fff ou --rw-text no
+   color dependendo do contraste da cor escolhida):
+body.religion-taoismo #firstHeading { background-color: ???; color: #fff; }
+body.religion-confucionismo #firstHeading { background-color: ???; color: #fff; }
+body.religion-xamanismo-siberiano #firstHeading { background-color: ???; color: #fff; }
+body.religion-xintoismo #firstHeading { background-color: ???; color: #fff; }
+body.religion-religiao-dos-povos-nativos-americanos #firstHeading { background-color: ???; color: #fff; }
+body.religion-boen #firstHeading { background-color: ???; color: #fff; }
+body.religion-hinduismo #firstHeading { background-color: ???; color: #fff; }
+body.religion-budismo #firstHeading { background-color: ???; color: #fff; }
+body.religion-religiao-greco-romana #firstHeading { background-color: ???; color: #fff; }
+body.religion-religiao-germano-celtica-antiga #firstHeading { background-color: ???; color: #fff; }
+body.religion-jainismo #firstHeading { background-color: ???; color: #fff; }
+body.religion-zoroastrismo #firstHeading { background-color: ???; color: #fff; }
+body.religion-judaismo #firstHeading { background-color: ???; color: #fff; }
+*/
+
+/* ---------- 4. Botão de troca de tema (injetado por Common.js) ---------- */
+#rw-theme-switcher {
+	display: flex;
+	gap: 4px;
+	align-items: center;
+	padding: 4px 8px;
+}
+
+#rw-theme-switcher button {
+	font-family: inherit;
+	font-size: 0.85em;
+	padding: 2px 8px;
+	border-radius: 4px;
+	border: 1px solid var(--rw-border);
+	background: var(--rw-bg-elevated);
+	color: var(--rw-text);
+	cursor: pointer;
+}
+
+#rw-theme-switcher button[aria-pressed="true"] {
+	border-color: var(--rw-link);
+	font-weight: 600;
+}
+
+#rw-custom-theme-panel {
+	display: none;
+	flex-direction: column;
+	gap: 6px;
+	padding: 8px;
+	background: var(--rw-bg-elevated);
+	border: 1px solid var(--rw-border);
+	border-radius: 4px;
+}
+
+#rw-custom-theme-panel.open {
+	display: flex;
+}
+
+#rw-custom-theme-panel label {
+	display: flex;
+	justify-content: space-between;
+	gap: 8px;
+	font-size: 0.8em;
+}
