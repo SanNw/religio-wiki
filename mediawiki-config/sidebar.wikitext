@@ -1,0 +1,33 @@
+# Barra lateral (navegação + categorias)
+
+## Page: MediaWiki:Sidebar
+```wikitext
+* navigation
+** Página principal|mainpage-description
+** Special:Random|randompage
+** Special:RecentChanges|recentchanges
+** Special:UserRights|Gerenciar editores
+
+* categorias-religiao-heading
+** Category:I. Xamanismos Hiperbóreos|I. Xamanismos Hiperbóreos
+** Category:II. Mitologias Arianas|II. Mitologias Arianas
+** Category:III. Monoteísmos Semíticos|III. Monoteísmos Semíticos
+
+* SEARCH
+* TOOLBOX
+```
+
+## Page: MediaWiki:categorias-religiao-heading
+```wikitext
+Categorias
+```
+(sem essa página, o MediaWiki mostraria a chave crua "categorias-religiao-heading"
+como título da seção em vez de "Categorias".)
+
+---
+
+O botão "Ver diagrama de categorias" (pop-up com o diagrama da classificação,
+proporções uniformes, cores das religiões já definidas) é injetado
+automaticamente pelo `common.js` logo abaixo do último bloco da barra
+lateral — não precisa de nada extra além do `common.js` já estar colado em
+`Special:MediaWiki:Common.js`.

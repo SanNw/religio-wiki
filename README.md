@@ -46,8 +46,17 @@ passo de instalação abaixo):
   `localStorage` — funciona também no modo anônimo.
 - **`LocalSettings-snippet.php`** → colar no final do `LocalSettings.php`:
   carrega as extensões de edição/citação, configura leitura anônima + edição
-  só por convite (ver "Quem pode editar" abaixo), e o mapeamento categoria →
-  classe CSS que colore o `#firstHeading` por religião.
+  só por convite (ver "Quem pode editar" abaixo), o botão "Doar" na barra
+  pessoal, o ImageMagick (thumbnails), e o mapeamento categoria → classe CSS
+  que colore o `#firstHeading` por religião.
+- **`pagina-principal.wikitext`** → conteúdo da página inicial (boas-vindas,
+  contador de artigos, artigo em destaque, imagem do dia, "Sobre a Religio
+  Wiki").
+- **`pagina-doar.wikitext`** → conteúdo de `Religio Wiki:Doar`.
+- **`sidebar.wikitext`** → conteúdo de `MediaWiki:Sidebar` (navegação +
+  categorias na lateral).
+- **`templates.wikitext`** → templates iniciais de artigo (infobox, ver
+  também, citação necessária, desambiguação).
 
 ### Cores por religião
 
@@ -87,11 +96,16 @@ baixadas do espelho no GitHub) já com:
 | Editor visual (WYSIWYG) | `VisualEditor` | editor visual da Wikipédia |
 | Formulário de campos de template | `TemplateData` | usado pelo VisualEditor para templates |
 | Templates de citação em Lua | `Scribunto` | base de `{{citar web}}`, `{{citar livro}}` (CS1) |
-| Upload de imagens + acervo do Commons | `$wgEnableUploads` / `$wgUseInstantCommons` (config nativa, sem extensão) | inserir imagens do Wikimedia Commons direto |
+| Upload de imagens + legenda + galeria | `$wgEnableUploads` + `ImageMagick` (config/pacote nativo, sem extensão) | `[[Arquivo:...\|thumb\|legenda]]`, `<gallery>` |
+| Acervo do Wikimedia Commons | `$wgUseInstantCommons` (config nativa) | inserir imagens do Commons sem reenviar |
 
 Histórico de página, diffs, página de discussão, lista de páginas vigiadas,
-desfazer edição, pré-visualizar antes de salvar — isso tudo já é nativo do
-MediaWiki, sem precisar instalar nada.
+desfazer edição, pré-visualizar antes de salvar, redirecionamento, tabela de
+conteúdo automática, tabelas ordenáveis — isso tudo já é nativo do MediaWiki,
+sem precisar instalar nada. Além disso, `templates.wikitext` traz 4
+templates iniciais que a Wikipédia resolve via template em vez de recurso
+nativo: **Infobox religião**, **Ver também**, **Citação necessária** e
+**Desambiguação**.
 
 Como não é possível baixar o Docker Hub nem clonar os repositórios das
 extensões dentro deste sandbox (ver nota mais abaixo), o `Dockerfile` não foi
@@ -115,6 +129,49 @@ edição é só de quem você escolher** — não existe cadastro público abert
 
 Para tirar o acesso de alguém, é o mesmo caminho: Special:UserRights,
 desmarcar `editor`.
+
+## Página principal
+
+Conteúdo em `pagina-principal.wikitext`. Estrutura: título "Boas-vindas à
+Religio Wiki" + subtítulo "a enciclopédia autêntica sobre as religiões" com
+a contagem de artigos ao lado (via `{{NUMBEROFARTICLES}}`, nativo); abaixo,
+lado a lado, "Artigo em destaque" e "Imagem do dia" — cada um transcluído de
+uma sub-página própria (`Página principal/Artigo em destaque` e
+`Página principal/Imagem do dia`) pra dar pra trocar sem editar a principal
+inteira; por fim "Sobre a Religio Wiki" com o texto que você definiu. A
+imagem do dia usa o `thumb` nativo do MediaWiki, que já preserva a proporção
+original — o CSS só faz o contêiner ficar grande/responsivo.
+
+## Doação
+
+Botão **"Doar"** injetado como o primeiro item da barra pessoal em toda
+página (à esquerda de "Entrar"/"Criar conta" — como o cadastro público está
+fechado, a maioria dos visitantes só vê "Entrar" mesmo, mas o "Doar" fica
+igualmente à esquerda dele). Leva para `Religio Wiki:Doar`
+(`pagina-doar.wikitext`), com o texto sobre o projeto ser independente e um
+widget de valores/frequência/forma de pagamento (`common.js`, seção "Widget
+da página de doação"): BRL, Único/Mensal/Anualmente, valores predefinidos
+(R$ 15 a R$ 300) + campo "Outro", e Pix/Débito/Crédito/Boleto/PayPal/Google
+Pay como opções de forma de pagamento.
+
+**Importante**: isso é só a interface — seleção de valor/frequência/forma
+funciona (visualmente), mas não processa pagamento de verdade. Cobrança real
+exige integrar um meio de pagamento de verdade (conta Pix, um gateway como
+Mercado Pago/PagSeguro/Stripe para cartão e boleto, conta PayPal Business
+etc.) — isso depende de credenciais/contas financeiras que só você pode
+abrir, não é algo que eu tenha como criar por você. O widget já deixa claro
+esse limite pra quem visitar a página (nota no rodapé do widget).
+
+## Diagrama de categorias
+
+Botão **"Ver diagrama de categorias"** logo abaixo da barra lateral (depois
+da lista de Categorias) em toda página, injetado pelo `common.js`. Abre um
+pop-up com a árvore de classificação (os três grupos do diagrama que você
+enviou), no estilo da Religio Wiki — fundo/texto conforme o tema ativo,
+Cristianismo e Islã já com a cor definida, espaçamento uniforme entre os
+itens (a versão original desenhada à mão tinha espaços bem desiguais entre
+os grupos; aqui ficou uma grade regular). Sem extensão nova — é só CSS/JS
+(`common.css` seção 8, `common.js` "Pop-up do diagrama de categorias").
 
 ## Passo a passo (primeira instalação)
 
@@ -193,3 +250,7 @@ servidor (sem esse bloqueio) para validar de ponta a ponta.
   criados ou importados de outro wiki.
 - Decidir a lista inicial de pessoas com acesso de `editor` (ver "Quem pode
   editar" acima).
+- Escrever/enviar o primeiro "Artigo em destaque" e "Imagem do dia" de
+  verdade (as sub-páginas em `pagina-principal.wikitext` têm só exemplo).
+- Escolher e configurar um meio de pagamento real para a página de doação
+  (ver aviso em "Doação" acima) — nenhuma cobrança funciona ainda.

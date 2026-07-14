@@ -69,11 +69,33 @@ wfLoadExtension( 'Scribunto' );
 $wgScribuntoDefaultEngine = 'luastandalone';
 $wgScribuntoEngineConf['luastandalone']['luaPath'] = '/usr/bin/lua5.1';
 
-// Upload de imagens (para ilustrar/citar com mídia) + acesso direto ao
-// acervo do Wikimedia Commons sem precisar reenviar os arquivos.
+// Upload de imagens (para ilustrar/citar com mídia, com legenda via
+// [[Arquivo:...|thumb|legenda]] ou <gallery>) + acesso direto ao acervo do
+// Wikimedia Commons sem precisar reenviar os arquivos.
 $wgEnableUploads = true;
 $wgUseInstantCommons = true;
 $wgFileExtensions = array_merge( $wgFileExtensions, [ 'pdf', 'svg', 'webp' ] );
+
+// ImageMagick para gerar as miniaturas (thumbnails) das imagens nos
+// artigos e na "Imagem do dia" da página principal — instalado no
+// Dockerfile desta pasta.
+$wgUseImageMagick = true;
+$wgImageMagickConvertCommand = '/usr/bin/convert';
+
+// ---------- Botão "Doar" ----------
+// Aparece como o primeiro item da barra pessoal — ou seja, sempre à
+// esquerda de "Entrar"/"Criar conta" — em todas as páginas. Leva para
+// Religio Wiki:Doar (ver mediawiki-config/pagina-doar.wikitext).
+$wgHooks['PersonalUrls'][] = static function ( array &$personal_urls, $title, $skin ) {
+	$donateTitle = Title::newFromText( 'Religio Wiki:Doar' );
+	$personal_urls = [
+		'donate' => [
+			'text' => 'Doar',
+			'href' => $donateTitle ? $donateTitle->getLocalURL() : '#',
+			'id' => 'pt-donate',
+		],
+	] + $personal_urls;
+};
 
 // ---------- Cor de cabeçalho por religião ----------
 // Adiciona uma classe "religion-<slug>" ao <body> conforme as categorias

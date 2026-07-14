@@ -167,3 +167,423 @@ body.religion-judaismo #firstHeading { background-color: ???; color: #fff; }
 	gap: 8px;
 	font-size: 0.8em;
 }
+
+/* ---------- 5. Botão "Doar" na barra pessoal ---------- */
+/* Injetado antes de "Entrar"/"Criar conta" pelo hook PersonalUrls
+   (LocalSettings-snippet.php). */
+#pt-donate a {
+	font-weight: 700;
+	color: var(--rw-link);
+}
+
+/* ---------- 6. Página inicial ---------- */
+.rw-home-hero {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-end;
+	justify-content: space-between;
+	gap: 16px;
+	padding-bottom: 14px;
+	margin-bottom: 18px;
+	border-bottom: 2px solid var(--rw-border);
+}
+
+.rw-home-hero h1 {
+	margin: 0 0 4px;
+	font-size: 2rem;
+	line-height: 1.2;
+	border: none;
+	padding: 0;
+}
+
+.rw-home-subtitle {
+	margin: 0;
+	font-size: 1.05rem;
+	color: var(--rw-text-muted);
+	font-style: italic;
+}
+
+.rw-home-stat {
+	text-align: right;
+	white-space: nowrap;
+}
+
+.rw-home-stat-number {
+	display: block;
+	font-size: 2.1rem;
+	font-weight: 700;
+	line-height: 1;
+	font-variant-numeric: tabular-nums;
+}
+
+.rw-home-stat-label {
+	display: block;
+	font-size: 0.78rem;
+	color: var(--rw-text-muted);
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	margin-top: 4px;
+}
+
+.rw-home-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 24px;
+	margin-bottom: 20px;
+}
+
+@media (max-width: 720px) {
+	.rw-home-grid { grid-template-columns: 1fr; }
+}
+
+.rw-home-box {
+	border: 1px solid var(--rw-border);
+	background: var(--rw-bg-elevated);
+	padding: 14px 16px;
+}
+
+.rw-home-box h2 {
+	margin-top: 0;
+	font-size: 1.05rem;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	color: var(--rw-text-muted);
+	border: none;
+	padding: 0 0 8px;
+}
+
+/* Imagem do dia: grande, em destaque, sempre preservando a proporção
+   original (largura/altura definidas pelo próprio MediaWiki no
+   thumbnail — aqui só garantimos que ela nunca estoura o contêiner). */
+.rw-home-box.rw-image-of-day img {
+	width: 100%;
+	height: auto;
+	display: block;
+}
+
+.rw-home-box.rw-image-of-day figcaption,
+.rw-home-box.rw-image-of-day .thumbcaption {
+	font-size: 0.82rem;
+	color: var(--rw-text-muted);
+	padding-top: 6px;
+}
+
+.rw-home-about {
+	border-top: 2px solid var(--rw-border);
+	padding-top: 16px;
+	margin-top: 6px;
+}
+
+.rw-home-about h2 {
+	font-size: 1.3rem;
+}
+
+.rw-home-about p {
+	max-width: 72ch;
+}
+
+/* ---------- 7. Página de doação ---------- */
+.rw-donate-page {
+	display: grid;
+	grid-template-columns: 1.1fr 1fr;
+	gap: 32px;
+	align-items: start;
+}
+
+@media (max-width: 760px) {
+	.rw-donate-page { grid-template-columns: 1fr; }
+}
+
+.rw-donate-copy p {
+	max-width: 60ch;
+}
+
+.rw-donate-widget {
+	border: 1px solid var(--rw-border);
+	background: var(--rw-bg-elevated);
+	padding: 18px;
+}
+
+.rw-donate-widget h2 {
+	margin-top: 0;
+	font-size: 1rem;
+	border: none;
+	padding: 0;
+}
+
+.rw-donate-currency {
+	font-size: 0.78rem;
+	color: var(--rw-text-muted);
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	margin-bottom: 12px;
+}
+
+.rw-donate-tabs {
+	display: flex;
+	gap: 6px;
+	margin-bottom: 14px;
+}
+
+.rw-donate-tabs button {
+	flex: 1;
+	font: inherit;
+	font-size: 0.85rem;
+	padding: 7px 4px;
+	border: 1px solid var(--rw-border);
+	background: var(--rw-bg);
+	color: var(--rw-text);
+	cursor: pointer;
+	border-radius: 3px;
+}
+
+.rw-donate-tabs button[aria-pressed="true"] {
+	background: var(--rw-link);
+	border-color: var(--rw-link);
+	color: var(--rw-bg-elevated);
+	font-weight: 700;
+}
+
+.rw-donate-amounts {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 8px;
+	margin-bottom: 12px;
+}
+
+.rw-donate-amounts button {
+	font: inherit;
+	font-size: 0.92rem;
+	font-variant-numeric: tabular-nums;
+	padding: 10px 4px;
+	border: 1px solid var(--rw-border);
+	background: var(--rw-bg);
+	color: var(--rw-text);
+	cursor: pointer;
+	border-radius: 3px;
+}
+
+.rw-donate-amounts button[aria-pressed="true"] {
+	border-color: var(--rw-link);
+	border-width: 2px;
+	font-weight: 700;
+}
+
+.rw-donate-custom {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	margin-bottom: 16px;
+	font-size: 0.9rem;
+}
+
+.rw-donate-custom input {
+	flex: 1;
+	font: inherit;
+	padding: 7px 8px;
+	border: 1px solid var(--rw-border);
+	background: var(--rw-bg);
+	color: var(--rw-text);
+	border-radius: 3px;
+}
+
+.rw-donate-methods {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	margin-bottom: 14px;
+}
+
+.rw-donate-methods button {
+	font: inherit;
+	font-size: 0.8rem;
+	padding: 5px 10px;
+	border: 1px solid var(--rw-border);
+	background: var(--rw-bg);
+	color: var(--rw-text);
+	cursor: pointer;
+	border-radius: 999px;
+}
+
+.rw-donate-methods button[aria-pressed="true"] {
+	background: var(--rw-text);
+	color: var(--rw-bg-elevated);
+	border-color: var(--rw-text);
+}
+
+.rw-donate-note {
+	font-size: 0.76rem;
+	color: var(--rw-text-muted);
+	border-top: 1px dashed var(--rw-border);
+	padding-top: 10px;
+	line-height: 1.5;
+}
+
+/* ---------- 8. Pop-up do diagrama de categorias ---------- */
+#rw-diagram-button {
+	display: block;
+	width: 100%;
+	margin-top: 8px;
+	font: inherit;
+	font-size: 0.78rem;
+	padding: 6px 8px;
+	border: 1px solid var(--rw-border);
+	background: var(--rw-bg-elevated);
+	color: var(--rw-text);
+	cursor: pointer;
+	border-radius: 3px;
+}
+
+#rw-diagram-overlay {
+	display: none;
+	position: fixed;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.45);
+	z-index: 100;
+	padding: 24px;
+	overflow: auto;
+}
+
+#rw-diagram-overlay.open {
+	display: flex;
+	align-items: flex-start;
+	justify-content: center;
+}
+
+.rw-diagram-modal {
+	background: var(--rw-bg);
+	color: var(--rw-text);
+	border: 1px solid var(--rw-border);
+	max-width: 900px;
+	width: 100%;
+	padding: 20px 24px 26px;
+	position: relative;
+}
+
+.rw-diagram-modal h2 {
+	margin: 0 0 4px;
+	font-size: 1.2rem;
+}
+
+.rw-diagram-modal .rw-diagram-subtitle {
+	margin: 0 0 18px;
+	font-size: 0.82rem;
+	color: var(--rw-text-muted);
+}
+
+.rw-diagram-close {
+	position: absolute;
+	top: 14px;
+	right: 14px;
+	font: inherit;
+	font-size: 0.85rem;
+	border: 1px solid var(--rw-border);
+	background: var(--rw-bg-elevated);
+	color: var(--rw-text);
+	padding: 4px 10px;
+	cursor: pointer;
+	border-radius: 3px;
+}
+
+.rw-diagram-groups {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 28px;
+}
+
+@media (max-width: 680px) {
+	.rw-diagram-groups { grid-template-columns: 1fr; }
+}
+
+.rw-diagram-group {
+	border-top: 3px solid var(--rw-text-muted);
+	padding-top: 10px;
+}
+
+.rw-diagram-group h3 {
+	font-size: 0.82rem;
+	margin: 0 0 10px;
+	line-height: 1.3;
+}
+
+.rw-diagram-items {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.rw-diagram-item {
+	display: flex;
+	align-items: center;
+	gap: 7px;
+	font-size: 0.85rem;
+	padding: 5px 8px;
+	background: var(--rw-bg-elevated);
+	border: 1px solid var(--rw-border);
+	border-radius: 3px;
+}
+
+.rw-diagram-item .rw-diagram-dot {
+	width: 9px;
+	height: 9px;
+	border-radius: 50%;
+	background: var(--rw-text-muted);
+	flex-shrink: 0;
+}
+
+.rw-diagram-item.rw-diagram-related {
+	margin-left: 14px;
+	font-size: 0.78rem;
+	color: var(--rw-text-muted);
+	border-style: dashed;
+}
+
+/* ---------- 9. Infoboxes e templates de artigo ---------- */
+.rw-infobox {
+	float: right;
+	width: 230px;
+	margin: 0 0 16px 20px;
+	border: 1px solid var(--rw-border);
+	background: var(--rw-bg-elevated);
+	font-size: 0.82rem;
+}
+
+.rw-infobox .rw-infobox-title {
+	font-weight: 700;
+	text-align: center;
+	padding: 6px;
+	border-bottom: 1px solid var(--rw-border);
+}
+
+.rw-infobox dl { margin: 0; padding: 8px 10px; }
+.rw-infobox dt { color: var(--rw-text-muted); font-size: 0.75rem; margin-top: 6px; }
+.rw-infobox dt:first-child { margin-top: 0; }
+.rw-infobox dd { margin: 0; }
+
+.rw-citation-needed {
+	color: var(--rw-link);
+	font-size: 0.75em;
+	vertical-align: super;
+}
+
+.rw-disambig-box {
+	padding: 8px 12px;
+	border-left: 3px solid var(--rw-text-muted);
+	background: var(--rw-bg-elevated);
+	font-size: 0.88rem;
+	font-style: italic;
+	margin-bottom: 16px;
+}
+
+/* Galeria/legendas de imagem em artigo (thumb nativo do MediaWiki) —
+   só ajusta espaçamento e cor da legenda ao tema. */
+.thumbcaption,
+.gallerytext {
+	color: var(--rw-text-muted);
+	font-size: 0.85em;
+}
+
+.thumbinner {
+	border-color: var(--rw-border) !important;
+	background: var(--rw-bg-elevated) !important;
+}

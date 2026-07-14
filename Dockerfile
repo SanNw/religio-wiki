@@ -5,7 +5,7 @@ FROM mediawiki:1.41
 ARG MW_BRANCH=REL1_41
 
 RUN apt-get update \
-	&& apt-get install -y --no-install-recommends git lua5.1 \
+	&& apt-get install -y --no-install-recommends git lua5.1 imagemagick \
 	&& rm -rf /var/lib/apt/lists/*
 
 WORKDIR /var/www/html/extensions

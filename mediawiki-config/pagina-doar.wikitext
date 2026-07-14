@@ -1,0 +1,34 @@
+# Página de doação
+
+## Page: Religio Wiki:Doar
+O widget de valores/frequência/forma de pagamento é gerado pelo `common.js`
+(procure "Widget da página de doação") dentro de `<div id="rw-donate-widget">`
+— é só deixar essa div vazia no wikitext, o script preenche sozinho. Hoje é
+só interface (seleção de valor/frequência/forma), sem processar pagamento de
+verdade — ver nota em "Pendências" no README.
+
+```wikitext
+<div class="rw-donate-page">
+<div class="rw-donate-copy">
+
+= Ajude a manter a Religio Wiki no ar =
+
+A Religio Wiki é mantida por um grupo pequeno, sem financiamento de
+instituição religiosa, editora ou empresa — o que nos permite escrever com
+independência, sem prestar contas a nenhum interesse por trás do conteúdo.
+
+É também o motivo pelo qual pedimos ajuda: não há grande investimento por
+trás do projeto, só o trabalho de quem pesquisa, escreve e revisa cada
+artigo a partir das fontes primárias de cada tradição. Hospedagem, domínio e
+o tempo dedicado à curadoria têm custo real.
+
+Se a Religio Wiki foi útil pra você, uma doação — de qualquer valor, única
+ou recorrente — ajuda a manter o projeto no ar e a expandir o acervo.
+
+</div>
+<div class="rw-donate-widget" id="rw-donate-widget"></div>
+</div>
+
+[[Categoria:Religio Wiki]]
+__NOTOC__
+```
