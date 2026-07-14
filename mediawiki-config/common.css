@@ -419,108 +419,31 @@ body.religion-judaismo #firstHeading { background-color: ???; color: #fff; }
 	line-height: 1.5;
 }
 
-/* ---------- 8. Pop-up do diagrama de categorias ---------- */
-#rw-diagram-button {
-	display: block;
-	width: 100%;
-	margin-top: 8px;
-	font: inherit;
-	font-size: 0.78rem;
-	padding: 6px 8px;
-	border: 1px solid var(--rw-border);
-	background: var(--rw-bg-elevated);
-	color: var(--rw-text);
-	cursor: pointer;
-	border-radius: 3px;
+/* ---------- 8. "Neste artigo" fixo ao rolar + Aparência ---------- */
+/* common.js (função mountToc) cria um <div class="rw-toc-sticky"> logo onde
+   o TOC nativo (#toc) estava, move o #toc pra dentro dele e injeta o painel
+   Aparência ali também — os dois passam a rolar juntos, fixos, exatamente
+   como você pediu. Só em telas largas (desktop); em telas estreitas volta a
+   rolar normal junto com o texto, senão sobra pouco espaço pro artigo. */
+.rw-toc-sticky {
+	float: right;
+	width: 260px;
+	margin: 0 0 16px 20px;
+}
+@media (min-width: 852px) {
+	.rw-toc-sticky {
+		position: sticky;
+		top: 16px;
+	}
+}
+@media (max-width: 851px) {
+	.rw-toc-sticky {
+		float: none;
+		width: auto;
+		margin: 0 0 16px;
+	}
 }
 
-#rw-diagram-overlay {
-	display: none;
-	position: fixed;
-	inset: 0;
-	background: rgba(0, 0, 0, 0.45);
-	z-index: 100;
-	padding: 24px;
-	overflow: auto;
-}
-
-#rw-diagram-overlay.open {
-	display: flex;
-	align-items: flex-start;
-	justify-content: center;
-}
-
-.rw-diagram-modal {
-	background: var(--rw-bg);
-	color: var(--rw-text);
-	border: 1px solid var(--rw-border);
-	max-width: 900px;
-	width: 100%;
-	padding: 20px 24px 26px;
-	position: relative;
-}
-
-.rw-diagram-modal h2 {
-	margin: 0 0 4px;
-	font-size: 1.2rem;
-}
-
-.rw-diagram-modal .rw-diagram-subtitle {
-	margin: 0 0 18px;
-	font-size: 0.82rem;
-	color: var(--rw-text-muted);
-}
-
-.rw-diagram-close {
-	position: absolute;
-	top: 14px;
-	right: 14px;
-	font: inherit;
-	font-size: 0.85rem;
-	border: 1px solid var(--rw-border);
-	background: var(--rw-bg-elevated);
-	color: var(--rw-text);
-	padding: 4px 10px;
-	cursor: pointer;
-	border-radius: 3px;
-}
-
-/* Diagrama em SVG (mesma estrutura enviada, restilizada com os tokens da
-   Religio Wiki em vez das cores fixas do arquivo original — assim segue o
-   tema claro/escuro/personalizado automaticamente). Ver common.js, seção
-   "Pop-up do diagrama de categorias", pelo <svg> completo. */
-.rw-diagram-modal svg {
-	width: 100%;
-	height: auto;
-	display: block;
-}
-
-.rw-diagram-svg-bg { fill: var(--rw-bg-elevated); }
-.rw-diagram-svg-title {
-	fill: var(--rw-text);
-	font-family: "Noto Sans", sans-serif;
-	font-weight: 700;
-}
-.rw-diagram-svg-section {
-	fill: var(--rw-link);
-	font-family: "Noto Sans", sans-serif;
-	font-weight: 700;
-}
-.rw-diagram-svg-line { stroke: var(--rw-text-muted); }
-.rw-diagram-svg-label {
-	fill: var(--rw-text);
-	font-family: "Noto Sans", sans-serif;
-}
-.rw-diagram-svg-note {
-	fill: var(--rw-text-muted);
-	font-family: "Noto Sans", sans-serif;
-	font-style: italic;
-}
-.rw-diagram-svg-christian { fill: #DC2626; font-weight: 700; }
-.rw-diagram-svg-islam { fill: #15803D; font-weight: 700; }
-
-/* ---------- 9. Painel "Aparência" (tamanho de texto / largura) ---------- */
-/* Injetado abaixo de "Neste artigo" (TOC nativo, id="toc") por common.js. */
 .rw-appearance-panel {
 	margin-top: 14px;
 	border: 1px solid var(--rw-border);
@@ -575,7 +498,7 @@ html[data-rw-textsize="large"] { font-size: 112.5%; }
 html[data-rw-width="wide"] #content,
 html[data-rw-width="wide"] .mw-body { max-width: none !important; }
 
-/* ---------- 10. Seletor de idioma do artigo ---------- */
+/* ---------- 9. Seletor de idioma do artigo ---------- */
 /* Injetado acima de "Neste artigo" por common.js, a partir das sub-páginas
    Título/en, Título/es, Título/fr, Título/it (ver $wgReligioWikiLanguages
    em LocalSettings-snippet.php — convenção de sub-página, não é o sistema
@@ -631,7 +554,7 @@ html[data-rw-width="wide"] .mw-body { max-width: none !important; }
 	font-size: 0.78rem;
 }
 
-/* ---------- 11. Lápis de edição (admin/editor) ---------- */
+/* ---------- 10. Lápis de edição (admin/editor) ---------- */
 /* body.rw-can-edit é adicionado pelo hook OutputPageBodyAttributes quando
    quem está vendo a página tem permissão de editar (ver
    LocalSettings-snippet.php). */
@@ -646,7 +569,7 @@ html[data-rw-width="wide"] .mw-body { max-width: none !important; }
 .rw-edit-pencil:hover { opacity: 1; text-decoration: none; }
 body.rw-can-edit .rw-edit-pencil { display: inline; }
 
-/* ---------- 12. Crédito de última edição ---------- */
+/* ---------- 11. Crédito de última edição ---------- */
 .rw-last-edited {
 	margin-top: 2em;
 	padding-top: 8px;
@@ -655,7 +578,7 @@ body.rw-can-edit .rw-edit-pencil { display: inline; }
 	color: var(--rw-text-muted);
 }
 
-/* ---------- 13. Infoboxes e templates de artigo ---------- */
+/* ---------- 12. Infoboxes e templates de artigo ---------- */
 .rw-infobox {
 	float: right;
 	width: 230px;
@@ -705,7 +628,7 @@ body.rw-can-edit .rw-edit-pencil { display: inline; }
 	background: var(--rw-bg-elevated) !important;
 }
 
-/* ---------- 14. Responsivo / menu hambúrguer ---------- */
+/* ---------- 13. Responsivo / menu hambúrguer ---------- */
 /* Skin legacy Vector não é responsivo de fábrica (foi desenhado antes de
    telas pequenas serem prioridade) — essas regras adaptam a barra lateral
    fixa (#mw-panel) e o cabeçalho pra telas estreitas. Se no futuro quiser
@@ -740,6 +663,52 @@ body.rw-can-edit .rw-edit-pencil { display: inline; }
 	z-index: 150;
 }
 
+/* Rede de segurança contra rolamento lateral indevido — nada na página
+   deve ser mais largo que a tela. */
+html, body {
+	max-width: 100%;
+	overflow-x: hidden;
+}
+img, svg, table, pre {
+	max-width: 100%;
+}
+
+/* Grupos com sub-lista dentro da barra lateral (ex.: uma categoria com as
+   religiões do grupo listadas embaixo) viram collapse/accordion — fechados
+   por padrão, pra lateral não ficar gigante de tão comprida. Aplica-se
+   automaticamente a qualquer <li> com <ul> dentro, via common.js "Menu
+   hambúrguer" (mesmo em desktop, não só no menu mobile). */
+.rw-collapse-toggle {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	width: 100%;
+	font: inherit;
+	font-size: inherit;
+	font-weight: inherit;
+	color: inherit;
+	background: none;
+	border: none;
+	padding: 2px 0;
+	cursor: pointer;
+	text-align: left;
+}
+.rw-collapse-toggle .rw-collapse-chevron {
+	font-size: 0.75em;
+	transition: transform 0.15s ease;
+	margin-left: 6px;
+	flex-shrink: 0;
+}
+.rw-collapse-toggle[aria-expanded="true"] .rw-collapse-chevron {
+	transform: rotate(180deg);
+}
+li.rw-collapse-item > ul {
+	display: none;
+}
+li.rw-collapse-item.open > ul {
+	display: block;
+}
+
 @media (max-width: 851px) {
 	#rw-hamburger { display: inline-flex; }
 
@@ -750,11 +719,15 @@ body.rw-can-edit .rw-edit-pencil { display: inline; }
 		left: 0;
 		bottom: 0;
 		width: min(80vw, 300px);
+		max-width: 100%;
 		z-index: 200;
+		overflow-x: hidden;
 		overflow-y: auto;
 		background: var(--rw-bg-elevated);
 		border-right: 1px solid var(--rw-border);
 		padding: 16px;
+		padding-top: 48px;
+		box-sizing: border-box;
 		overscroll-behavior: contain;
 	}
 	#mw-panel.rw-sidebar-open {
@@ -770,6 +743,12 @@ body.rw-can-edit .rw-edit-pencil { display: inline; }
 	#p-search,
 	.rw-search {
 		max-width: none;
+	}
+	/* Textos longos (nome de religião comprido) quebram a linha em vez de
+	   forçar a barra lateral a ficar mais larga que a tela. */
+	#mw-panel, #mw-panel * {
+		overflow-wrap: break-word;
+		word-break: break-word;
 	}
 }
 
@@ -795,7 +774,7 @@ body.rw-can-edit .rw-edit-pencil { display: inline; }
 	}
 }
 
-/* ---------- 15. Pop-up de login / criar conta ---------- */
+/* ---------- 14. Pop-up de login / criar conta ---------- */
 #rw-auth-overlay {
 	display: none;
 	position: fixed;

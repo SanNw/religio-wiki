@@ -35,9 +35,7 @@ artigo" no README.
 
 ---
 
-O botão "Ver diagrama de categorias" (pop-up com o diagrama da classificação,
-espaçamento uniforme, cores das religiões já definidas, no estilo visual da
-Religio Wiki) é injetado automaticamente pelo `common.js` logo abaixo do
-bloco "Categorias" acima e antes do bloco nativo "Ferramentas" — não precisa
-de nada extra além do `common.js` já estar colado em
-`Special:MediaWiki:Common.js`.
+Em tela estreita, cada bloco da lateral acima (Navegação, Categorias,
+Ferramentas) vira um collapse/accordion fechado por padrão — ver "Menu
+hambúrguer" em `common.js` (`collapsePortlets`). Deixa o menu compacto em
+vez de uma lista comprida.

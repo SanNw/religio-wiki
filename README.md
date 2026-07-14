@@ -191,53 +191,44 @@ etc.) — isso depende de credenciais/contas financeiras que só você pode
 abrir, não é algo que eu tenha como criar por você. O widget já deixa claro
 esse limite pra quem visitar a página (nota no rodapé do widget).
 
-## Diagrama de categorias
-
-Botão **"Ver diagrama de categorias"** logo abaixo do bloco "Categorias" da
-barra lateral e **acima** do bloco nativo "Ferramentas" (não no fim da
-lateral) — injetado pelo `common.js`, que agora procura especificamente o
-portlet de categorias (`#p-categorias-religiao-heading`) e insere o botão
-logo depois dele, antes de `#p-tb` (o "Ferramentas" nativo).
-
-O pop-up mostra o SVG que você enviou (mesma estrutura/coordenadas/textos),
-com as cores fixas do arquivo trocadas por classes que seguem os tokens da
-Religio Wiki — então ele já respeita tema claro/escuro/personalizado
-automaticamente, e Cristianismo/Islã saem coloridos com o vermelho/verde já
-definidos. Fonte trocada de Georgia/Helvetica (do arquivo original) para a
-Noto Sans do projeto. Sem extensão nova — é só CSS/JS (`common.css`,
-comentário "Diagrama em SVG"; `common.js`, "Pop-up do diagrama de
-categorias").
-
 ## Ferramentas de leitura do artigo
 
-Quatro coisas novas em todo artigo, seguindo o padrão da Wikipédia:
+**"Ver diagrama de categorias" foi removido** — não fazia mais parte do
+projeto (nem o botão, nem o pop-up, nem o SVG); tirei de `common.css` e
+`common.js` por completo.
 
-- **Idiomas** (acima de "Neste artigo", em **estilo collapse**: começa
-  fechado, um clique no cabeçalho abre/fecha): lista Português (original) +
-  os idiomas configurados. Um detalhe importante: a Wikipédia de verdade
-  liga **wikis inteiramente separados** por idioma (pt.wikipedia.org,
-  en.wikipedia.org...); aqui é **um wiki só**, então "trocar de idioma" é
-  navegar para uma sub-página do mesmo artigo (`Cristianismo/en`, por
-  exemplo) — não existe conteúdo traduzido automaticamente, é preciso
-  escrever cada versão. O seletor já configurado (inglês, espanhol, francês,
-  italiano) mostra em itálico/esmaecido o idioma que ainda não tem
-  sub-página escrita, com um link "+ Adicionar idioma" apontando para
-  `Religio Wiki:Idiomas` (`pagina-idiomas.wikitext`), que explica como
-  traduzir um artigo e como configurar um idioma novo na lista. Ver
-  "Idiomas do artigo (convenção de sub-página)" em
-  `LocalSettings-snippet.php`.
-- **Aparência** (abaixo de "Neste artigo"): tamanho do texto
-  (Pequeno/Padrão/Grande) e largura do conteúdo (Padrão/Largo), persistido
-  por leitor via `localStorage` — como o menu de aparência da Wikipédia,
-  mas separado do seletor de tema (claro/escuro/personalizado) que já
-  existia. **Corrigido dois bugs** que você reportou: (1) tamanho do texto
-  agora reescala o `<html>` inteiro (`font-size: 87.5%/112.5%`) em vez de só
-  um trecho isolado — antes só o parágrafo mudava um pouco e os títulos
-  ficavam do mesmo tamanho, dando a impressão de "não fazer nada"; (2)
-  "Largo" agora só alarga a coluna de leitura (`#content`/`.mw-body`) — a
-  versão anterior colapsava a grade inteira numa coluna só, o que esticava
-  elementos pensados pra ficar estreitos, como o botão "Ver diagrama de
-  categorias".
+Três coisas em todo artigo, seguindo o padrão da Wikipédia, **só dentro de
+artigo de verdade** — nenhuma delas aparece na página principal, em
+`Religio Wiki:Doar` ou em qualquer página fora do namespace principal, já
+que todas dependem do índice nativo (`#toc`, que essas páginas não têm por
+causa do `__NOTOC__`) e agora também checam a namespace explicitamente:
+
+- **Idiomas**, em **estilo collapse** (começa fechado, clique no cabeçalho
+  abre/fecha): lista Português (original) + os idiomas configurados. Um
+  detalhe importante: a Wikipédia de verdade liga **wikis inteiramente
+  separados** por idioma (pt.wikipedia.org, en.wikipedia.org...); aqui é
+  **um wiki só**, então "trocar de idioma" é navegar para uma sub-página do
+  mesmo artigo (`Cristianismo/en`, por exemplo) — não existe conteúdo
+  traduzido automaticamente, é preciso escrever cada versão. O seletor já
+  configurado (inglês, espanhol, francês, italiano) mostra em
+  itálico/esmaecido o idioma que ainda não tem sub-página escrita, com um
+  link "+ Adicionar idioma" apontando para `Religio Wiki:Idiomas`
+  (`pagina-idiomas.wikitext`).
+- **"Neste artigo" (índice nativo) + Aparência, fixos ao rolar a tela,
+  juntos**: `common.js` (função `mount` do painel Aparência) cria um
+  contêiner (`.rw-toc-sticky`), move o índice nativo do MediaWiki pra dentro
+  dele e injeta o painel Aparência logo abaixo — os dois passam a rolar
+  fixos juntos (`position: sticky`) em telas largas. O índice em si **já é
+  clicável nativamente**: cada item já é um link real pro trecho
+  correspondente do artigo (isso não precisou de nenhum ajuste, é como o
+  MediaWiki sempre gerou o índice — só o índice hand-made da prévia no
+  navegador não era clicável, e isso já foi corrigido lá também).
+  Aparência: tamanho do texto (Pequeno/Padrão/Grande) e largura do conteúdo
+  (Padrão/Largo), persistido por leitor via `localStorage`. **Corrigidos os
+  dois bugs** que você reportou antes: (1) tamanho do texto agora reescala
+  o `<html>` inteiro (`font-size: 87.5%/112.5%`) em vez de só um trecho
+  isolado; (2) "Largo" agora só alarga a coluna de leitura, sem esticar
+  nada da lateral.
 - **Lápis de edição** (✏, ao lado do título): só aparece pra quem realmente
   pode editar aquela página — o hook `OutputPageBodyAttributes` marca
   `body.rw-can-edit` no servidor checando a permissão de verdade
@@ -261,12 +252,25 @@ habilitada) pra listar as notas de rodapé do corpo do texto.
 ## Responsivo / versão mobile
 
 O skin legacy Vector (o que a instalação usa) não foi desenhado pra tela
-pequena — essas regras (seção 14 do `common.css`) adaptam o que dá:
+pequena — essas regras (seção 13 do `common.css`) adaptam o que dá.
+
+**Rolamento lateral corrigido**: `html, body { max-width: 100%; overflow-x:
+hidden; }` como rede de segurança, mais `overflow-wrap`/`word-break` na
+barra lateral pra nome comprido de religião quebrar linha em vez de esticar
+o menu, mais `max-width:100%` em imagem/SVG/tabela. Na prévia do navegador
+a causa principal era um bug específico do grid CSS ali (um item com
+`grid-column: 3` numa grade que só tinha 1 coluna em tela estreita, o que
+fazia o navegador criar colunas extras pra caber — corrigido lá também).
 
 - Abaixo de 851px, a barra lateral fixa (`#mw-panel`) some e vira um menu
   hambúrguer (☰, canto superior esquerdo, `common.js` "Menu hambúrguer") —
   abre como painel deslizante por cima do conteúdo, com fundo escurecido
   atrás; fecha ao clicar fora, apertar Esc, ou clicar num link do menu.
+- **Cada bloco da lateral vira collapse/accordion, fechado por padrão**
+  (`common.js`, função `collapsePortlets`) — é o que deixa a lateral
+  compacta em vez de uma lista comprida: "Categorias", "Navegação" etc.
+  ficam recolhidos até o leitor tocar no título de cada um. Funciona em
+  qualquer tela, não só no menu mobile.
 - Na página principal, "Artigo em destaque" e "Imagem do dia" (lado a lado
   no desktop) empilham em coluna única abaixo de 720px — isso já existia
   desde a primeira versão da página principal.
@@ -286,7 +290,7 @@ um projeto à parte, não incluído nesta rodada.
 
 ## Login e cadastro
 
-Pop-up centralizado (`common.css` seção 15, `common.js` "Pop-up de login /
+Pop-up centralizado (`common.css` seção 14, `common.js` "Pop-up de login /
 criar conta") que abre ao clicar em "Entrar" (ou "Criar conta", quando
 visível) em qualquer página — no lugar de ir pra uma página cheia à parte.
 Duas abas, Entrar/Criar conta, cada uma com:

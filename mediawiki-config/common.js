@@ -125,174 +125,6 @@
 	}
 }() );
 
-/* ===== Pop-up do diagrama de categorias ===== */
-( function () {
-	'use strict';
-
-	// SVG enviado pelo usuário, com as cores fixas trocadas por classes que
-	// seguem os tokens da Religio Wiki (tema claro/escuro/personalizado) —
-	// ver common.css, seções 8/13. Estrutura e coordenadas originais mantidas.
-	var DIAGRAM_SVG = '' +
-		'<svg viewBox="0 0 900 950" xmlns="http://www.w3.org/2000/svg">' +
-		'<rect width="900" height="950" class="rw-diagram-svg-bg"/>' +
-		'<text x="450" y="55" text-anchor="middle" font-size="26" class="rw-diagram-svg-title">Classificação das Religiões</text>' +
-
-		'<text x="450" y="105" text-anchor="middle" font-size="17" class="rw-diagram-svg-section">I. Os Xamanismos Hiperbóreos</text>' +
-		'<g class="rw-diagram-svg-line" stroke-width="1.5" fill="none">' +
-		'<line x1="450" y1="118" x2="450" y2="150"/>' +
-		'<line x1="140" y1="150" x2="740" y2="150"/>' +
-		'<line x1="140" y1="150" x2="140" y2="180"/>' +
-		'<line x1="290" y1="150" x2="290" y2="180"/>' +
-		'<line x1="450" y1="150" x2="450" y2="180"/>' +
-		'<line x1="740" y1="150" x2="740" y2="180"/>' +
-		'</g>' +
-		'<text x="140" y="200" text-anchor="middle" font-size="16" class="rw-diagram-svg-label">Taoísmo</text>' +
-		'<text x="290" y="200" text-anchor="middle" font-size="16" class="rw-diagram-svg-label">Confucionismo</text>' +
-		'<text x="740" y="200" text-anchor="middle" font-size="16" class="rw-diagram-svg-label">Xintoísmo</text>' +
-		'<line x1="140" y1="210" x2="140" y2="245" class="rw-diagram-svg-line" stroke-width="1.5"/>' +
-		'<text x="140" y="265" text-anchor="middle" font-size="15.5" class="rw-diagram-svg-label">Xamanismo Siberiano</text>' +
-		'<line x1="740" y1="210" x2="740" y2="245" class="rw-diagram-svg-line" stroke-width="1.5"/>' +
-		'<text x="740" y="263" text-anchor="middle" font-size="15.5" class="rw-diagram-svg-label">' +
-		'<tspan x="740" dy="0">Religião</tspan><tspan x="740" dy="20">Ameríndia</tspan>' +
-		'</text>' +
-		'<line x1="450" y1="180" x2="450" y2="330" class="rw-diagram-svg-line" stroke-width="1.5"/>' +
-		'<text x="450" y="350" text-anchor="middle" font-size="16" class="rw-diagram-svg-label">Bön (a religião pré-budista do Tibete)</text>' +
-
-		'<text x="450" y="415" text-anchor="middle" font-size="17" class="rw-diagram-svg-section">II. As Mitologias Árias</text>' +
-		'<g class="rw-diagram-svg-line" stroke-width="1.5" fill="none">' +
-		'<line x1="450" y1="428" x2="450" y2="460"/>' +
-		'<line x1="230" y1="460" x2="670" y2="460"/>' +
-		'<line x1="230" y1="460" x2="230" y2="490"/>' +
-		'<line x1="670" y1="460" x2="670" y2="490"/>' +
-		'</g>' +
-		'<text x="230" y="510" text-anchor="middle" font-size="16" class="rw-diagram-svg-label">Hinduísmo</text>' +
-		'<text x="670" y="510" text-anchor="middle" font-size="16" class="rw-diagram-svg-label">Budismo</text>' +
-		'<g class="rw-diagram-svg-line" stroke-width="1.5" fill="none">' +
-		'<line x1="230" y1="520" x2="230" y2="545"/>' +
-		'<line x1="130" y1="545" x2="230" y2="545"/>' +
-		'<line x1="130" y1="545" x2="130" y2="565"/>' +
-		'</g>' +
-		'<text x="220" y="585" text-anchor="middle" font-size="15.5" class="rw-diagram-svg-label">Religião Greco-Romana*</text>' +
-		'<g class="rw-diagram-svg-line" stroke-width="1.5" fill="none">' +
-		'<line x1="670" y1="520" x2="670" y2="545"/>' +
-		'<line x1="600" y1="545" x2="670" y2="545"/>' +
-		'<line x1="600" y1="545" x2="600" y2="565"/>' +
-		'</g>' +
-		'<text x="600" y="585" text-anchor="middle" font-size="15.5" class="rw-diagram-svg-label">Antiga Religião Germano-Céltica*</text>' +
-		'<g class="rw-diagram-svg-line" stroke-width="1.5" fill="none">' +
-		'<line x1="230" y1="595" x2="230" y2="615"/>' +
-		'<line x1="185" y1="615" x2="230" y2="615"/>' +
-		'<line x1="185" y1="615" x2="185" y2="635"/>' +
-		'</g>' +
-		'<text x="200" y="655" text-anchor="middle" font-size="15.5" class="rw-diagram-svg-label">Jainismo</text>' +
-		'<g class="rw-diagram-svg-line" stroke-width="1.5" fill="none">' +
-		'<line x1="600" y1="595" x2="600" y2="615"/>' +
-		'<line x1="600" y1="615" x2="640" y2="615"/>' +
-		'<line x1="640" y1="615" x2="640" y2="635"/>' +
-		'</g>' +
-		'<text x="630" y="655" text-anchor="middle" font-size="15.5" class="rw-diagram-svg-label">Zoroastrismo (Parsismo)</text>' +
-		'<text x="600" y="695" text-anchor="middle" font-size="14" class="rw-diagram-svg-note">*extinta</text>' +
-
-		'<text x="450" y="770" text-anchor="middle" font-size="17" class="rw-diagram-svg-section">III. Os Monoteísmos Semíticos</text>' +
-		'<g class="rw-diagram-svg-line" stroke-width="1.5" fill="none">' +
-		'<line x1="450" y1="783" x2="450" y2="815"/>' +
-		'<line x1="180" y1="815" x2="720" y2="815"/>' +
-		'<line x1="180" y1="815" x2="180" y2="845"/>' +
-		'<line x1="450" y1="815" x2="450" y2="845"/>' +
-		'<line x1="720" y1="815" x2="720" y2="845"/>' +
-		'</g>' +
-		'<text x="180" y="865" text-anchor="middle" font-size="17" class="rw-diagram-svg-label">Judaísmo</text>' +
-		'<text x="450" y="865" text-anchor="middle" font-size="17" class="rw-diagram-svg-label rw-diagram-svg-christian">Cristianismo</text>' +
-		'<text x="720" y="865" text-anchor="middle" font-size="17" class="rw-diagram-svg-label rw-diagram-svg-islam">Islã</text>' +
-		'</svg>';
-
-	function buildOverlay() {
-		var overlay = document.createElement( 'div' );
-		overlay.id = 'rw-diagram-overlay';
-
-		var modal = document.createElement( 'div' );
-		modal.className = 'rw-diagram-modal';
-		modal.setAttribute( 'role', 'dialog' );
-		modal.setAttribute( 'aria-modal', 'true' );
-		modal.setAttribute( 'aria-labelledby', 'rw-diagram-title' );
-
-		var closeBtn = document.createElement( 'button' );
-		closeBtn.type = 'button';
-		closeBtn.className = 'rw-diagram-close';
-		closeBtn.textContent = 'Fechar ✕';
-		closeBtn.addEventListener( 'click', function () { close(); } );
-
-		var h2 = document.createElement( 'h2' );
-		h2.id = 'rw-diagram-title';
-		h2.textContent = 'Classificação das religiões';
-
-		var subtitle = document.createElement( 'p' );
-		subtitle.className = 'rw-diagram-subtitle';
-		subtitle.textContent = 'Estrutura de categorias da Religio Wiki, em três grandes grupos.';
-
-		var svgHolder = document.createElement( 'div' );
-		svgHolder.innerHTML = DIAGRAM_SVG;
-
-		modal.appendChild( closeBtn );
-		modal.appendChild( h2 );
-		modal.appendChild( subtitle );
-		modal.appendChild( svgHolder );
-		overlay.appendChild( modal );
-
-		function close() {
-			overlay.classList.remove( 'open' );
-			document.removeEventListener( 'keydown', onKeydown );
-		}
-		function onKeydown( e ) {
-			if ( e.key === 'Escape' ) { close(); }
-		}
-		overlay.addEventListener( 'click', function ( e ) {
-			if ( e.target === overlay ) { close(); }
-		} );
-
-		overlay.rwOpen = function () {
-			overlay.classList.add( 'open' );
-			document.addEventListener( 'keydown', onKeydown );
-			closeBtn.focus();
-		};
-
-		return overlay;
-	}
-
-	function mount() {
-		// Insere logo depois do portlet "Categorias" (MediaWiki:Sidebar,
-		// id p-categorias-religiao-heading) e antes do portlet nativo
-		// "Ferramentas" (id p-tb) — não simplesmente no fim da lateral.
-		var categoriesPortlet = document.getElementById( 'p-categorias-religiao-heading' );
-		var toolsPortlet = document.getElementById( 'p-tb' );
-		var anchor = categoriesPortlet || toolsPortlet;
-		if ( !anchor ) {
-			return;
-		}
-
-		var overlay = buildOverlay();
-		document.body.appendChild( overlay );
-
-		var button = document.createElement( 'button' );
-		button.type = 'button';
-		button.id = 'rw-diagram-button';
-		button.textContent = 'Ver diagrama de categorias';
-		button.addEventListener( 'click', function () { overlay.rwOpen(); } );
-
-		if ( categoriesPortlet ) {
-			categoriesPortlet.parentNode.insertBefore( button, categoriesPortlet.nextSibling );
-		} else {
-			toolsPortlet.parentNode.insertBefore( button, toolsPortlet );
-		}
-	}
-
-	if ( document.readyState === 'loading' ) {
-		document.addEventListener( 'DOMContentLoaded', mount );
-	} else {
-		mount();
-	}
-}() );
-
 /* ===== Painel "Aparência" (tamanho de texto / largura) ===== */
 ( function () {
 	'use strict';
@@ -342,10 +174,23 @@
 	}
 
 	function mount() {
-		var toc = document.getElementById( 'toc' );
-		if ( !toc ) {
+		// Só dentro de artigo (namespace principal) — em qualquer outra
+		// página (Religio Wiki:Doar, Special:, etc.) isso não aparece.
+		if ( typeof mw !== 'undefined' && mw.config && mw.config.get( 'wgNamespaceNumber' ) !== 0 ) {
 			return;
 		}
+		var toc = document.getElementById( 'toc' );
+		if ( !toc ) {
+			return; // páginas sem índice (ex.: __NOTOC__ na principal/Doar) não têm isso
+		}
+
+		// "Neste artigo" e "Aparência" ficam fixos (sticky) juntos ao rolar a
+		// tela — cria um wrapper flutuante, move o índice nativo pra dentro
+		// dele e injeta o painel logo abaixo. common.css, seção 8.
+		var wrapper = document.createElement( 'div' );
+		wrapper.className = 'rw-toc-sticky';
+		toc.parentNode.insertBefore( wrapper, toc );
+		wrapper.appendChild( toc );
 
 		var panel = document.createElement( 'div' );
 		panel.className = 'rw-appearance-panel';
@@ -365,7 +210,7 @@
 			{ id: 'wide', label: 'Largo' }
 		], WIDTH_KEY ) );
 
-		toc.parentNode.insertBefore( panel, toc.nextSibling );
+		wrapper.appendChild( panel );
 	}
 
 	if ( document.readyState === 'loading' ) {
@@ -693,6 +538,46 @@
 			if ( e.target.tagName === 'A' ) {
 				close();
 			}
+		} );
+
+		collapsePortlets( panel );
+	}
+
+	// Cada bloco da lateral (ex.: "Categorias", "Navegação") vira um
+	// collapse/accordion fechado por padrão — é o que deixa o menu
+	// compacto em vez de uma lista comprida exigindo rolar bastante.
+	function collapsePortlets( panel ) {
+		var portlets = panel.querySelectorAll( '.portal, .mw-portlet, [id^="p-"]' );
+		portlets.forEach( function ( portlet ) {
+			var heading = portlet.querySelector( 'h3, h2' );
+			var body = portlet.querySelector( '.body' ) || portlet.querySelector( 'ul' );
+			if ( !heading || !body || heading.dataset.rwCollapseDone ) {
+				return;
+			}
+			heading.dataset.rwCollapseDone = '1';
+
+			var toggle = document.createElement( 'button' );
+			toggle.type = 'button';
+			toggle.className = 'rw-collapse-toggle';
+			toggle.setAttribute( 'aria-expanded', 'false' );
+
+			var label = document.createElement( 'span' );
+			label.textContent = heading.textContent;
+			var chevron = document.createElement( 'span' );
+			chevron.className = 'rw-collapse-chevron';
+			chevron.textContent = '▾';
+			toggle.appendChild( label );
+			toggle.appendChild( chevron );
+
+			heading.textContent = '';
+			heading.appendChild( toggle );
+
+			body.style.display = 'none';
+			toggle.addEventListener( 'click', function () {
+				var isOpen = body.style.display !== 'none';
+				body.style.display = isOpen ? 'none' : '';
+				toggle.setAttribute( 'aria-expanded', String( !isOpen ) );
+			} );
 		} );
 	}
 
