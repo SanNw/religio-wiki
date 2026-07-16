@@ -1,0 +1,32 @@
+name: Deploy Wiki Content
+
+# Roda o pull + deploy-wiki-content.sh na VPS a cada push em main que mexa
+# em conteúdo do wiki, no script de deploy ou no Dockerfile. Também pode ser
+# disparado manualmente pela aba Actions.
+#
+# Segurança: a chave SSH usada aqui (secret VPS_DEPLOY_SSH_KEY) está presa
+# no authorized_keys da VPS a um "forced command" — ela só consegue executar
+# exatamente "git pull && deploy-wiki-content.sh" em /opt/religio-wiki,
+# nada além disso (sem shell livre, sem port-forwarding). O conteúdo do
+# passo "script" abaixo é ignorado pelo servidor por causa disso; ele só
+# precisa existir para o ssh-action ter algo pra enviar.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "mediawiki-config/**"
+      - "scripts/deploy-wiki-content.sh"
+      - "Dockerfile"
+  workflow_dispatch: {}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to VPS (forced command on server runs the real script)
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: 179.197.79.199
+          username: root
+          key: ${{ secrets.VPS_DEPLOY_SSH_KEY }}
+          script: echo "trigger only — servidor força git pull + deploy-wiki-content.sh"
