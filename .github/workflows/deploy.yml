@@ -10,6 +10,11 @@ name: Deploy Wiki Content
 # nada além disso (sem shell livre, sem port-forwarding). O conteúdo do
 # passo "script" abaixo é ignorado pelo servidor por causa disso; ele só
 # precisa existir para o ssh-action ter algo pra enviar.
+#
+# Requer 3 secrets em Settings → Secrets and variables → Actions:
+#   VPS_HOST           IP ou domínio da VPS (não fica em texto puro no repo)
+#   VPS_USER           usuário SSH (ex.: root)
+#   VPS_DEPLOY_SSH_KEY chave privada com o forced command acima
 on:
   push:
     branches: [main]
@@ -26,7 +31,7 @@ jobs:
       - name: Deploy to VPS (forced command on server runs the real script)
         uses: appleboy/ssh-action@v1.2.0
         with:
-          host: 179.197.79.199
-          username: root
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_DEPLOY_SSH_KEY }}
           script: echo "trigger only — servidor força git pull + deploy-wiki-content.sh"
