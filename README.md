@@ -341,8 +341,6 @@ dois exemplos que você deu:
 ## Passo a passo (primeira instalação)
 
 ```bash
-cd "Religio Wiki"
-
 # 1. Copie o arquivo de ambiente e defina senhas fortes
 cp .env.example .env
 # edite DB_PASSWORD e DB_ROOT_PASSWORD em .env
