@@ -415,7 +415,7 @@ Sintoma: cores e textos aparecem certos, mas cabeçalho, fontes, menus
 sanfona e o layout em geral estão diferentes do combinado — geralmente
 parecido com o Vector padrão do MediaWiki, sem a identidade da Religio Wiki.
 
-Duas causas possíveis, nessa ordem de probabilidade:
+Três causas possíveis, nessa ordem de probabilidade:
 
 1. **`MediaWiki:Common.css`/`Common.js` nunca foram aplicados.** Esses
    arquivos só têm efeito quando o conteúdo deles está dentro dessas páginas
@@ -438,6 +438,17 @@ Duas causas possíveis, nessa ordem de probabilidade:
    $wgVectorDefaultSkinVersionForNewAccounts = '1';
    $wgVectorDefaultSkinVersionForExistingAccounts = '1';
    ```
+3. **Sua própria conta já tinha uma preferência de skin salva antes dessa
+   configuração existir.** `$wgDefaultSkin`/`$wgVectorDefaultSkinVersion*`
+   só valem para quem nunca escolheu nada manualmente — contas criadas antes
+   dessa config (tipicamente o `Admin` do `install.php`) ficam com "Vector
+   (2022)" gravado como preferência pessoal em `user_properties`, que sempre
+   vence sobre o padrão do site. Sinal de que é isso: em
+   `Special:Preferences` → aba **Aparência**, o rádio marcado é "Vector
+   (2022)" mesmo com "Vector legado (2010)" aparecendo como "(padrão)" ao
+   lado. Resolve na hora clicando em "Vector legado (2010)" → Salvar nessa
+   mesma tela, ou de uma vez para todas as contas com o passo 4/4 do
+   `deploy-wiki-content.sh` (abaixo).
 
 ### Passo a passo pra aplicar a correção num wiki que já está no ar
 

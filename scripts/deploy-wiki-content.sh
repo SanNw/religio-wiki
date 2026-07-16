@@ -15,7 +15,7 @@ ADMIN_USER="${1:-Admin}"
 COMPOSE="docker compose"
 SERVICE="mediawiki"
 
-echo "== 1/3: LocalSettings.php =="
+echo "== 1/4: LocalSettings.php =="
 if [ ! -f LocalSettings.php ]; then
   echo "ERRO: LocalSettings.php não encontrado nesta pasta. Rode o instalador primeiro (ver README)." >&2
   exit 1
@@ -49,7 +49,7 @@ else
   echo "  config de skin (Vector clássico) adicionada ao LocalSettings.php."
 fi
 
-echo "== 2/3: subindo/reiniciando o container =="
+echo "== 2/4: subindo/reiniciando o container =="
 $COMPOSE up -d
 $COMPOSE restart "$SERVICE"
 
@@ -63,7 +63,7 @@ edit_page() {
     "$title" < "$file"
 }
 
-echo "== 3/3: aplicando páginas =="
+echo "== 3/4: aplicando páginas =="
 edit_page "MediaWiki:Common.css" mediawiki-config/common.css
 edit_page "MediaWiki:Common.js" mediawiki-config/common.js
 
@@ -72,9 +72,24 @@ while IFS=$'\t' read -r file title; do
   edit_page "$title" "mediawiki-config/pages/$file"
 done < mediawiki-config/pages/manifest.tsv
 
+echo "== 4/4: resetando skin fixado em contas já existentes =="
+# $wgDefaultSkin/$wgVectorDefaultSkinVersion só valem pra quem NUNCA salvou uma
+# preferência própria de aparência. Contas criadas antes dessa configuração
+# (ex.: o Admin do install.php) já têm "Vector (2022)" gravado como escolha
+# pessoal em user_properties, e isso sempre vence sobre o padrão do site —
+# por isso o wiki continua "sem a identidade" mesmo logado como Admin. Limpa
+# essa preferência pra todo mundo, fazendo cair de volta no padrão (Vector
+# clássico). Não apaga conta, senha nem nenhum outro dado — só essa escolha.
+$COMPOSE exec -T "$SERVICE" php maintenance/sql.php --query \
+  "DELETE FROM user_properties WHERE up_property = 'skin';"
+
 echo
 echo "Pronto. Dê um Ctrl+F5 (hard refresh) no navegador — o MediaWiki cacheia"
 echo "Common.css/Common.js agressivamente via ResourceLoader."
+echo
+echo "Se ainda aparecer 'Vector (2022)' marcado em Preferências → Aparência pra"
+echo "alguma conta, é porque ela mudou isso de novo manualmente depois deste"
+echo "script rodar — é só marcar 'Vector legado (2010)' e Salvar ali mesmo."
 echo
 echo "Confira também 'Gerenciar editores' (Special:UserRights) para colocar seu"
 echo "usuário no grupo 'editor' caso a aba 'Editar' ainda não apareça."
