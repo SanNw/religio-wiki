@@ -4,6 +4,18 @@
  * pelo instalador (ver README.md da pasta "Religio Wiki").
  */
 
+// ---------- Skin: força o Vector clássico (não o Vector 2022) ----------
+// Todo o design da Religio Wiki (common.css/common.js) foi escrito em cima
+// do DOM do Vector clássico (#mw-panel, #p-personal, #pt-login, #toc
+// nativo etc.). Instalações novas do MediaWiki (1.36+) vêm com o Vector
+// 2022 como padrão, cujo DOM é bem diferente — se essa configuração não
+// estiver aqui, o wiki fica "parecido, mas não igual" ao projeto (cabeçalho,
+// menus e fontes destoando), mesmo com o Common.css/Common.js corretos.
+$wgDefaultSkin = 'vector';
+$wgVectorDefaultSkinVersion = '1';
+$wgVectorDefaultSkinVersionForNewAccounts = '1';
+$wgVectorDefaultSkinVersionForExistingAccounts = '1';
+
 // ---------- Acesso: leitura pública/anônima, edição só por convite ----------
 // Qualquer pessoa lê sem login ("modo anônimo") E pode criar a própria
 // conta livremente — mas ter conta não dá direito de editar. Edição

@@ -398,11 +398,75 @@ VPS com os containers já no ar. Ele aplica retroativamente tudo que faltou.
 - `Dockerfile` — `mediawiki:1.41` oficial + extensões de edição/citação (ver
   seção acima).
 - `docker-compose.yml` — serviços `db` (MariaDB) e `mediawiki` (builda a
-  partir do `Dockerfile`).
+  partir do `Dockerfile`), porta `8080`.
 - `.env` — senhas do banco (não versionado, veja `.env.example`).
 - `LocalSettings.php` — configuração gerada pelo instalador + o conteúdo de
   `mediawiki-config/LocalSettings-snippet.php` (não versionado, contém
   chaves secretas; fica só na máquina onde a wiki roda).
+- `scripts/deploy-wiki-content.sh` — aplica todo `mediawiki-config/` no wiki
+  já instalado (idempotente, pode rodar de novo a qualquer momento).
+- `scripts/rebuild-from-scratch.sh` — **destrutivo**: apaga banco de dados e
+  imagens, reinstala o MediaWiki do zero e já deixa com o conteúdo do projeto
+  aplicado. Use só se `deploy-wiki-content.sh` não resolver.
+
+## Solução de problemas: "o site no ar não está fiel ao projeto"
+
+Sintoma: cores e textos aparecem certos, mas cabeçalho, fontes, menus
+sanfona e o layout em geral estão diferentes do combinado — geralmente
+parecido com o Vector padrão do MediaWiki, sem a identidade da Religio Wiki.
+
+Duas causas possíveis, nessa ordem de probabilidade:
+
+1. **`MediaWiki:Common.css`/`Common.js` nunca foram aplicados.** Esses
+   arquivos só têm efeito quando o conteúdo deles está dentro dessas páginas
+   especiais do próprio wiki — existir em `mediawiki-config/` no repositório
+   não é suficiente. Resolve com `./scripts/deploy-wiki-content.sh`.
+2. **O wiki está rodando o skin Vector 2022 (o moderno), não o Vector
+   clássico.** Instalações novas do MediaWiki (1.36+) vêm com o Vector 2022
+   como padrão — mas todo o `common.css`/`common.js` deste projeto foi
+   escrito em cima do DOM do Vector **clássico** (`#mw-panel`, `#p-personal`,
+   `#pt-login`, `#toc` nativo). Com o Vector 2022 ativo, mesmo aplicando o
+   CSS/JS certos, boa parte dos seletores não bate com nada na página e o
+   layout continua visualmente diferente. Sinal de que é isso: aparece um
+   link "Mudar para aparência antiga" no rodapé do menu lateral — esse link
+   só existe no Vector 2022. Resolve adicionando ao `LocalSettings.php` (já
+   incluído em `LocalSettings-snippet.php` e aplicado automaticamente por
+   `deploy-wiki-content.sh`):
+   ```php
+   $wgDefaultSkin = 'vector';
+   $wgVectorDefaultSkinVersion = '1';
+   $wgVectorDefaultSkinVersionForNewAccounts = '1';
+   $wgVectorDefaultSkinVersionForExistingAccounts = '1';
+   ```
+
+### Passo a passo pra aplicar a correção num wiki que já está no ar
+
+```bash
+cd ~/religio-wiki           # pasta do repositório clonado na VPS
+git pull origin main        # traz o LocalSettings-snippet.php e os scripts atualizados
+./scripts/deploy-wiki-content.sh
+```
+
+Depois:
+- Dê **Ctrl+F5** no navegador (o MediaWiki cacheia Common.css/Common.js
+  agressivamente via ResourceLoader).
+- Confira `Special:Version` pra ver se o skin ativo mudou pra "Vector"
+  (versão legada), e `Special:Preferences` → aba Aparência pra garantir que
+  sua própria conta não está fixada manualmente no Vector 2022.
+- Se a aba "Editar" ainda não aparecer, confira `Special:UserRights` e
+  coloque seu usuário no grupo certo (Admin/sysop já deveria editar por
+  padrão — se não conseguir, o bloco de permissões pode não ter sido salvo;
+  rode `docker compose exec mediawiki cat LocalSettings.php` e confira se
+  o conteúdo de `LocalSettings-snippet.php` está mesmo lá no final).
+
+### Se isso ainda não resolver: reinstalar do zero
+
+`./scripts/rebuild-from-scratch.sh` derruba os containers **com volumes**
+(apaga banco de dados e imagens enviadas), reconstrói a imagem Docker,
+reinstala o MediaWiki e aplica todo o conteúdo do projeto em sequência — uma
+única execução, sem passos manuais. Só use se tiver certeza de que não há
+conteúdo real (artigos escritos por pessoas de verdade) que valha a pena
+preservar no banco atual.
 
 ## Nota sobre este ambiente
 

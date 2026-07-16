@@ -16,17 +16,37 @@ COMPOSE="docker compose"
 SERVICE="mediawiki"
 
 echo "== 1/3: LocalSettings.php =="
-MARKER="Religio Wiki — trechos para colar"
 if [ ! -f LocalSettings.php ]; then
   echo "ERRO: LocalSettings.php não encontrado nesta pasta. Rode o instalador primeiro (ver README)." >&2
   exit 1
 fi
+
+MARKER="Religio Wiki — trechos para colar"
 if grep -q "$MARKER" LocalSettings.php; then
-  echo "  já aplicado, pulando."
+  echo "  bloco principal já aplicado, pulando."
 else
   echo "" >> LocalSettings.php
   cat mediawiki-config/LocalSettings-snippet.php >> LocalSettings.php
-  echo "  adicionado ao final do LocalSettings.php."
+  echo "  bloco principal adicionado ao final do LocalSettings.php."
+fi
+
+# Checagem separada: mesmo quando o bloco principal já tinha sido colado antes
+# (versão anterior do snippet, sem a config de skin), garante que a linha do
+# Vector clássico entra de qualquer forma — é o que faz o common.css/common.js
+# baterem com o DOM real da página.
+SKIN_MARKER="wgVectorDefaultSkinVersion"
+if grep -q "$SKIN_MARKER" LocalSettings.php; then
+  echo "  config de skin (Vector clássico) já presente, pulando."
+else
+  {
+    echo ""
+    echo "// Religio Wiki — força Vector clássico (ver LocalSettings-snippet.php)"
+    echo "\$wgDefaultSkin = 'vector';"
+    echo "\$wgVectorDefaultSkinVersion = '1';"
+    echo "\$wgVectorDefaultSkinVersionForNewAccounts = '1';"
+    echo "\$wgVectorDefaultSkinVersionForExistingAccounts = '1';"
+  } >> LocalSettings.php
+  echo "  config de skin (Vector clássico) adicionada ao LocalSettings.php."
 fi
 
 echo "== 2/3: subindo/reiniciando o container =="
