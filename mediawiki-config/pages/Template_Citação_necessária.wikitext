@@ -1,0 +1,4 @@
+<sup class="rw-citation-needed">[[Wikipédia:Carece de fontes|carece de fontes]]</sup>{{#ifeq:{{NAMESPACE}}|||[[Categoria:Artigos que carecem de fontes]]}}<noinclude>
+Uso: coloque logo depois da frase que precisa de referência —
+texto sem fonte{{Citação necessária}}.
+</noinclude>

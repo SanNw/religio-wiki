@@ -1,0 +1,12 @@
+<div class="rw-disambig-box">
+'''{{PAGENAME}}''' pode se referir a:
+</div>
+{{{conteudo|}}}
+[[Categoria:Desambiguação]]<noinclude>
+Uso:
+{{Desambiguação
+|conteudo=
+* [[Artigo A]] — descrição breve
+* [[Artigo B]] — descrição breve
+}}
+</noinclude>

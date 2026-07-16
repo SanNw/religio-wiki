@@ -31,7 +31,9 @@ identidade visual:
 ## Identidade e configuração de conteúdo
 
 Configuração já pronta em `mediawiki-config/` (aplicar depois do passo a
-passo de instalação abaixo):
+passo de instalação abaixo — **de preferência todas de uma vez, rodando
+`./scripts/deploy-wiki-content.sh`**, em vez de colar arquivo por arquivo à
+mão; ver passo 6 mais abaixo):
 
 - **`categorias.wikitext`** — estrutura de categorias baseada na classificação
   de religiões enviada (I. Xamanismos Hiperbóreos, II. Mitologias Arianas,
@@ -368,17 +370,28 @@ docker compose run --rm mediawiki php maintenance/install.php \
   "Religio Wiki" \
   Admin
 
-# 5. Cole o conteúdo de mediawiki-config/LocalSettings-snippet.php no final
-#    do LocalSettings.php gerado (extensões, permissões, cor por religião)
-
-# 6. Suba o MediaWiki
+# 5. Suba o MediaWiki
 docker compose up -d
 
-# 7. Acesse http://localhost:8080 e faça login como "Admin"
+# 6. Aplique TODO o conteúdo de mediawiki-config/ de uma vez só — isso substitui
+#    o passo manual de colar cada arquivo em Special:MediaWiki:Common.css,
+#    Common.js, templates, categorias, página principal, doação e idiomas.
+#    É idempotente: pode rodar de novo sem risco se algo mudar.
+./scripts/deploy-wiki-content.sh
+
+# 7. Acesse http://localhost:8080, faça login como "Admin" e dê um Ctrl+F5
 ```
 
-Nas próximas vezes, basta `docker compose up -d` (os passos 2, 4 e 5 são só
-da primeira instalação, pois geram/editam o `LocalSettings.php`).
+Nas próximas vezes, basta `docker compose up -d` (o passo 4 é só da primeira
+instalação, pois gera o `LocalSettings.php`). Já `deploy-wiki-content.sh` pode
+ser rodado de novo sempre que `mediawiki-config/` mudar — ele não perde
+edições feitas depois pelos editores nas páginas normais do wiki (fora das
+listadas no script), só sobrescreve as próprias páginas de configuração.
+
+**Se você já tem um wiki no ar e ele não está fiel ao projeto** (cabeçalho,
+fontes, menus sanfona, templates ausentes) — sintoma de que esse passo 6 foi
+pulado — é só rodar `./scripts/deploy-wiki-content.sh` na pasta do projeto na
+VPS com os containers já no ar. Ele aplica retroativamente tudo que faltou.
 
 ## Estrutura
 
