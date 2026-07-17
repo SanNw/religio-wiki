@@ -1050,6 +1050,15 @@ padding: 0;
 font-size: 0.85rem;
 }
 
+/* Entrar/Criar conta/Preferências etc. um pouco maiores que as abas de
+   página (Ler/Editar/Histórico) -- referência: protótipo no Figma
+   ("carrossel"), variante 5 do componente de botão/link testado ali
+   (âmbar, sublinhado no hover -- mesmo comportamento que todo link do
+   site já tem via a { } / a:hover { } genérico, só o tamanho muda). */
+#p-personal ul {
+font-size: 1rem;
+}
+
 #p-namespaces li a,
 #p-views li a,
 #p-cactions li a,
