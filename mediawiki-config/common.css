@@ -931,14 +931,19 @@ li.rw-collapse-item.open > ul {
 	line-height: 1.5;
 }
 
-/* ---------- 7. Correções de paridade visual (fonte de títulos + logo ausente) ---------- */
-@import url('https://fonts.googleapis.com/css2?family=Abril+Fatface&display=swap');
 
-#firstHeading,
-.rw-home-hero h1,
-.mw-first-heading {
-font-family: 'Abril Fatface', Georgia, 'Times New Roman', serif;
-font-weight: 400;
+/* ---------- 7. Correcoes de paridade visual ---------- */
+
+/* Titulo do artigo: no artefato de referencia nao ha fonte serifada
+   separada -- e so peso 700 na mesma Noto Sans do corpo. Ajusta tamanho/
+   padding pra bater com .firstHeading do artefato (1.9rem, peso 700,
+   padding 0.35em 0.6em, raio 3px). */
+#firstHeading {
+font-size: 1.9rem;
+font-weight: 700;
+line-height: 1.25;
+padding: 0.35em 0.6em;
+border-radius: 3px;
 }
 
 /* Sem arquivo de logo real configurado ($wgLogo) ainda -- esconde o
@@ -946,4 +951,105 @@ font-weight: 400;
 #p-logo,
 .mw-wiki-logo {
 display: none;
+}
+
+/* ---------- 8. Cabecalho unico (equivalente ao .rw-topbar do artefato) ----------
+   Vector legado divide o cabecalho em varias linhas/portlets soltos
+   (#p-personal, #left-navigation, #right-navigation). Reagrupa tudo numa
+   unica faixa com o fundo/borda do tema em vez do branco padrao do MediaWiki. */
+#mw-head {
+display: flex;
+flex-wrap: wrap;
+align-items: center;
+justify-content: flex-end;
+gap: 6px 18px;
+padding: 8px 20px;
+background: var(--rw-bg-elevated);
+border-bottom: 1px solid var(--rw-border);
+}
+
+#left-navigation {
+margin-right: auto;
+order: 1;
+}
+
+#right-navigation {
+display: flex;
+flex-wrap: wrap;
+align-items: center;
+gap: 14px;
+order: 2;
+}
+
+#p-personal {
+order: 3;
+}
+
+#rw-theme-switcher {
+order: 4;
+}
+
+#p-namespaces ul,
+#p-views ul,
+#p-cactions ul,
+#p-personal ul {
+display: flex;
+align-items: center;
+gap: 12px;
+list-style: none;
+margin: 0;
+padding: 0;
+font-size: 0.85rem;
+}
+
+#p-namespaces li a,
+#p-views li a,
+#p-cactions li a,
+#p-personal li a {
+display: inline-block;
+padding: 2px 0;
+border: none !important;
+background: none !important;
+color: var(--rw-link);
+}
+
+#p-namespaces li.selected a,
+#p-views li.selected a {
+font-weight: 700;
+color: var(--rw-text);
+}
+
+#p-search {
+order: 1.5;
+flex: 1 1 200px;
+max-width: 320px;
+}
+
+#p-search .vector-search-box-inner,
+#simpleSearch {
+background: none;
+border: none;
+}
+
+#searchInput {
+width: 100%;
+box-sizing: border-box;
+padding: 5px 10px;
+font: inherit;
+font-size: 0.9rem;
+background: var(--rw-bg);
+color: var(--rw-text);
+border: 1px solid var(--rw-border) !important;
+border-radius: 3px;
+}
+
+@media (max-width: 720px) {
+#mw-head {
+justify-content: flex-start;
+}
+#p-search {
+order: 5;
+flex-basis: 100%;
+max-width: none;
+}
 }
