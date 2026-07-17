@@ -1053,3 +1053,11 @@ flex-basis: 100%;
 max-width: none;
 }
 }
+
+#p-namespaces li,
+#p-views li,
+#p-cactions li,
+#p-personal li {
+background: none !important;
+border: none !important;
+}
