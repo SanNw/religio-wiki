@@ -219,6 +219,14 @@ $wgReligioWikiLanguages = [
 //
 // Depois de ter as credenciais, descomente as linhas abaixo e preencha:
 //
+// IMPORTANTE: PluggableAuth_EnableLocalLogin tem padrão "false" na própria
+// extensão -- sem essa linha, ativar PluggableAuth desliga o login por
+// usuário/senha para TODO MUNDO, inclusive o Admin (o pop-up de login
+// continua mostrando os campos, mas toda tentativa falha com "As
+// credenciais fornecidas não puderam ser autenticadas", mesmo com a senha
+// certa -- não é bug de senha, é o provedor local desabilitado). Descubro
+// isso ao tentar logar como Admin depois do login social já configurado.
+// $wgPluggableAuth_EnableLocalLogin = true;
 // wfLoadExtension( 'PluggableAuth' );
 // wfLoadExtension( 'OpenIDConnect' );
 // $wgPluggableAuth_Config['Google'] = [

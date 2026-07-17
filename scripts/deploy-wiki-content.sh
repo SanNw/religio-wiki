@@ -68,6 +68,22 @@ if grep -qF "wgHiddenPrefs[] = 'skin';" LocalSettings.php; then
   mv LocalSettings.php.tmp LocalSettings.php
 fi
 
+# PluggableAuth_EnableLocalLogin tem padrão "false" na própria extensão --
+# se o login social (PluggableAuth) estiver configurado sem essa linha,
+# ninguém consegue mais logar com usuário/senha, nem o Admin (toda
+# tentativa falha com "As credenciais fornecidas não puderam ser
+# autenticadas", mesmo com a senha certa -- não é bug de senha). Descoberto
+# ao validar a extensão ReligiowikiCustomizer e não conseguir logar como
+# Admin depois do login social já estar configurado.
+if grep -qF "wfLoadExtension( 'PluggableAuth' )" LocalSettings.php && ! grep -q "wgPluggableAuth_EnableLocalLogin" LocalSettings.php; then
+  {
+    echo ""
+    echo "// Religio Wiki — reativa login local (ver LocalSettings-snippet.php)"
+    echo "\$wgPluggableAuth_EnableLocalLogin = true;"
+  } >> LocalSettings.php
+  echo "  login local reativado (PluggableAuth_EnableLocalLogin) no LocalSettings.php."
+fi
+
 echo "== 2/4: subindo/reiniciando o container =="
 $COMPOSE up -d
 $COMPOSE restart "$SERVICE"
