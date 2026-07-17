@@ -1071,3 +1071,48 @@ background-image: none !important;
 border: none !important;
 box-shadow: none !important;
 }
+
+/* ---------- 9. Marca (logo) no cabecalho ----------
+   Vector legado poe #p-logo na barra lateral, nao no cabecalho -- o
+   artefato de referencia tem "Logo" como primeiro item da faixa unica.
+   Sem arquivo de logo real configurado ($wgLogo) ainda, entao common.js
+   ("Marca no cabecalho") injeta o mesmo circulo+texto do artefato
+   (.rw-brand/.mark) como primeiro filho de #mw-head, em vez de mover o
+   #p-logo vazio (que continua escondido pela regra da secao 7). Troque
+   isso por um <img> de verdade quando houver um arquivo de logo. */
+.rw-brand {
+order: -1;
+display: flex;
+align-items: baseline;
+gap: 8px;
+font-weight: 700;
+font-size: 1.05rem;
+color: var(--rw-text);
+text-decoration: none;
+white-space: nowrap;
+}
+.rw-brand:hover {
+text-decoration: none;
+}
+.rw-brand .rw-brand-mark {
+display: inline-flex;
+align-items: center;
+justify-content: center;
+width: 22px;
+height: 22px;
+border: 1.5px solid var(--rw-text);
+border-radius: 50%;
+font-size: 0.75rem;
+font-weight: 700;
+flex-shrink: 0;
+}
+
+/* ---------- 10. Ler / Ver codigo-fonte / Ver historico como icones ----------
+   #p-views ja faz parte da faixa unica (secao 8) -- aqui so troca o texto
+   pelos icones (common.js, "Icones dos controles de pagina"), com o texto
+   original preservado em title= (tooltip). Mesmo tamanho/hover/cor dos
+   demais controles do cabecalho, ja herdados de "#p-views li a" acima. */
+#p-views li a.rw-icon-action {
+font-size: 0.95rem;
+line-height: 1;
+}

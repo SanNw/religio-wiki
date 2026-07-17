@@ -588,6 +588,87 @@
 	}
 }() );
 
+/* ===== Marca no cabeçalho ===== */
+( function () {
+	'use strict';
+
+	// #p-logo vive na barra lateral no Vector legado, não no cabeçalho, e
+	// hoje não há arquivo de logo configurado ($wgLogo) — common.css (seção
+	// 7) esconde o placeholder vazio. Em vez de mover o nó vazio, injeta o
+	// mesmo círculo+texto do artefato de referência como primeiro filho de
+	// #mw-head. Troque por um <img> de verdade quando houver logo.
+	function mount() {
+		var head = document.getElementById( 'mw-head' );
+		if ( !head || document.querySelector( '.rw-brand' ) ) {
+			return;
+		}
+
+		var link = document.createElement( 'a' );
+		link.className = 'rw-brand';
+		link.href = ( typeof mw !== 'undefined' && mw.util ) ? mw.util.getUrl( '' ) : '/';
+
+		var mark = document.createElement( 'span' );
+		mark.className = 'rw-brand-mark';
+		mark.textContent = 'R';
+		mark.setAttribute( 'aria-hidden', 'true' );
+		link.appendChild( mark );
+
+		var label = document.createElement( 'span' );
+		label.textContent = ( typeof mw !== 'undefined' && mw.config ) ? mw.config.get( 'wgSiteName' ) : 'Religio Wiki';
+		link.appendChild( label );
+
+		head.insertBefore( link, head.firstChild );
+	}
+
+	if ( document.readyState === 'loading' ) {
+		document.addEventListener( 'DOMContentLoaded', mount );
+	} else {
+		mount();
+	}
+}() );
+
+/* ===== Ícones dos controles de página (Ler / Ver código-fonte / Ver histórico) ===== */
+( function () {
+	'use strict';
+
+	// Só troca o texto por ícone — href e funcionamento nativo do MediaWiki
+	// ficam intactos. O texto original vira tooltip (title=), sem perder
+	// acessibilidade nem informação pra quem não vê o ícone. Contas com
+	// permissão de editar veem "ca-edit" em vez de "ca-viewsource" (não
+	// coberto aqui de propósito — fora do escopo pedido, e o link nativo
+	// continua funcionando normalmente como texto).
+	var ICONS = {
+		'ca-view': [ '📖', 'Ler' ],
+		'ca-viewsource': [ '</>', 'Ver código-fonte' ],
+		'ca-history': [ '🕘', 'Ver histórico' ]
+	};
+
+	function mount() {
+		Object.keys( ICONS ).forEach( function ( id ) {
+			var li = document.getElementById( id );
+			if ( !li ) {
+				return;
+			}
+			var a = li.querySelector( 'a' );
+			if ( !a || a.classList.contains( 'rw-icon-action' ) ) {
+				return;
+			}
+			var icon = ICONS[ id ][ 0 ];
+			var text = ICONS[ id ][ 1 ];
+			a.title = a.title || text;
+			a.setAttribute( 'aria-label', text );
+			a.classList.add( 'rw-icon-action' );
+			a.textContent = icon;
+		} );
+	}
+
+	if ( document.readyState === 'loading' ) {
+		document.addEventListener( 'DOMContentLoaded', mount );
+	} else {
+		mount();
+	}
+}() );
+
 /* ===== Pop-up de login / criar conta ===== */
 ( function () {
 	'use strict';
