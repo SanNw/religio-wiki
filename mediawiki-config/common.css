@@ -958,14 +958,35 @@ display: none;
    (#p-personal, #left-navigation, #right-navigation). Reagrupa tudo numa
    unica faixa com o fundo/borda do tema em vez do branco padrao do MediaWiki. */
 #mw-head {
+/* O Vector legado posiciona #mw-head com position:absolute + left/width
+   proprios do skin original (pensados pra um cabecalho de varias linhas,
+   nao pra faixa unica) -- sem sobrescrever isso aqui, o primeiro item da
+   faixa (a marca, secao 9) ficava atras da barra lateral fixa (#mw-panel,
+   ~168px), e testar so a largura/left sem ancorar tambem o "right" jogava
+   o outro extremo (Entrar/Criar conta/tema) pra fora da tela. Ancorar
+   left+right (em vez de confiar na largura herdada) faz a faixa ocupar
+   exatamente a area visivel, e o padding-left abre espaco pra nao ficar
+   atras da barra lateral -- so acima de 851px, onde ela e uma coluna fixa
+   de verdade (abaixo disso vira menu hamburguer sobreposto, sem ocupar
+   espaco permanente, ver secao 13). */
+position: absolute;
+left: 0;
+right: 0;
+width: auto;
 display: flex;
 flex-wrap: wrap;
 align-items: center;
 justify-content: flex-end;
 gap: 6px 18px;
-padding: 8px 20px;
+padding: 8px 20px 8px 176px;
 background: var(--rw-bg-elevated);
 border-bottom: 1px solid var(--rw-border);
+}
+
+@media (max-width: 851px) {
+#mw-head {
+padding-left: 20px;
+}
 }
 
 #left-navigation {
