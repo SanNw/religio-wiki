@@ -84,6 +84,25 @@ if grep -qF "wfLoadExtension( 'PluggableAuth' )" LocalSettings.php && ! grep -q 
   echo "  login local reativado (PluggableAuth_EnableLocalLogin) no LocalSettings.php."
 fi
 
+# WikiSEO (nativa, instalada junto com as outras 17 extensões) e a
+# ReligiowikiCustomizer (Fase 6) geravam meta tags de SEO ao mesmo tempo,
+# sem coordenação -- og:title/twitter:card/JSON-LD apareciam duplicados e
+# às vezes conflitantes (ex.: home com schema WebSite E Article ao mesmo
+# tempo). A ReligiowikiCustomizer cobre isso de forma mais integrada ao
+# projeto ({{#rwseo:}}, breadcrumbs, sitemap), então desativa os geradores
+# nativos em vez de manter os dois sistemas ativos. Script sed escrito num
+# arquivo à parte (em vez de inline) pra não brigar com o escape de "$" do
+# bash dentro de aspas duplas.
+if grep -qF "^wfLoadExtension( 'WikiSEO' );" LocalSettings.php; then
+  cat > /tmp/disable_wikiseo.sed << 'SEDEOF'
+s/^wfLoadExtension( 'WikiSEO' );/\/\/ Desativado -- ReligiowikiCustomizer (Fase 6) ja cobre SEO, evita meta tags duplicadas.\n\/\/ wfLoadExtension( 'WikiSEO' );/
+s/^\$wgMetadataGenerators = \[.*\];/\/\/ $wgMetadataGenerators = [ 'OpenGraph', 'Twitter', 'SchemaOrg' ];/
+SEDEOF
+  sed -i -f /tmp/disable_wikiseo.sed LocalSettings.php
+  rm -f /tmp/disable_wikiseo.sed
+  echo "  WikiSEO desativada (geradores redundantes com a Fase 6 da ReligiowikiCustomizer)."
+fi
+
 echo "== 2/4: subindo/reiniciando o container =="
 $COMPOSE up -d
 $COMPOSE restart "$SERVICE"
