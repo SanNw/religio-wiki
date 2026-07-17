@@ -1,5 +1,6 @@
 * navigation
 ** Página principal|mainpage-description
+** Special:Search|Criar novo artigo
 ** Special:Random|randompage
 ** Special:RecentChanges|recentchanges
 ** Special:UserRights|Gerenciar editores
