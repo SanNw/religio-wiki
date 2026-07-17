@@ -1,0 +1,20 @@
+{
+	"require": {
+		"mediawiki/semantic-media-wiki": "7.1.0",
+		"mediawiki/page-forms": "6.0.9",
+		"mediawiki/cargo": "3.9.3",
+		"mediawiki/data-transfer": "1.8",
+		"mediawiki/simple-batch-upload": "3.0.2",
+		"mediawiki/maps": "13.0.2",
+		"octfx/wiki-seo": "2.7.0",
+		"starcitizenwiki/embedvideo": "4.1.0"
+	},
+	"extra": {
+		"merge-plugin": {
+			"include": [
+				"extensions/TemplateStyles/composer.json",
+				"extensions/ExternalData/composer.json"
+			]
+		}
+	}
+}

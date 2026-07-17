@@ -253,3 +253,124 @@ $wgLanguageCode = 'pt-br';
 
 // ---------- Nome do site ----------
 $wgSitename = 'Religio Wiki';
+
+// ================================================================
+// Extensões adicionais (instaladas via git/Composer — ver Dockerfile e
+// composer.local.json). Compatibilidade com MediaWiki 1.43 conferida
+// direto no extension.json de cada extensão em 2026-07-17. Confira
+// Special:Version depois do rebuild da imagem.
+// ================================================================
+
+// ---------- ConfirmEdit + QuestyCaptcha (anti-spam, perguntas em PT-BR) ----------
+wfLoadExtension( 'ConfirmEdit' );
+wfLoadExtension( 'ConfirmEdit/QuestyCaptcha' );
+$wgCaptchaClass = 'QuestyCaptcha';
+$wgCaptchaQuestions = [
+	'Quantos dias tem uma semana?' => [ '7', 'sete' ],
+	'Qual é a cor do céu num dia sem nuvens?' => 'azul',
+	'Quanto é dois mais dois?' => [ '4', 'quatro' ],
+	'Complete: Religio ______ (nome deste site, em latim)' => 'wiki',
+	'Quantos continentes existem no mundo?' => [ '7', 'sete' ],
+	'Em que idioma está escrito este texto? (uma palavra)' => [ 'português', 'portugues' ],
+];
+$wgCaptchaTriggers['edit'] = true;
+$wgCaptchaTriggers['create'] = true;
+$wgCaptchaTriggers['createaccount'] = true;
+$wgCaptchaTriggers['addurl'] = true;
+
+// ---------- ReplaceText: permissão só para sysop ----------
+wfLoadExtension( 'ReplaceText' );
+$wgGroupPermissions['sysop']['replacetext'] = true;
+$wgGroupPermissions['editor']['replacetext'] = false;
+$wgGroupPermissions['user']['replacetext'] = false;
+
+// ---------- Gadgets ----------
+// A lista de gadgets mora na página wiki MediaWiki:Gadgets-definition,
+// criada automaticamente (se ainda não existir) depois do rebuild.
+wfLoadExtension( 'Gadgets' );
+
+// ---------- CategoryTree (árvore de categorias assíncrona) ----------
+wfLoadExtension( 'CategoryTree' );
+$wgCategoryTreeDynamicTag = true; // <categorytree> carrega via AJAX, não bloqueia o carregamento da página
+$wgUseCategoryBrowser = true;
+
+// ---------- External Data (só HTTPS) ----------
+// Whitelist de prefixo de URL, no mesmo estilo de $wgAllowExternalImagesFrom
+// do core — qualquer fonte que não comece com "https://" é rejeitada.
+wfLoadExtension( 'ExternalData' );
+$wgExternalDataSources['*']['allowed urls'] = [ 'https://' ];
+
+// ---------- TemplateStyles (CSS sanitizado por template) ----------
+// Sanitização de propriedades é automática (Css-sanitizer) — não precisa
+// de mais configuração para o uso básico com <templatestyles src="..." />.
+wfLoadExtension( 'TemplateStyles' );
+
+// ---------- CodeMirror (editor padrão com destaque de sintaxe) ----------
+wfLoadExtension( 'CodeMirror' );
+$wgDefaultUserOptions['usecodemirror'] = 1;
+
+// ---------- Header Tabs ----------
+// <headertabs /> no fim da página transforma cada ==Seção== em aba. Ativado
+// automaticamente (sem precisar da tag) no namespace "Religio Wiki:",
+// pensado para páginas de documentação/ajuda do projeto.
+wfLoadExtension( 'HeaderTabs' );
+$wgHeaderTabsAutomaticNamespaces = [ NS_PROJECT ];
+
+// ---------- EmbedVideo (YouTube, Vimeo, MP4 local, com consentimento) ----------
+wfLoadExtension( 'EmbedVideo' );
+$wgEmbedVideoEnableVideoHandler = true; // <video> nativo para MP4 local
+$wgEmbedVideoRequireConsent = true; // só carrega o player externo após clique explícito
+$wgEmbedVideoShowPrivacyNotice = true;
+$wgEmbedVideoDefaultWidth = 400;
+
+// ---------- Semantic MediaWiki ----------
+// Carregada como extensão normal (wfLoadExtension) — a função antiga
+// enableSemantics() não existe mais nas versões 3.x+. Armazenamento:
+// SQLStore padrão, nas mesmas tabelas do MariaDB já usado pelo wiki
+// (nenhum banco separado). As tabelas são criadas pelo update.php.
+wfLoadExtension( 'SemanticMediaWiki' );
+
+// ---------- Page Forms ----------
+// Carregada depois do SemanticMediaWiki de propósito: integra
+// automaticamente com SMW quando a extensão já está habilitada (detecção
+// própria do Page Forms, sem config extra necessária).
+wfLoadExtension( 'PageForms' );
+
+// ---------- Cargo ----------
+// Backend de dados alternativo/complementar ao SMW, também com integração
+// automática ao Page Forms (campos "Cargo table/field" nos formulários).
+wfLoadExtension( 'Cargo' );
+
+// ---------- Data Transfer ----------
+// Import/export CSV e XML (Special:ImportCSV, Special:ImportXML,
+// Special:ViewXML) — reconhece automaticamente templates ligados a
+// tabelas Cargo/propriedades SMW, sem config extra além de carregar
+// depois das duas extensões acima.
+wfLoadExtension( 'DataTransfer' );
+
+// ---------- SimpleBatchUpload ----------
+// Restrito a quem já tem permissão de upload (grupo "editor" e sysop —
+// mesma política do resto do wiki, ver bloco de permissões no topo deste
+// arquivo). Tamanho máximo = limite padrão de upload do servidor
+// ($wgMaxUploadSize / upload_max_filesize do PHP), não redefinido aqui.
+wfLoadExtension( 'SimpleBatchUpload' );
+$wgGroupPermissions['editor']['batchupload'] = true;
+$wgGroupPermissions['sysop']['batchupload'] = true;
+$wgGroupPermissions['user']['batchupload'] = false;
+$wgGroupPermissions['*']['batchupload'] = false;
+
+// ---------- Maps ----------
+// Leaflet + OpenStreetMap como serviço padrão — único provedor que não
+// exige chave de API (ao contrário do Google Maps). Já é o padrão da
+// extensão desde a v9, fixado aqui de forma explícita para não depender
+// do padrão de fábrica mudar numa atualização futura.
+wfLoadExtension( 'Maps' );
+$egMapsDefaultService = 'leaflet';
+$egMapsLeafletLayer = 'OpenStreetMap';
+
+// ---------- WikiSEO ----------
+// Meta description e canonical URL são automáticos ao carregar a
+// extensão; $wgMetadataGenerators liga os geradores de OpenGraph, Twitter
+// Cards e Schema.org.
+wfLoadExtension( 'WikiSEO' );
+$wgMetadataGenerators = [ 'OpenGraph', 'Twitter', 'SchemaOrg' ];
