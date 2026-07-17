@@ -16,6 +16,15 @@ $wgVectorDefaultSkinVersion = '1';
 $wgVectorDefaultSkinVersionForNewAccounts = '1';
 $wgVectorDefaultSkinVersionForExistingAccounts = '1';
 
+// O padrão acima não é suficiente sozinho: preferência pessoal de skin salva
+// numa conta (Special:Preferences → Aparência) sempre vence sobre o padrão
+// do site, então uma conta antiga (ou alguém clicando sem querer) podia
+// voltar pro Vector 2022. Solução definitiva: remove os outros skins da
+// lista de opções — ninguém tem mais o que escolher além do Vector clássico,
+// nem por preferência salva, nem por link direto (?useskin=...).
+$wgSkipSkins = [ 'vector-2022', 'monobook', 'minerva', 'timeless' ];
+$wgHiddenPrefs[] = 'skin'; // some com a escolha de tema em Preferências (só sobra um)
+
 // ---------- Acesso: leitura pública/anônima, edição só por convite ----------
 // Qualquer pessoa lê sem login ("modo anônimo") E pode criar a própria
 // conta livremente — mas ter conta não dá direito de editar. Edição

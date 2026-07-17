@@ -30,13 +30,12 @@ else
   echo "  bloco principal adicionado ao final do LocalSettings.php."
 fi
 
-# Checagem separada: mesmo quando o bloco principal já tinha sido colado antes
-# (versão anterior do snippet, sem a config de skin), garante que a linha do
-# Vector clássico entra de qualquer forma — é o que faz o common.css/common.js
+# Checagens separadas: mesmo quando o bloco principal já tinha sido colado
+# antes (versões anteriores do snippet, sem alguma dessas configs), garante
+# que cada uma entra de qualquer forma — é o que faz o common.css/common.js
 # baterem com o DOM real da página.
-SKIN_MARKER="wgVectorDefaultSkinVersion"
-if grep -q "$SKIN_MARKER" LocalSettings.php; then
-  echo "  config de skin (Vector clássico) já presente, pulando."
+if grep -q "wgVectorDefaultSkinVersion" LocalSettings.php; then
+  echo "  padrão de skin (Vector clássico) já presente, pulando."
 else
   {
     echo ""
@@ -46,7 +45,19 @@ else
     echo "\$wgVectorDefaultSkinVersionForNewAccounts = '1';"
     echo "\$wgVectorDefaultSkinVersionForExistingAccounts = '1';"
   } >> LocalSettings.php
-  echo "  config de skin (Vector clássico) adicionada ao LocalSettings.php."
+  echo "  padrão de skin (Vector clássico) adicionado ao LocalSettings.php."
+fi
+
+if grep -q "wgSkipSkins" LocalSettings.php; then
+  echo "  bloqueio dos outros skins já presente, pulando."
+else
+  {
+    echo ""
+    echo "// Religio Wiki — remove os outros skins da lista (ver LocalSettings-snippet.php)"
+    echo "\$wgSkipSkins = [ 'vector-2022', 'monobook', 'minerva', 'timeless' ];"
+    echo "\$wgHiddenPrefs[] = 'skin';"
+  } >> LocalSettings.php
+  echo "  bloqueio dos outros skins adicionado ao LocalSettings.php."
 fi
 
 echo "== 2/4: subindo/reiniciando o container =="

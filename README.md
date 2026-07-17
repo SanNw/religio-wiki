@@ -450,6 +450,17 @@ Três causas possíveis, nessa ordem de probabilidade:
    mesma tela, ou de uma vez para todas as contas com o passo 4/4 do
    `deploy-wiki-content.sh` (abaixo).
 
+   **Correção definitiva** (recomendada — já incluída em
+   `LocalSettings-snippet.php`): em vez de só trocar o padrão e torcer pra
+   ninguém escolher outro skin de novo, remove os outros skins da lista de
+   opções. Sem isso, nenhuma preferência salva nem link direto
+   (`?useskin=vector-2022`) consegue mais ativar o Vector 2022 — só existe
+   uma opção no wiki inteiro.
+   ```php
+   $wgSkipSkins = [ 'vector-2022', 'monobook', 'minerva', 'timeless' ];
+   $wgHiddenPrefs[] = 'skin'; // some com a escolha de tema em Preferências
+   ```
+
 ### Passo a passo pra aplicar a correção num wiki que já está no ar
 
 ```bash
