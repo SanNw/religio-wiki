@@ -93,7 +93,7 @@ fi
 # nativos em vez de manter os dois sistemas ativos. Script sed escrito num
 # arquivo à parte (em vez de inline) pra não brigar com o escape de "$" do
 # bash dentro de aspas duplas.
-if grep -qF "^wfLoadExtension( 'WikiSEO' );" LocalSettings.php; then
+if grep -q "^wfLoadExtension( 'WikiSEO' );" LocalSettings.php; then
   cat > /tmp/disable_wikiseo.sed << 'SEDEOF'
 s/^wfLoadExtension( 'WikiSEO' );/\/\/ Desativado -- ReligiowikiCustomizer (Fase 6) ja cobre SEO, evita meta tags duplicadas.\n\/\/ wfLoadExtension( 'WikiSEO' );/
 s/^\$wgMetadataGenerators = \[.*\];/\/\/ $wgMetadataGenerators = [ 'OpenGraph', 'Twitter', 'SchemaOrg' ];/
