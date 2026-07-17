@@ -14,11 +14,11 @@
 <div class="rw-home-grid">
 <div class="rw-home-box">
 == Artigo em destaque ==
-{{Página principal/Artigo em destaque}}
+{{:Página principal/Artigo em destaque}}
 </div>
 <div class="rw-home-box rw-image-of-day">
 == Imagem do dia ==
-{{Página principal/Imagem do dia}}
+{{:Página principal/Imagem do dia}}
 </div>
 </div>
 

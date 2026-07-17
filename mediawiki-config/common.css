@@ -930,3 +930,20 @@ li.rw-collapse-item.open > ul {
 	margin-top: 12px;
 	line-height: 1.5;
 }
+
+/* ---------- 7. Correções de paridade visual (fonte de títulos + logo ausente) ---------- */
+@import url('https://fonts.googleapis.com/css2?family=Abril+Fatface&display=swap');
+
+#firstHeading,
+.rw-home-hero h1,
+.mw-first-heading {
+font-family: 'Abril Fatface', Georgia, 'Times New Roman', serif;
+font-weight: 400;
+}
+
+/* Sem arquivo de logo real configurado ($wgLogo) ainda -- esconde o
+   placeholder de aviso do MediaWiki em vez de deixar o texto cru visivel. */
+#p-logo,
+.mw-wiki-logo {
+display: none;
+}
