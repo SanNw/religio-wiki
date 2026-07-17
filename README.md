@@ -94,6 +94,23 @@ correspondente e preencher a cor.
 - Self-host da fonte Noto Sans em vez de carregar do Google Fonts, se
   preferir não depender de CDN externo (o `common.css` já indica onde trocar).
 
+## Painel administrativo (ReligiowikiCustomizer)
+
+Extensão própria do projeto, repositório separado:
+[`SanNw/religiowiki-customizer`](https://github.com/SanNw/religiowiki-customizer)
+— clonada automaticamente pelo `Dockerfile` e carregada via
+`wfLoadExtension('ReligiowikiCustomizer')` no `LocalSettings-snippet.php`.
+
+Fase 1 (concluída): `Special:ReligiowikiCustomizer` (restrita a
+`editinterface`/sysop) com formulário de cores, tipografia e largura
+máxima do tema — gera as variáveis `--rw-*` a partir de configuração salva
+no banco em vez de exigir editar `common.css` na mão. `common.css` não
+precisa de nenhuma alteração: a extensão emite os aliases `--rw-bg`/
+`--rw-bg-elevated`/`--rw-link` que ele já lê, então tudo continua
+funcionando, só passa a ser configurável pela interface. Ver o README do
+próprio repositório da extensão para detalhes de arquitetura e o
+`PROMPT_MESTRE` das 8 fases planejadas.
+
 ## Ferramentas de edição, criação e citação
 
 O tarball/imagem padrão do MediaWiki vem "pelado" — sem as extensões que a

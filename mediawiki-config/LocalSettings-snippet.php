@@ -99,6 +99,14 @@ wfLoadExtension( 'Scribunto' );
 $wgScribuntoDefaultEngine = 'luastandalone';
 $wgScribuntoEngineConf['luastandalone']['luaPath'] = '/usr/bin/lua5.1';
 
+// ReligiowikiCustomizer: painel admin (Special:ReligiowikiCustomizer) que
+// gera as variáveis de cor/tipografia/largura do tema a partir de
+// configuração salva no banco, em vez de hardcoded — ver
+// https://github.com/SanNw/religiowiki-customizer. Common.css continua
+// igual: a extensão só passa a controlar de onde --rw-bg/--rw-link/etc.
+// vêm, os aliases legados garantem compatibilidade total.
+wfLoadExtension( 'ReligiowikiCustomizer' );
+
 // Upload de imagens (para ilustrar/citar com mídia, com legenda via
 // [[Arquivo:...|thumb|legenda]] ou <gallery>) + acesso direto ao acervo do
 // Wikimedia Commons sem precisar reenviar os arquivos.

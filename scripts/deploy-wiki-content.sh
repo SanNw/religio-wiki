@@ -72,6 +72,10 @@ echo "== 2/4: subindo/reiniciando o container =="
 $COMPOSE up -d
 $COMPOSE restart "$SERVICE"
 
+# Cria/atualiza a tabela do ReligiowikiCustomizer (e qualquer outra pendência
+# de schema de extensão) — seguro rodar sempre, update.php é idempotente.
+$COMPOSE exec -T "$SERVICE" php maintenance/update.php --quiet --skip-external-dependencies
+
 edit_page() {
   local title="$1" file="$2"
   echo "  -> ${title}"
