@@ -18,4 +18,12 @@ RUN set -eux; \
 		rm -rf "${ext}/.git"; \
 	done
 
+# ReligiowikiCustomizer — extensão própria do projeto (repositório separado,
+# não é um mirror do Wikimedia como as de cima), painel admin de tema/
+# homepage/componentes. Ver mediawiki-config/LocalSettings-snippet.php.
+RUN set -eux; \
+	rm -rf ReligiowikiCustomizer; \
+	git clone --depth 1 https://github.com/SanNw/religiowiki-customizer.git ReligiowikiCustomizer; \
+	rm -rf ReligiowikiCustomizer/.git
+
 WORKDIR /var/www/html
