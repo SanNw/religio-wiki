@@ -55,9 +55,17 @@ else
     echo ""
     echo "// Religio Wiki — remove os outros skins da lista (ver LocalSettings-snippet.php)"
     echo "\$wgSkipSkins = [ 'vector-2022', 'monobook', 'minerva', 'timeless' ];"
-    echo "\$wgHiddenPrefs[] = 'skin';"
   } >> LocalSettings.php
   echo "  bloqueio dos outros skins adicionado ao LocalSettings.php."
+fi
+
+# Corrige um deploy anterior que adicionou $wgHiddenPrefs — esse global foi
+# removido do MediaWiki core há algumas versões e derruba o site com um
+# "DomainException" na inicialização em instalações recentes (1.4x).
+if grep -qF "wgHiddenPrefs[] = 'skin';" LocalSettings.php; then
+  echo "  removendo \$wgHiddenPrefs['skin'] (causava DomainException/site fora do ar)..."
+  grep -vF "wgHiddenPrefs[] = 'skin';" LocalSettings.php > LocalSettings.php.tmp
+  mv LocalSettings.php.tmp LocalSettings.php
 fi
 
 echo "== 2/4: subindo/reiniciando o container =="

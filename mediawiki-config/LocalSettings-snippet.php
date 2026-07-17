@@ -23,7 +23,10 @@ $wgVectorDefaultSkinVersionForExistingAccounts = '1';
 // lista de opções — ninguém tem mais o que escolher além do Vector clássico,
 // nem por preferência salva, nem por link direto (?useskin=...).
 $wgSkipSkins = [ 'vector-2022', 'monobook', 'minerva', 'timeless' ];
-$wgHiddenPrefs[] = 'skin'; // some com a escolha de tema em Preferências (só sobra um)
+// (não usar $wgHiddenPrefs aqui: foi removido do MediaWiki core há algumas
+// versões — em instalações recentes referenciá-lo pode derrubar o site com
+// um "DomainException" na inicialização. $wgSkipSkins sozinho já é
+// suficiente: com só um skin na lista, não sobra nada pra "esconder".)
 
 // ---------- Acesso: leitura pública/anônima, edição só por convite ----------
 // Qualquer pessoa lê sem login ("modo anônimo") E pode criar a própria

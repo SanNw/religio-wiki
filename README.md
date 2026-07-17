@@ -458,8 +458,13 @@ Três causas possíveis, nessa ordem de probabilidade:
    uma opção no wiki inteiro.
    ```php
    $wgSkipSkins = [ 'vector-2022', 'monobook', 'minerva', 'timeless' ];
-   $wgHiddenPrefs[] = 'skin'; // some com a escolha de tema em Preferências
    ```
+   **Não use `$wgHiddenPrefs`** pra esconder a escolha de tema em
+   Preferências (chegamos a testar isso) — foi removido do MediaWiki core há
+   algumas versões, e em instalações recentes (1.4x) referenciá-lo derruba o
+   site inteiro com um "Exceção fatal do tipo DomainException" na
+   inicialização. `$wgSkipSkins` sozinho já é suficiente: com só um skin na
+   lista, não sobra nada pra esconder.
 
 ### Passo a passo pra aplicar a correção num wiki que já está no ar
 
