@@ -1061,3 +1061,13 @@ max-width: none;
 background: none !important;
 border: none !important;
 }
+
+#mw-head #left-navigation #p-namespaces li,
+#mw-head #right-navigation #p-views li,
+#mw-head #right-navigation #p-cactions li,
+#mw-head #p-personal li {
+background-color: transparent !important;
+background-image: none !important;
+border: none !important;
+box-shadow: none !important;
+}
