@@ -987,6 +987,33 @@ border-bottom: 1px solid var(--rw-border);
 #mw-head {
 padding-left: 20px;
 }
+/* Abaixo de 851px, "flex-wrap" sozinho deixava a marca, os grupos de
+   abas (#p-namespaces/#p-views/#p-cactions, que crescem bastante em
+   página de discussão -- Ler/Editar/Adicionar tópico/Ver histórico/
+   Vigiar juntos), a barra pessoal (6 itens: Admin/Discussão/
+   Preferências/Páginas vigiadas/Contribuições/Sair) e o seletor de tema
+   todos disputando espaço na mesma sopa de itens pequenos, quebrando
+   linha de um jeito imprevisível (relatado como "tudo sobreposto, nada
+   organizado"). Força cada grupo a ocupar a linha inteira, em vez de só
+   deixar o flex-wrap decidir -- cada bloco vira uma linha própria,
+   sempre na mesma ordem (já definida pelos "order" acima).  */
+.rw-brand,
+#left-navigation,
+#right-navigation,
+#p-personal,
+#rw-theme-switcher {
+flex: 1 1 100%;
+}
+#right-navigation {
+justify-content: flex-start;
+}
+#p-namespaces ul,
+#p-views ul,
+#p-cactions ul,
+#p-personal ul {
+flex-wrap: wrap;
+row-gap: 4px;
+}
 }
 
 #left-navigation {
