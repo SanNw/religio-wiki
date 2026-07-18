@@ -23,6 +23,31 @@ fazer ao continuar**: subir o wiki de verdade
 (`docker compose build && docker compose up -d && ./scripts/deploy-wiki-content.sh`)
 e olhar a tela/log de erro com atenção antes de mexer em mais nada.
 
+## Primeira execução ao vivo — contrato de saída do MediaWiki 1.43
+
+O primeiro deploy ao vivo derrubou TODAS as páginas com erro 500:
+`Call to undefined method ReligioWikiTemplate::printTrail()`
+(em `includes/ReligioWikiTemplate.php`, na última linha do `execute()`).
+
+Causa: no MediaWiki 1.43, `Skin::outputPageFinal()` (método `final`) envolve
+a saída do `execute()` deste template — ele mesmo prepende o topo
+(`OutputPage::headElement()`, que já inclui `<!DOCTYPE><html><head>…<body …>`)
+e anexa o rodapé (`OutputPage::tailElement()`, que emite
+`getBottomScripts()` + `</body></html>`). Portanto o `execute()` deve gerar
+**só o conteúdo do `<body>`**. Duas construções da API clássica não valem
+mais aqui:
+
+- `$this->printTrail()` — removido do `BaseTemplate`; chamar = método
+  indefinido (o erro 500 acima). O rodapé agora vem do `tailElement()`.
+- `$this->html( 'headelement' )` — `headelement` deixou de ser chave de
+  dados do QuickTemplate; virava no-op + warning "Undefined array key". O
+  head agora vem do `headElement()`, prependido pelo framework.
+
+Fechar `</body></html>` no próprio template também está errado pelo mesmo
+motivo (duplica as tags do `tailElement` e joga os scripts do rodapé pra
+fora do `<html>`). Corrigido: `execute()` não abre head nem fecha o
+documento — só imprime o miolo do body.
+
 ## Pontos específicos de risco
 
 - **Registro do skin via `skin.json`** (`ValidSkinNames.religiowiki.args`
