@@ -8,7 +8,11 @@ ARG MW_BRANCH=REL1_43
 
 RUN apt-get update \
 	&& apt-get install -y --no-install-recommends git lua5.1 imagemagick unzip \
+		ffmpeg poppler-utils ghostscript \
 	&& rm -rf /var/lib/apt/lists/*
+# ffmpeg -> TimedMediaHandler (transcodifica vídeo/áudio); poppler-utils +
+# ghostscript -> PdfHandler (miniaturas e texto de PDFs). Ver o lote de
+# extensões e as configs em mediawiki-config/LocalSettings-snippet.php.
 
 # Extensões PHP "gd" e "zip" — necessárias pelo phpoffice/phpspreadsheet
 # (dependência do Data Transfer para ler/gerar planilhas). Não vêm
@@ -59,6 +63,23 @@ RUN set -eux; \
 # "composer update" abaixo.
 RUN set -eux; \
 	for ext in ExternalData HeaderTabs TemplateStyles CodeMirror; do \
+		rm -rf "${ext}"; \
+		git clone --depth 1 --branch "${MW_BRANCH}" \
+			"https://github.com/wikimedia/mediawiki-extensions-${ext}.git" "${ext}"; \
+		rm -rf "${ext}/.git"; \
+	done
+
+# Lote de extensões adicionais (funcionalidades estilo Wikipédia) — mesmo
+# padrão de git clone na branch do MediaWiki instalado. Ficaram DE FORA de
+# propósito: CirrusSearch (exige serviço Elasticsearch/OpenSearch à parte) e
+# Graph (descontinuada, desativada na Wikipédia por falha de segurança).
+# DiscussionTools é tratada à parte porque depende de reativar o VisualEditor.
+RUN set -eux; \
+	for ext in \
+		UniversalLanguageSelector Popups PageImages TextExtracts Echo Interwiki \
+		MultimediaViewer ImageMap Poem CharInsert Kartographer TimedMediaHandler \
+		PdfHandler AbuseFilter SpamBlacklist TitleBlacklist CheckUser SecurePoll \
+		Renameuser Nuke DeleteBatch; do \
 		rm -rf "${ext}"; \
 		git clone --depth 1 --branch "${MW_BRANCH}" \
 			"https://github.com/wikimedia/mediawiki-extensions-${ext}.git" "${ext}"; \
