@@ -26,6 +26,16 @@ on:
       - "composer.local.json"
   workflow_dispatch: {}
 
+# Nunca deixa dois deploys rodarem ao mesmo tempo na VPS. Sem isto, um push em
+# main e um disparo manual (ou dois pushes seguidos) rodavam
+# "git pull + docker compose up" concorrentemente e um pisava no outro —
+# containers meio-criados, conflito de nome e porta 8080 "already allocated".
+# cancel-in-progress: false enfileira (não cancela no meio de uma operação
+# docker), então cada deploy espera o anterior terminar.
+concurrency:
+  group: deploy-vps
+  cancel-in-progress: false
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
