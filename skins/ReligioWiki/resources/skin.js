@@ -493,7 +493,9 @@
 			var toggle = document.createElement( 'button' );
 			toggle.type = 'button';
 			toggle.className = 'rw-collapse-toggle';
-			toggle.setAttribute( 'aria-expanded', 'false' );
+			// Abre por padrão (fica mais bonito): a lateral já vem expandida,
+			// o chevron aponta pra cima e o clique continua colapsando/reabrindo.
+			toggle.setAttribute( 'aria-expanded', 'true' );
 
 			var label = document.createElement( 'span' );
 			label.textContent = heading.textContent;
@@ -506,7 +508,7 @@
 			heading.textContent = '';
 			heading.appendChild( toggle );
 
-			body.style.display = 'none';
+			body.style.display = ''; // aberto por padrão
 			toggle.addEventListener( 'click', function () {
 				var isOpen = body.style.display !== 'none';
 				body.style.display = isOpen ? 'none' : '';
