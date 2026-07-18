@@ -210,17 +210,12 @@ if grep -q "rw-extensions-batch-2" LocalSettings.php; then
   echo "  bloco rw-extensions-batch-2 (quebrado) removido do LocalSettings.php."
 fi
 
-# Diagnóstico temporário (rw-show-exception-details): mostra o backtrace nas
-# páginas com erro 500, pra descobrir qual extensão do lote quebra o render de
-# página inteira. Removido depois que o problema for isolado.
-if ! grep -q "rw-show-exception-details" LocalSettings.php; then
-  cat >> LocalSettings.php << 'PHPEOF'
-
-// rw-show-exception-details (diagnóstico temporário do 500)
-$wgShowExceptionDetails = true;
-$wgShowDBErrorBacktrace = true;
-PHPEOF
-  echo "  diagnóstico de exceção ligado (temporário)."
+# Diagnóstico do 500 já concluído (era o AbuseFilter sem a lib Composer
+# wikimedia/equivset). Remove o ShowExceptionDetails temporário do
+# LocalSettings.php ao vivo — não deve ficar ligado em produção.
+if grep -q "rw-show-exception-details" LocalSettings.php; then
+  sed -i '/rw-show-exception-details/,+2d' LocalSettings.php
+  echo "  diagnóstico de exceção (temporário) removido."
 fi
 
 # Lote de extensões estilo Wikipédia — reintroduzido (batch-3) com o JsonConfig,
