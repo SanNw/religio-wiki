@@ -88,6 +88,15 @@ wfLoadExtension( 'WikiEditor' );
 // citação) num formulário em vez de wikitexto cru.
 wfLoadExtension( 'TemplateData' );
 
+// TemplateWizard: adiciona um botão (peça de quebra-cabeça) na barra do
+// WikiEditor que abre um assistente para inserir predefinições (templates)
+// preenchendo seus campos num formulário, em vez de digitar o wikitexto
+// {{...|...}} à mão. Lê os campos/descrições do bloco <templatedata> de cada
+// template (ver as predefinições em mediawiki-config/pages/Template_*.wikitext),
+// então funciona melhor quanto mais templates tiverem esse bloco. Depende de
+// WikiEditor e TemplateData, ambos já carregados acima.
+wfLoadExtension( 'TemplateWizard' );
+
 // Scribunto: módulos em Lua — é o que faz funcionar os templates de citação
 // no estilo CS1 da Wikipédia (Module:Citation/CS1 e templates como
 // {{citar web}}, {{citar livro}}), caso você importe esses templates depois.

@@ -17,4 +17,44 @@ Uso:
 |texto_central=Bíblia
 |origem=Levante, século I
 }}
+<templatedata>
+{
+	"description": "Caixa de informações resumidas de uma religião, exibida no topo do artigo.",
+	"format": "block",
+	"params": {
+		"nome": {
+			"label": "Nome",
+			"description": "Nome da religião. Se vazio, usa o título da página.",
+			"type": "string",
+			"suggested": true
+		},
+		"imagem": {
+			"label": "Imagem",
+			"description": "Nome do arquivo já enviado, sem o prefixo \"Arquivo:\" (ex.: Cristo.jpg).",
+			"type": "wiki-file-name"
+		},
+		"grupo": {
+			"label": "Grupo",
+			"description": "Grupo/categoria de classificação (ex.: III. Monoteísmos Semíticos).",
+			"type": "string",
+			"suggested": true
+		},
+		"relacionadas": {
+			"label": "Relacionadas",
+			"description": "Religiões relacionadas, com links (ex.: [[Judaísmo]], [[Islã]]).",
+			"type": "content"
+		},
+		"texto_central": {
+			"label": "Texto central",
+			"description": "Escritura ou texto central da religião (ex.: Bíblia).",
+			"type": "string"
+		},
+		"origem": {
+			"label": "Origem",
+			"description": "Lugar e época de origem (ex.: Levante, século I).",
+			"type": "string"
+		}
+	}
+}
+</templatedata>
 </noinclude>

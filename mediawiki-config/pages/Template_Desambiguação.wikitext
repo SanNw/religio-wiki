@@ -9,4 +9,18 @@ Uso:
 * [[Artigo A]] — descrição breve
 * [[Artigo B]] — descrição breve
 }}
+<templatedata>
+{
+	"description": "Página de desambiguação: lista os artigos que um mesmo nome pode designar.",
+	"format": "block",
+	"params": {
+		"conteudo": {
+			"label": "Conteúdo",
+			"description": "Lista dos significados, um por linha começando com \"* [[Artigo]] — descrição\".",
+			"type": "content",
+			"required": true
+		}
+	}
+}
+</templatedata>
 </noinclude>

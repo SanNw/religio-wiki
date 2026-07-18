@@ -1,3 +1,32 @@
 '''Ver também:''' {{#if:{{{1|}}}|[[{{{1}}}]]}}{{#if:{{{2|}}}| · [[{{{2}}}]]}}{{#if:{{{3|}}}| · [[{{{3}}}]]}}{{#if:{{{4|}}}| · [[{{{4}}}]]}}<noinclude>
 Uso: {{Ver também|Judaísmo|Islã|Gnosticismo}} (até 4 artigos).
+<templatedata>
+{
+	"description": "Linha \"Ver também\" com links para até 4 artigos relacionados.",
+	"format": "inline",
+	"params": {
+		"1": {
+			"label": "Artigo 1",
+			"description": "Título do primeiro artigo relacionado.",
+			"type": "wiki-page-name",
+			"required": true
+		},
+		"2": {
+			"label": "Artigo 2",
+			"description": "Título do segundo artigo relacionado.",
+			"type": "wiki-page-name"
+		},
+		"3": {
+			"label": "Artigo 3",
+			"description": "Título do terceiro artigo relacionado.",
+			"type": "wiki-page-name"
+		},
+		"4": {
+			"label": "Artigo 4",
+			"description": "Título do quarto artigo relacionado.",
+			"type": "wiki-page-name"
+		}
+	}
+}
+</templatedata>
 </noinclude>
