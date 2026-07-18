@@ -41,8 +41,23 @@
 	}
 
 	function buildSwitcher() {
-		var container = document.createElement( 'div' );
-		container.id = 'rw-theme-switcher';
+		// Dropdown "Tema ▾" (colapsado por padrão), no mesmo padrão visual do
+		// dropdown "Admin" — fica na mesma linha que os outros controles
+		// pessoais. As três opções (Claro/Escuro/Personalizado) e o painel de
+		// cores do tema personalizado ficam dentro do menu, que abre no clique.
+		var wrapper = document.createElement( 'div' );
+		wrapper.className = 'rw-personal-dropdown rw-theme-dropdown';
+
+		var toggle = document.createElement( 'button' );
+		toggle.type = 'button';
+		toggle.className = 'rw-personal-dropdown-toggle';
+		toggle.setAttribute( 'aria-expanded', 'false' );
+		toggle.innerHTML = 'Tema <span class="rw-collapse-chevron">▾</span>';
+		wrapper.appendChild( toggle );
+
+		var menu = document.createElement( 'div' );
+		menu.className = 'rw-personal-dropdown-menu rw-theme-menu';
+		wrapper.appendChild( menu );
 
 		var themes = [
 			{ id: 'light', label: 'Claro' },
@@ -51,9 +66,17 @@
 		];
 		var buttons = {};
 
+		var panel = document.createElement( 'div' );
+		panel.id = 'rw-custom-theme-panel';
+		panel.className = 'rw-custom-theme-panel';
+		if ( savedTheme === 'custom' ) {
+			panel.classList.add( 'open' );
+		}
+
 		themes.forEach( function ( t ) {
 			var btn = document.createElement( 'button' );
 			btn.type = 'button';
+			btn.className = 'rw-theme-opt';
 			btn.textContent = t.label;
 			btn.setAttribute( 'aria-pressed', String( t.id === savedTheme ) );
 			btn.addEventListener( 'click', function () {
@@ -66,17 +89,15 @@
 				panel.classList.toggle( 'open', t.id === 'custom' );
 				if ( t.id === 'custom' ) {
 					applyCustomVars( loadCustomVars() );
+				} else {
+					// escolha simples (claro/escuro): fecha o dropdown
+					wrapper.classList.remove( 'open' );
+					toggle.setAttribute( 'aria-expanded', 'false' );
 				}
 			} );
 			buttons[ t.id ] = btn;
-			container.appendChild( btn );
+			menu.appendChild( btn );
 		} );
-
-		var panel = document.createElement( 'div' );
-		panel.id = 'rw-custom-theme-panel';
-		if ( savedTheme === 'custom' ) {
-			panel.classList.add( 'open' );
-		}
 
 		var fields = [
 			{ key: 'bg', label: 'Fundo', fallback: '#FBF3E1' },
@@ -104,16 +125,28 @@
 			label.appendChild( input );
 			panel.appendChild( label );
 		} );
+		menu.appendChild( panel );
 
-		var wrapper = document.createElement( 'div' );
-		wrapper.appendChild( container );
-		wrapper.appendChild( panel );
+		toggle.addEventListener( 'click', function () {
+			var isOpen = wrapper.classList.toggle( 'open' );
+			toggle.setAttribute( 'aria-expanded', String( isOpen ) );
+		} );
+		document.addEventListener( 'click', function ( e ) {
+			if ( !wrapper.contains( e.target ) ) {
+				wrapper.classList.remove( 'open' );
+				toggle.setAttribute( 'aria-expanded', 'false' );
+			}
+		} );
+
 		return wrapper;
 	}
 
 	function mount() {
 		var personalTools = document.getElementById( 'p-personal' );
 		var target = personalTools || document.body;
+		if ( target.querySelector( '.rw-theme-dropdown' ) ) {
+			return; // idempotência: não monta o dropdown de tema duas vezes
+		}
 		target.appendChild( buildSwitcher() );
 	}
 
