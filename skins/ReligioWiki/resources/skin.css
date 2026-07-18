@@ -602,3 +602,43 @@ input[type="text"], input[type="password"], input[type="email"], input[type="num
 	/* Abas do artigo com alvo de toque maior. */
 	.rw-tab { padding: 8px 12px; }
 }
+
+/* ---------- miniaturas de imagem (thumb) — imagem AO LADO do texto ---------- */
+/* O skin não carrega o mediawiki.skinning.content, então .thumb/.tright não
+   tinham float: imagens ficavam empilhadas abaixo do texto e a caixa que só
+   continha uma imagem flutuada colapsava. Cobre o thumb legado (.thumb.tright)
+   e o novo baseado em <figure> (.mw-halign-*). */
+.thumb { margin-bottom: 1em; }
+.thumb.tright, figure.mw-halign-right, .floatright, .mw-halign-right {
+	float: right;
+	clear: right;
+	margin: 0.3em 0 0.8em 1.2em;
+}
+.thumb.tleft, figure.mw-halign-left, .floatleft, .mw-halign-left {
+	float: left;
+	clear: left;
+	margin: 0.3em 1.2em 0.8em 0;
+}
+.thumb.tnone, figure.mw-halign-none, .mw-halign-none { float: none; }
+figure.mw-halign-center, .mw-halign-center, .center { margin-left: auto; margin-right: auto; text-align: center; }
+.thumbinner {
+	border: 1px solid var(--rw-border);
+	background: var(--rw-bg-elevated);
+	padding: 4px;
+	max-width: 100%;
+}
+.thumbimage, .mw-file-element, figure img { display: block; max-width: 100%; height: auto; }
+.thumbcaption, figcaption {
+	padding: 4px 2px 0;
+	font-size: 0.85em;
+	color: var(--rw-text-muted);
+	line-height: 1.45;
+}
+figure.mw-default-size, .thumb { max-width: 100%; }
+/* o corpo do artigo "contém" as imagens flutuadas (não vazam pro rodapé) */
+.rw-article::after { content: ""; display: table; clear: both; }
+
+/* ---------- esconde o título "Religio Wiki:Doar" na página de doação ---------- */
+/* O conteúdo da página já traz o próprio cabeçalho ("Ajude a manter a Religio
+   Wiki no ar"), então o título nativo "Religio Wiki:Doar" fica redundante. */
+body.page-Religio_Wiki_Doar #firstHeading { display: none; }

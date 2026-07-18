@@ -345,3 +345,19 @@
 	}
 }
 
+
+/* Imagem do dia: contém a imagem mesmo quando o editor insere um
+   [[Arquivo:...|thumb]] (que flutua) e a centraliza, sem colapsar a caixa. */
+.rw-home-box { overflow: hidden; }
+.rw-home-box.rw-image-of-day .thumb,
+.rw-home-box.rw-image-of-day figure {
+	float: none;
+	margin: 0 auto;
+	max-width: 100%;
+}
+.rw-home-box.rw-image-of-day .thumbinner {
+	border: none;
+	background: none;
+	padding: 0;
+	width: auto !important;
+}
