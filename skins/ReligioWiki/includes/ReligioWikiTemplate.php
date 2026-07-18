@@ -19,7 +19,14 @@ class ReligioWikiTemplate extends BaseTemplate {
 		$title = $skin->getTitle();
 		$isArticle = $title && $title->inNamespace( NS_MAIN ) && $skin->getRelevantTitle()->exists();
 		?>
-<?php $this->html( 'headelement' ) ?>
+<?php
+	// MediaWiki 1.43: NÃO emitir headelement / <html><head><body> aqui. O head
+	// completo já é prependido pelo Skin::outputPageFinal() via
+	// OutputPage::headElement() em volta do que este execute() imprime — este
+	// template gera só o conteúdo do <body>. (headelement deixou de ser chave
+	// de dados do QuickTemplate no 1.43; $this->html('headelement') virava
+	// no-op + um warning "Undefined array key" a cada página.)
+?>
 <div class="rw-topbar">
 	<a href="<?php echo htmlspecialchars( Title::newMainPage()->getLocalURL() ) ?>" class="rw-brand">
 		<span class="mark">R</span> <?php echo htmlspecialchars( $this->data['sitename'] ) ?>
@@ -142,10 +149,14 @@ class ReligioWikiTemplate extends BaseTemplate {
 	</ul>
 <?php } ?>
 </div>
-
-<?php $this->printTrail(); ?>
-</body>
-</html>
-		<?php
+<?php
+	// MediaWiki 1.43: este template gera SÓ o conteúdo do <body>. NÃO chamar
+	// printTrail() (foi removido do BaseTemplate -> "Call to undefined method
+	// ReligioWikiTemplate::printTrail()", a causa do erro 500 em TODA página)
+	// nem fechar </body></html> aqui: o Skin::outputPageFinal() já envolve a
+	// saída deste execute() com OutputPage::headElement() (topo, incl.
+	// <html><head><body>) e OutputPage::tailElement() (scripts do rodapé via
+	// getBottomScripts() + </body></html>). Fechar aqui duplicaria as tags e
+	// jogaria os scripts do rodapé pra fora do <html>.
 	}
 }
