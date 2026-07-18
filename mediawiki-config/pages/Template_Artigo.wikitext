@@ -1,0 +1,8 @@
+<noinclude>
+Modelo usado pelo [[Form:Artigo]] para criar artigos de forma guiada. O miolo
+(resumo, conteúdo, categoria) é preenchido pelo formulário — normalmente você
+não edita este modelo à mão.
+</noinclude><includeonly>{{{resumo|}}}
+
+{{{conteúdo|}}}
+{{#if:{{{categoria|}}}|[[Category:{{{categoria}}}]]|}}</includeonly>

@@ -1,0 +1,13 @@
+<div class="rw-criar-artigo">
+== Criar um artigo novo ==
+
+Digite o nome do artigo e clique em '''Criar'''. Abre um formulário simples: você escolhe a '''categoria''' (a religião ou grupo a que o artigo pertence), escreve um '''resumo''' curto e o '''conteúdo''', e salva. Sem precisar decorar wikitexto.
+
+{{#forminput:form=Artigo|placeholder=Nome do novo artigo…|button text=Criar}}
+
+;Como funciona
+* '''Categoria:''' comece a digitar e escolha uma categoria que já existe (ex.: ''Cristianismo'', ''Budismo''). Se ainda não existir, é só digitar o nome novo — a categoria passa a existir sozinha quando o artigo é salvo.
+* '''Já existe um artigo com esse nome?''' Ele abre para edição, sem criar duplicado.
+* Precisa de mais campos (imagem, origem, etc.)? Dá para adicionar a [[Template:Infobox religião|ficha da religião]] depois, editando o artigo.
+</div>
+__NOTOC__
