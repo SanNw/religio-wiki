@@ -1,0 +1,20 @@
+<noinclude>
+Formulário guiado para criar artigos. Abra por [[Religio Wiki:Criar artigo]]
+ou [[Special:FormEdit/Artigo]].
+</noinclude><includeonly>{{{info|create title=Criar artigo}}}
+{{{for template|Artigo}}}
+{| class="rw-form-table"
+|-
+! Categoria
+| {{{field|categoria|input type=combobox|autocomplete on namespace=Category|existing values only=false|placeholder=Ex.: Cristianismo — ou digite uma categoria nova}}}
+|-
+! Resumo
+| {{{field|resumo|input type=textarea|rows=3|placeholder=Uma ou duas frases de introdução.}}}
+|-
+! Conteúdo
+| {{{field|conteúdo|input type=textarea|rows=14}}}
+|}
+{{{end template}}}
+
+{{{standard input|save|label=Salvar artigo}}} {{{standard input|preview|label=Pré-visualizar}}} {{{standard input|cancel|label=Cancelar}}}
+</includeonly>

@@ -143,6 +143,25 @@ if grep -qE "^wfLoadExtension\( 'VisualEditor' \);" LocalSettings.php; then
   echo "  VisualEditor desativado (removido a pedido)."
 fi
 
+# "Criar artigo" (Ferramentas) aponta pro formulário guiado Religio Wiki:Criar
+# artigo (Page Forms). Hook adicional que roda DEPOIS do original (do bloco
+# principal) e sobrescreve só o href do item t-createarticle na instalação já
+# existente. Idempotente pelo marcador rw-createarticle-form.
+if ! grep -q "rw-createarticle-form" LocalSettings.php; then
+  cat >> LocalSettings.php << 'PHPEOF'
+
+// Religio Wiki — "Criar artigo" aponta pro formulário guiado (rw-createarticle-form).
+$wgHooks['SidebarBeforeOutput'][] = static function ( $sk, &$sidebar ) {
+	if ( !$sk->getAuthority()->isAllowed( 'createpage' ) ) { return; }
+	$t = Title::newFromText( 'Religio Wiki:Criar artigo' );
+	if ( $t && isset( $sidebar['TOOLBOX']['createarticle'] ) ) {
+		$sidebar['TOOLBOX']['createarticle']['href'] = $t->getLocalURL();
+	}
+};
+PHPEOF
+  echo "  'Criar artigo' (Ferramentas) apontado pro formulário guiado."
+fi
+
 echo "== 2/4: rebuild da imagem + subindo/reiniciando o container =="
 # Rebuild explícito: "up -d" sozinho NÃO reconstrói a imagem quando só o
 # Dockerfile muda (ex.: skin novo copiado em skins/ReligioWiki, extensões

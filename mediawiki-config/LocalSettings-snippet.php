@@ -177,18 +177,18 @@ $wgHooks['OutputPageBodyAttributes'][] = static function ( $out, $sk, &$bodyAttr
 };
 
 // ---------- "Criar artigo" na caixa de ferramentas (só quem pode criar) ----------
-// Sem isso, criar um artigo depende de já saber o truque de "busque um
-// título inexistente e clique em criar" — esse atalho deixa explícito.
-// Some da lateral sozinho pra quem não tem o direito 'createpage' (leitor
-// anônimo ou conta sem grupo "editor"), sem precisar de CSS pra esconder.
+// Aponta para o formulário guiado Religio Wiki:Criar artigo (Page Forms) —
+// bem mais simples que o truque antigo de "busque um título inexistente e
+// clique em criar". Some da lateral sozinho pra quem não tem o direito
+// 'createpage' (leitor anônimo ou conta sem grupo "editor").
 $wgHooks['SidebarBeforeOutput'][] = static function ( $sk, &$sidebar ) {
 	if ( !$sk->getAuthority()->isAllowed( 'createpage' ) ) {
 		return;
 	}
-	$searchTitle = SpecialPage::getTitleFor( 'Search' );
+	$criarTitle = Title::newFromText( 'Religio Wiki:Criar artigo' );
 	$sidebar['TOOLBOX']['createarticle'] = [
 		'text' => 'Criar artigo',
-		'href' => $searchTitle->getLocalURL(),
+		'href' => $criarTitle ? $criarTitle->getLocalURL() : SpecialPage::getTitleFor( 'Search' )->getLocalURL(),
 		'id' => 't-createarticle',
 	];
 };
