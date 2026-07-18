@@ -18,6 +18,12 @@ class ReligioWikiTemplate extends BaseTemplate {
 		$out = $skin->getOutput();
 		$title = $skin->getTitle();
 		$isArticle = $title && $title->inNamespace( NS_MAIN ) && $skin->getRelevantTitle()->exists();
+		$isMainPage = $title && $title->isMainPage();
+		// Link "Doar" renderizado direto aqui (e não via hook PersonalUrls, que
+		// deixou de ser chamado no MediaWiki 1.43 — buildPersonalUrls() não o
+		// dispara, então o botão nunca aparecia). Aponta para Religio Wiki:Doar.
+		$donateTitle = Title::newFromText( 'Religio Wiki:Doar' );
+		$donateHref = $donateTitle ? $donateTitle->getLocalURL() : '#';
 		?>
 <?php
 	// MediaWiki 1.43: NÃO emitir headelement / <html><head><body> aqui. O head
@@ -35,6 +41,7 @@ class ReligioWikiTemplate extends BaseTemplate {
 		<?php echo $this->makeSearchInput( [ 'placeholder' => 'Buscar na ' . htmlspecialchars( $this->data['sitename'] ) ] ) ?>
 	</div>
 	<div id="p-personal" class="rw-personal">
+		<a id="pt-donate" class="rw-donate" href="<?php echo htmlspecialchars( $donateHref ) ?>"><strong>Doar</strong></a>
 		<ul>
 <?php foreach ( $this->getPersonalTools() as $key => $item ) { ?>
 			<?php echo $this->makeListItem( $key, $item ) ?>
@@ -70,7 +77,7 @@ class ReligioWikiTemplate extends BaseTemplate {
 <?php } ?>
 	</div>
 
-	<main id="content" class="mw-body" role="main">
+	<main id="content" class="mw-body<?php echo $isMainPage ? ' rw-mainpage' : '' ?>" role="main">
 		<?php if ( $out->getIndicators() ) {
 			foreach ( $out->getIndicators() as $indicatorId => $indicatorContent ) {
 				echo Html::rawElement( 'div', [ 'class' => 'mw-indicator', 'id' => "mw-indicator-$indicatorId" ], $indicatorContent );

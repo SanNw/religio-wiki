@@ -119,6 +119,18 @@ a.new { color: #BA2828; }
 }
 .rw-search button { display: none; } /* botão nativo de busca some — o campo já basta */
 
+/* #p-personal é flex pra deixar "Doar", o dropdown "Admin" e o dropdown
+   "Tema" todos na MESMA linha. Antes o flex ficava só no <ul>, e o dropdown
+   de tema (anexado por skin.js como irmão do <ul>) caía numa linha embaixo. */
+#p-personal.rw-personal {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	white-space: nowrap;
+}
+.rw-donate { color: var(--rw-link); font-size: 0.85rem; }
+.rw-donate:hover { text-decoration: underline; }
+
 #p-personal.rw-personal ul {
 	display: flex;
 	align-items: center;
@@ -217,30 +229,50 @@ a.new { color: #BA2828; }
 .rw-tab-more .rw-personal-dropdown-toggle { padding: 6px 10px; font-size: inherit; color: var(--rw-text-muted); }
 .rw-tab-more .rw-personal-dropdown-toggle:hover { color: var(--rw-link); }
 
-/* ---------- seletor de tema (montado por skin.js) ---------- */
-#rw-theme-switcher { display: flex; gap: 4px; }
-#rw-theme-switcher button {
+/* ---------- dropdown de tema "Tema ▾" (montado por skin.js) ---------- */
+/* Reaproveita o visual de .rw-personal-dropdown; aqui só o conteúdo do menu:
+   as três opções (Claro/Escuro/Personalizado) como botões em bloco e, abaixo,
+   o painel de cores que só aparece quando "Personalizado" está selecionado. */
+.rw-theme-menu { min-width: 160px; padding: 4px; }
+.rw-theme-opt {
+	display: block;
+	width: 100%;
+	text-align: left;
 	font: inherit;
-	font-size: 0.78rem;
-	padding: 3px 9px;
+	font-size: 0.85rem;
+	padding: 6px 10px;
+	border: none;
 	border-radius: 3px;
-	border: 1px solid var(--rw-border);
-	background: var(--rw-bg);
+	background: none;
 	color: var(--rw-text);
 	cursor: pointer;
 }
-#rw-theme-switcher button[aria-pressed="true"] { border-color: var(--rw-link); color: var(--rw-link); font-weight: 700; }
-#rw-custom-theme-panel {
+.rw-theme-opt:hover { background: var(--rw-bg); }
+.rw-theme-opt[aria-pressed="true"] { color: var(--rw-link); font-weight: 700; }
+.rw-custom-theme-panel {
 	display: none;
-	gap: 10px;
-	align-items: center;
-	padding: 6px 20px;
-	border-bottom: 1px solid var(--rw-border);
-	background: var(--rw-bg-elevated);
-	font-size: 0.8rem;
+	margin-top: 4px;
+	padding: 6px 10px 2px;
+	border-top: 1px solid var(--rw-border);
 }
-#rw-custom-theme-panel.open { display: flex; }
-#rw-custom-theme-panel label { display: flex; align-items: center; gap: 5px; }
+.rw-custom-theme-panel.open { display: block; }
+.rw-custom-theme-panel label {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	padding: 3px 0;
+	font-size: 0.8rem;
+	color: var(--rw-text);
+}
+.rw-custom-theme-panel input[type="color"] {
+	width: 34px;
+	height: 20px;
+	padding: 0;
+	border: 1px solid var(--rw-border);
+	background: none;
+	cursor: pointer;
+}
 
 /* ---------- layout principal: sidebar | conteúdo | TOC ---------- */
 .rw-layout {
@@ -298,6 +330,11 @@ html[data-rw-width="wide"] .rw-layout { grid-template-columns: 190px minmax(0, 1
 }
 body.religion-cristianismo .firstHeading { background: #DC2626; color: #fff; }
 body.religion-islam .firstHeading { background: #15803D; color: #fff; }
+
+/* Na página principal, esconde o título H1 "Página principal" (o conteúdo da
+   home já traz o seu próprio "Boas-vindas..."). A aba "Página principal" ao
+   lado de "Discussão" fica intacta — ela mora em .rw-page-tabs, não aqui. */
+.rw-mainpage #firstHeading { display: none; }
 
 .rw-subtitle, #contentSub {
 	font-size: 0.82rem;
