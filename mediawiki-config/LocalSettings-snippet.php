@@ -71,15 +71,17 @@ $wgPFEnableStringFunctions = true;
 // link, assinatura, etc.), a mesma barra clássica da Wikipédia.
 wfLoadExtension( 'WikiEditor' );
 
-// VisualEditor: edição em modo "o que você vê é o que tem", sem precisar
-// saber wikitexto — como o editor visual da Wikipédia.
-wfLoadExtension( 'VisualEditor' );
-$wgDefaultUserOptions['visualeditor-enable'] = 1;
-$wgVirtualRestConfig['modules']['parsoid'] = [
-	'url' => 'http://localhost:80/rest.php',
-	'domain' => 'localhost',
-	'prefix' => 'localhost',
-];
+// VisualEditor: REMOVIDO a pedido. O editor visual depende do Parsoid
+// (serviço à parte); sem ele configurado, a aba "Editar" (VE) não funciona.
+// A edição fica só por "Editar código-fonte" (wikitexto), que funciona sempre.
+// Para reativar no futuro: descomente e configure um endpoint Parsoid válido.
+// wfLoadExtension( 'VisualEditor' );
+// $wgDefaultUserOptions['visualeditor-enable'] = 1;
+// $wgVirtualRestConfig['modules']['parsoid'] = [
+// 	'url' => 'http://localhost:80/rest.php',
+// 	'domain' => 'localhost',
+// 	'prefix' => 'localhost',
+// ];
 
 // TemplateData: documentação estruturada de templates, usada pelo
 // VisualEditor para mostrar os campos de um template (ex.: template de
