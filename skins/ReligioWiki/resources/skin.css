@@ -171,6 +171,35 @@ a.new { color: #BA2828; }
 .rw-collapse-chevron { font-size: 0.75em; transition: transform 0.15s ease; margin-left: 6px; flex-shrink: 0; }
 .rw-personal-dropdown-toggle[aria-expanded="true"] .rw-collapse-chevron { transform: rotate(180deg); }
 
+/* Barra pessoal do usuário logado agrupada em "Fulano ▾": skin.js move a <ul>
+   nativa (#p-personal) pra dentro de .rw-admin-personal, mas essa <ul> NÃO tem
+   a classe .rw-personal-dropdown-menu — então precisa das mesmas regras de
+   esconder/mostrar aqui, senão os itens (Discussão/Preferências/Sair/...)
+   ficam sempre visíveis e o "Admin ▾" não colapsa. */
+#p-personal .rw-admin-personal > ul {
+	display: none;
+	position: absolute;
+	top: 100%;
+	right: 0;
+	margin: 6px 0 0;
+	background: var(--rw-bg-elevated);
+	border: 1px solid var(--rw-border);
+	border-radius: 4px;
+	min-width: 170px;
+	padding: 4px 0;
+	list-style: none;
+	z-index: 60;
+}
+#p-personal .rw-admin-personal.open > ul { display: block; }
+#p-personal .rw-admin-personal > ul li { padding: 0; }
+#p-personal .rw-admin-personal > ul li a {
+	display: block;
+	padding: 6px 14px;
+	color: var(--rw-text);
+	font-size: 0.85rem;
+}
+#p-personal .rw-admin-personal > ul li a:hover { background: var(--rw-bg); text-decoration: none; }
+
 /* ---------- barra de abas do artigo ---------- */
 .rw-page-tabs {
 	display: flex;
