@@ -134,13 +134,24 @@ PHPEOF
   echo "  link 'Personalizar wiki' (admin) adicionado ao LocalSettings.php."
 fi
 
-# VisualEditor removido a pedido: a aba "Editar" (VE) depende do Parsoid, que
-# não está configurado, então não funcionava. Comenta o carregamento no
-# LocalSettings.php já existente (o "Editar código-fonte" cobre a edição).
-# Idempotente: só age se a linha ativa (não comentada) ainda existir.
-if grep -qE "^wfLoadExtension\( 'VisualEditor' \);" LocalSettings.php; then
-  sed -i "s|^wfLoadExtension( 'VisualEditor' );|// VisualEditor removido a pedido (VE sem Parsoid nao funciona): wfLoadExtension( 'VisualEditor' );|" LocalSettings.php
-  echo "  VisualEditor desativado (removido a pedido)."
+# Editor moderno (rw-editor-modern): reativa o VisualEditor e liga o
+# DiscussionTools (que exige VisualEditor + Linter). No MediaWiki 1.43 o VE usa
+# o Parsoid embutido no core (sem serviço externo), então a aba "Editar" volta
+# a funcionar. Bloco idempotente porque o snippet principal só é colado uma vez.
+# (Antes havia aqui um bloco que DESATIVAVA o VE — removido, senão re-comentaria
+# a linha nova a cada deploy.)
+if ! grep -q "rw-editor-modern" LocalSettings.php; then
+  cat >> LocalSettings.php << 'PHPEOF'
+
+// Religio Wiki — rw-editor-modern (VisualEditor + DiscussionTools).
+// Ver mediawiki-config/LocalSettings-snippet.php.
+wfLoadExtension( 'VisualEditor' );
+$wgDefaultUserOptions['visualeditor-enable'] = 1;
+$wgVisualEditorEnableWikitext = true;
+wfLoadExtension( 'Linter' );
+wfLoadExtension( 'DiscussionTools' );
+PHPEOF
+  echo "  VisualEditor + DiscussionTools (editor moderno) ativados no LocalSettings.php."
 fi
 
 # "Criar artigo" (Ferramentas) aponta pro formulário guiado Religio Wiki:Criar

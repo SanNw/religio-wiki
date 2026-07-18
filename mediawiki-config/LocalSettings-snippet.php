@@ -71,17 +71,24 @@ $wgPFEnableStringFunctions = true;
 // link, assinatura, etc.), a mesma barra clássica da Wikipédia.
 wfLoadExtension( 'WikiEditor' );
 
-// VisualEditor: REMOVIDO a pedido. O editor visual depende do Parsoid
-// (serviço à parte); sem ele configurado, a aba "Editar" (VE) não funciona.
-// A edição fica só por "Editar código-fonte" (wikitexto), que funciona sempre.
-// Para reativar no futuro: descomente e configure um endpoint Parsoid válido.
-// wfLoadExtension( 'VisualEditor' );
-// $wgDefaultUserOptions['visualeditor-enable'] = 1;
-// $wgVirtualRestConfig['modules']['parsoid'] = [
-// 	'url' => 'http://localhost:80/rest.php',
-// 	'domain' => 'localhost',
-// 	'prefix' => 'localhost',
-// ];
+// VisualEditor: REATIVADO. No MediaWiki 1.43 o VE usa o Parsoid embutido no
+// core (via REST API interna), sem precisar de RESTBase ou de um serviço
+// Parsoid à parte — por isso a aba "Editar" volta a funcionar sem config extra.
+// É também pré-requisito do DiscussionTools (ver abaixo). O "Editar
+// código-fonte" (wikitexto) continua disponível em paralelo.
+wfLoadExtension( 'VisualEditor' );
+$wgDefaultUserOptions['visualeditor-enable'] = 1;
+// Editor de wikitexto 2017 (mesma engine do VE) — usado pela ferramenta de
+// resposta do DiscussionTools.
+$wgVisualEditorEnableWikitext = true;
+
+// Linter: pré-requisito do DiscussionTools; marca erros de wikitexto
+// (Special:LintErrors). Sem interface intrusiva no leitor.
+wfLoadExtension( 'Linter' );
+
+// DiscussionTools: sistema moderno de discussões (responder inline, iniciar
+// tópico, assinar tópicos). Depende de VisualEditor + Linter, carregados acima.
+wfLoadExtension( 'DiscussionTools' );
 
 // TemplateData: documentação estruturada de templates, usada pelo
 // VisualEditor para mostrar os campos de um template (ex.: template de
