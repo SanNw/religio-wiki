@@ -544,3 +544,39 @@ input[type="text"], input[type="password"], input[type="email"], input[type="num
 	padding: 7px 14px;
 	cursor: pointer;
 }
+
+/* ---------- tabelas de formulário (Page Forms: Form:Artigo etc.) ---------- */
+.rw-form-table { border-collapse: collapse; width: 100%; max-width: 640px; }
+.rw-form-table th {
+	text-align: left;
+	vertical-align: top;
+	padding: 8px 12px 8px 0;
+	font-weight: 600;
+	color: var(--rw-text-muted);
+	white-space: nowrap;
+}
+.rw-form-table td { padding: 8px 0; }
+.rw-form-table input[type="text"],
+.rw-form-table textarea,
+.rw-form-table select {
+	width: 100%;
+	max-width: 100%;
+	box-sizing: border-box;
+	font: inherit;
+	padding: 6px 8px;
+	background: var(--rw-bg);
+	color: var(--rw-text);
+	border: 1px solid var(--rw-border);
+	border-radius: 3px;
+}
+
+@media (max-width: 600px) {
+	/* Empilha rótulo acima do campo — 2 colunas ficam apertadas no celular. */
+	.rw-form-table, .rw-form-table tbody, .rw-form-table tr,
+	.rw-form-table th, .rw-form-table td { display: block; width: 100%; }
+	.rw-form-table th { padding: 10px 0 3px; white-space: normal; }
+	/* font-size >= 16px evita o zoom automático do iOS ao focar. */
+	.rw-form-table input[type="text"], .rw-form-table textarea { font-size: 16px; }
+	/* Abas do artigo com alvo de toque maior. */
+	.rw-tab { padding: 8px 12px; }
+}
