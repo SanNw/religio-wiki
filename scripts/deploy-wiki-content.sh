@@ -210,6 +210,19 @@ if grep -q "rw-extensions-batch-2" LocalSettings.php; then
   echo "  bloco rw-extensions-batch-2 (quebrado) removido do LocalSettings.php."
 fi
 
+# Diagnóstico temporário (rw-show-exception-details): mostra o backtrace nas
+# páginas com erro 500, pra descobrir qual extensão do lote quebra o render de
+# página inteira. Removido depois que o problema for isolado.
+if ! grep -q "rw-show-exception-details" LocalSettings.php; then
+  cat >> LocalSettings.php << 'PHPEOF'
+
+// rw-show-exception-details (diagnóstico temporário do 500)
+$wgShowExceptionDetails = true;
+$wgShowDBErrorBacktrace = true;
+PHPEOF
+  echo "  diagnóstico de exceção ligado (temporário)."
+fi
+
 # Lote de extensões estilo Wikipédia — reintroduzido (batch-3) com o JsonConfig,
 # que faltava: o Kartographer o exige e sem ele o MediaWiki caía no carregamento
 # (foi o que derrubou o batch-2). JsonConfig é carregado ANTES do Kartographer.
