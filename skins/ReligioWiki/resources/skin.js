@@ -299,14 +299,14 @@
 
 		var toc = document.getElementById( 'toc' );
 		if ( toc ) {
-			tocColumn.appendChild( toc );
+				tocColumn.appendChild( makeFloatCard( 'rw-toc-card', 'Neste artigo', toc ) );
 		}
 
 		var panel = document.createElement( 'div' );
 		panel.className = 'rw-appearance-panel';
 		var h2 = document.createElement( 'h2' );
 		h2.textContent = 'Aparência';
-		panel.appendChild( h2 );
+		// h2 "Aparência" não é anexado: o cabeçalho vira o botão do card flutuante.
 		panel.appendChild( buildGroup( 'Texto', 'data-rw-textsize', [
 			{ id: 'small', label: 'Pequeno' },
 			{ id: 'standard', label: 'Padrão' },
@@ -316,7 +316,36 @@
 			{ id: 'standard', label: 'Padrão' },
 			{ id: 'wide', label: 'Largo' }
 		], WIDTH_KEY ) );
-		tocColumn.appendChild( panel );
+		tocColumn.appendChild( makeFloatCard( 'rw-appearance-card', 'Aparência', panel ) );
+	}
+
+	// Card flutuante recolhível: um botão que abre/fecha o corpo. No desktop
+	// o CSS mostra o corpo inline (na coluna lateral fixa); no mobile o card
+	// vira um botão sanfona fixo no canto inferior direito (não atrapalha a
+	// leitura). Usado pelo "Neste artigo" (índice) e pela "Aparência".
+	function makeFloatCard( id, label, bodyContent ) {
+		var card = document.createElement( 'div' );
+		card.className = 'rw-float-card';
+		card.id = id;
+
+		var toggle = document.createElement( 'button' );
+		toggle.type = 'button';
+		toggle.className = 'rw-float-toggle';
+		toggle.setAttribute( 'aria-expanded', 'false' );
+		toggle.innerHTML = label + ' <span class="rw-collapse-chevron">▾</span>'; // label é string fixa e confiável
+
+		var body = document.createElement( 'div' );
+		body.className = 'rw-float-body';
+		body.appendChild( bodyContent );
+
+		toggle.addEventListener( 'click', function () {
+			var open = card.classList.toggle( 'rw-open' );
+			toggle.setAttribute( 'aria-expanded', String( open ) );
+		} );
+
+		card.appendChild( toggle );
+		card.appendChild( body );
+		return card;
 	}
 
 	if ( document.readyState === 'loading' ) {

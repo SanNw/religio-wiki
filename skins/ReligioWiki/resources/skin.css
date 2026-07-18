@@ -417,6 +417,83 @@ body.religion-islam .firstHeading { background: #15803D; color: #fff; }
 }
 .rw-toc #toc a { display: inline-block; max-width: 100%; }
 
+/* ---------- cards flutuantes: "Neste artigo" (índice) e "Aparência" ---------- */
+/* Desktop: conteúdo inline na coluna lateral fixa (a coluna .rw-toc já é
+   position:sticky em >=852px). O botão-sanfona fica escondido; o corpo aparece. */
+.rw-float-toggle { display: none; }
+.rw-float-body { display: block; }
+.rw-float-card { margin-bottom: 14px; }
+.rw-float-card:last-child { margin-bottom: 0; }
+
+/* Mobile: a coluna vira botões flutuantes fixos no canto inferior direito —
+   "Neste artigo" em cima, "Aparência" embaixo — recolhidos por padrão pra não
+   atrapalhar a leitura. O corpo abre PRA CIMA do botão (column-reverse). */
+@media (max-width: 851px) {
+	#rw-toc-column.rw-toc {
+		position: fixed;
+		right: 12px;
+		bottom: 12px;
+		top: auto;
+		left: auto;
+		z-index: 180;
+		grid-column: auto;
+		width: auto;
+		max-width: calc(100vw - 24px);
+		display: flex;
+		flex-direction: column;
+		align-items: flex-end;
+		gap: 8px;
+		margin: 0;
+		padding: 0;
+		background: none;
+		border: none;
+	}
+	.rw-float-card {
+		margin: 0;
+		display: flex;
+		flex-direction: column-reverse;
+		align-items: flex-end;
+	}
+	.rw-float-toggle {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		font: inherit;
+		font-size: 0.85rem;
+		color: var(--rw-text);
+		background: var(--rw-bg-elevated);
+		border: 1px solid var(--rw-border);
+		border-radius: 22px;
+		padding: 9px 16px;
+		cursor: pointer;
+		box-shadow: 0 2px 8px rgba(0,0,0,0.22);
+		touch-action: manipulation;
+		white-space: nowrap;
+	}
+	.rw-float-toggle[aria-expanded="true"] .rw-collapse-chevron { transform: rotate(180deg); }
+	.rw-float-body {
+		display: none;
+		margin: 0 0 6px;
+		width: min(82vw, 300px);
+		max-height: 60vh;
+		overflow-y: auto;
+		overscroll-behavior: contain;
+		background: var(--rw-bg-elevated);
+		border: 1px solid var(--rw-border);
+		border-radius: 10px;
+		padding: 12px 14px;
+		box-shadow: 0 4px 16px rgba(0,0,0,0.28);
+	}
+	.rw-float-card.rw-open .rw-float-body { display: block; }
+	/* dentro do card mobile o índice não precisa da caixa/borda própria */
+	.rw-float-body #toc, .rw-float-body .rw-appearance-panel {
+		border: none;
+		background: none;
+		padding: 0;
+		margin: 0;
+	}
+}
+
 .rw-appearance-panel { margin-top: 14px; border: 1px solid var(--rw-border); background: var(--rw-bg-elevated); padding: 10px 14px; font-size: 0.82rem; }
 .rw-appearance-panel h2 { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--rw-text-muted); margin: 0 0 8px; }
 .rw-appearance-group { margin-bottom: 8px; }
