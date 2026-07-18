@@ -442,3 +442,43 @@ $egMapsLeafletLayer = 'OpenStreetMap';
 // Cards e Schema.org.
 wfLoadExtension( 'WikiSEO' );
 $wgMetadataGenerators = [ 'OpenGraph', 'Twitter', 'SchemaOrg' ];
+
+// ================================================================
+// Lote de extensões estilo Wikipédia (rw-extensions-batch-3). Baixadas pelo
+// Dockerfile (git clone REL1_43). JsonConfig é carregado ANTES do Kartographer
+// (que o exige). CirrusSearch e Graph ficaram de fora; DiscussionTools é
+// tratada à parte (depende do VisualEditor).
+// ================================================================
+wfLoadExtension( 'PageImages' );
+wfLoadExtension( 'TextExtracts' );
+wfLoadExtension( 'Popups' );
+wfLoadExtension( 'Echo' );
+wfLoadExtension( 'UniversalLanguageSelector' );
+wfLoadExtension( 'Interwiki' );
+$wgGroupPermissions['sysop']['interwiki'] = true;
+wfLoadExtension( 'MultimediaViewer' );
+wfLoadExtension( 'ImageMap' );
+wfLoadExtension( 'Poem' );
+wfLoadExtension( 'CharInsert' );
+wfLoadExtension( 'JsonConfig' );
+wfLoadExtension( 'Kartographer' );
+wfLoadExtension( 'TimedMediaHandler' );
+$wgFFmpegLocation = '/usr/bin/ffmpeg';
+$wgFileExtensions = array_merge( $wgFileExtensions, [ 'ogg', 'ogv', 'oga', 'webm', 'mp3', 'mp4', 'wav', 'flac' ] );
+wfLoadExtension( 'PdfHandler' );
+wfLoadExtension( 'AbuseFilter' );
+$wgGroupPermissions['sysop']['abusefilter-modify'] = true;
+$wgGroupPermissions['sysop']['abusefilter-view'] = true;
+$wgGroupPermissions['sysop']['abusefilter-log'] = true;
+$wgGroupPermissions['sysop']['abusefilter-log-detail'] = true;
+wfLoadExtension( 'SpamBlacklist' );
+wfLoadExtension( 'TitleBlacklist' );
+wfLoadExtension( 'CheckUser' );
+$wgGroupPermissions['sysop']['checkuser'] = true;
+$wgGroupPermissions['sysop']['checkuser-log'] = true;
+wfLoadExtension( 'SecurePoll' );
+wfLoadExtension( 'Renameuser' );
+$wgGroupPermissions['sysop']['renameuser'] = true;
+wfLoadExtension( 'Nuke' );
+wfLoadExtension( 'DeleteBatch' );
+$wgGroupPermissions['sysop']['deletebatch'] = true;

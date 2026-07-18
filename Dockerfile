@@ -77,9 +77,9 @@ RUN set -eux; \
 RUN set -eux; \
 	for ext in \
 		UniversalLanguageSelector Popups PageImages TextExtracts Echo Interwiki \
-		MultimediaViewer ImageMap Poem CharInsert Kartographer TimedMediaHandler \
-		PdfHandler AbuseFilter SpamBlacklist TitleBlacklist CheckUser SecurePoll \
-		Renameuser Nuke DeleteBatch; do \
+		MultimediaViewer ImageMap Poem CharInsert JsonConfig Kartographer \
+		TimedMediaHandler PdfHandler AbuseFilter SpamBlacklist TitleBlacklist \
+		CheckUser SecurePoll Renameuser Nuke DeleteBatch; do \
 		rm -rf "${ext}"; \
 		git clone --depth 1 --branch "${MW_BRANCH}" \
 			"https://github.com/wikimedia/mediawiki-extensions-${ext}.git" "${ext}"; \
