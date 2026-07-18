@@ -191,6 +191,24 @@ $wgHooks['SidebarBeforeOutput'][] = static function ( $sk, &$sidebar ) {
 	];
 };
 
+// ---------- "Personalizar wiki" na caixa de ferramentas (só admin) ----------
+// Atalho para o painel Special:ReligiowikiCustomizer na seção "Ferramentas".
+// Condicionado ao direito 'editinterface' — a MESMA permissão que a própria
+// página especial exige (grupos "Administradores" e "Administradores da
+// interface") — então o link some sozinho pra quem não é admin, sem CSS e sem
+// levar ninguém a uma tela de "Erro de permissão".
+$wgHooks['SidebarBeforeOutput'][] = static function ( $sk, &$sidebar ) {
+	if ( !$sk->getAuthority()->isAllowed( 'editinterface' ) ) {
+		return;
+	}
+	$customizerTitle = SpecialPage::getTitleFor( 'ReligiowikiCustomizer' );
+	$sidebar['TOOLBOX']['religiowikicustomizer'] = [
+		'text' => 'Personalizar wiki',
+		'href' => $customizerTitle->getLocalURL(),
+		'id' => 't-religiowikicustomizer',
+	];
+};
+
 // ---------- Quem editou por último ----------
 // Mostra "Esta página foi editada pela última vez às [hora], em [data], por
 // [usuário]" no rodapé de cada artigo — nativo do MediaWiki, só precisa

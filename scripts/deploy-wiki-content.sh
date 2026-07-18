@@ -110,6 +110,30 @@ SEDEOF
   echo "  WikiSEO desativada (geradores redundantes com a Fase 6 da ReligiowikiCustomizer)."
 fi
 
+# Link "Personalizar wiki" (Ferramentas -> Special:ReligiowikiCustomizer, só
+# admin). Checagem própria porque o bloco principal do snippet só é colado uma
+# vez (marcador acima), então instalações onde ele já existia não pegariam
+# esse hook novo. Idempotente: só adiciona se o id do link ainda não estiver lá.
+if ! grep -q "t-religiowikicustomizer" LocalSettings.php; then
+  cat >> LocalSettings.php << 'PHPEOF'
+
+// Religio Wiki — link "Personalizar wiki" na caixa de ferramentas (só admin,
+// direito editinterface) -> Special:ReligiowikiCustomizer. Ver LocalSettings-snippet.php.
+$wgHooks['SidebarBeforeOutput'][] = static function ( $sk, &$sidebar ) {
+	if ( !$sk->getAuthority()->isAllowed( 'editinterface' ) ) {
+		return;
+	}
+	$customizerTitle = SpecialPage::getTitleFor( 'ReligiowikiCustomizer' );
+	$sidebar['TOOLBOX']['religiowikicustomizer'] = [
+		'text' => 'Personalizar wiki',
+		'href' => $customizerTitle->getLocalURL(),
+		'id' => 't-religiowikicustomizer',
+	];
+};
+PHPEOF
+  echo "  link 'Personalizar wiki' (admin) adicionado ao LocalSettings.php."
+fi
+
 echo "== 2/4: rebuild da imagem + subindo/reiniciando o container =="
 # Rebuild explícito: "up -d" sozinho NÃO reconstrói a imagem quando só o
 # Dockerfile muda (ex.: skin novo copiado em skins/ReligioWiki, extensões
