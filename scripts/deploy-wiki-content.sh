@@ -176,7 +176,16 @@ echo "== 2/4: rebuild da imagem + subindo/reiniciando o container =="
 # via Composer) — sem isso, o container continuava rodando a imagem antiga
 # depois do deploy.
 $COMPOSE build "$SERVICE"
-$COMPOSE up -d
+# Um deploy anterior interrompido (ex.: timeout de SSH no meio do "up") pode
+# deixar um container renomeado/órfão do serviço mediawiki para trás — algo
+# como "<hash>_religio-wiki-mediawiki-1". Nesse caso o "compose up" seguinte
+# aborta com "container name already in use" e NADA sobe. Remover os containers
+# do serviço mediawiki antes do "up" desfaz esse impasse (o "up" recria o
+# container do zero com a imagem nova). O banco NÃO é tocado — fica no ar, então
+# o update.php mais abaixo continua funcionando sem esperar o db reiniciar.
+docker ps -a --filter "label=com.docker.compose.service=$SERVICE" -q \
+  | xargs -r docker rm -f >/dev/null 2>&1 || true
+$COMPOSE up -d --remove-orphans
 $COMPOSE restart "$SERVICE"
 
 # Cria/atualiza a tabela do ReligiowikiCustomizer (e qualquer outra pendência
