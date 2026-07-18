@@ -22,6 +22,8 @@ on:
       - "mediawiki-config/**"
       - "scripts/deploy-wiki-content.sh"
       - "Dockerfile"
+      - "skins/**"
+      - "composer.local.json"
   workflow_dispatch: {}
 
 jobs:
