@@ -19,6 +19,13 @@ class ReligioWikiTemplate extends BaseTemplate {
 		$title = $skin->getTitle();
 		$isArticle = $title && $title->inNamespace( NS_MAIN ) && $skin->getRelevantTitle()->exists();
 		$isMainPage = $title && $title->isMainPage();
+		// "Admin" = quem tem o direito editinterface (grupos Administradores /
+		// Administradores da interface). Usado pra esconder itens só de admin
+		// na lateral e a aba "Discussão" pra quem não é admin.
+		$isAdmin = $skin->getAuthority()->isAllowed( 'editinterface' );
+		// Itens da lateral (MediaWiki:Sidebar) que só admin deve ver — casados
+		// pelo rótulo exato definido no wikitext da sidebar.
+		$adminOnlySidebar = [ 'Criar novo artigo', 'Mudanças recentes', 'Gerenciar editores' ];
 		// Link "Doar" renderizado direto aqui (e não via hook PersonalUrls, que
 		// deixou de ser chamado no MediaWiki 1.43 — buildPersonalUrls() não o
 		// dispara, então o botão nunca aparecia). Aponta para Religio Wiki:Doar.
@@ -65,6 +72,7 @@ class ReligioWikiTemplate extends BaseTemplate {
 				<?php if ( is_array( $box['content'] ) ) { ?>
 				<ul>
 					<?php foreach ( $box['content'] as $key => $link ) {
+							if ( !$isAdmin && is_array( $link ) && in_array( $link['text'] ?? '', $adminOnlySidebar, true ) ) { continue; } // só admin: Criar novo artigo / Mudanças recentes / Gerenciar editores
 						echo $this->makeListItem( $key, $link );
 					} ?>
 				</ul>
@@ -87,6 +95,7 @@ class ReligioWikiTemplate extends BaseTemplate {
 <?php
 		$contentNav = $this->data['content_navigation'] ?? [];
 		foreach ( ( $contentNav['namespaces'] ?? [] ) as $key => $tab ) {
+			if ( !$isAdmin && ( $key === 'talk' || substr( (string)$key, -5 ) === '_talk' ) ) { continue; } // aba "Discussão" só para admin
 			$class = 'rw-tab' . ( ( $tab['class'] ?? '' ) === 'selected' ? ' rw-tab-current' : '' );
 			printf( '<a href="%s" class="%s">%s</a>' . "\n",
 				htmlspecialchars( $tab['href'] ), $class, htmlspecialchars( $tab['text'] ) );
@@ -135,7 +144,7 @@ class ReligioWikiTemplate extends BaseTemplate {
 
 		<div id="bodyContent" class="rw-article">
 			<?php $this->html( 'bodytext' ) ?>
-			<?php $this->html( 'catlinks' ) ?>
+			<?php if ( $isArticle ) { $this->html( 'catlinks' ); } // "Categorias: ..." só nos artigos ?>
 			<?php $this->html( 'dataAfterContent' ) ?>
 		</div>
 	</main>

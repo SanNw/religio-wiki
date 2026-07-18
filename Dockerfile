@@ -35,6 +35,15 @@ RUN set -eux; \
 # ReligiowikiCustomizer — extensão própria do projeto (repositório separado,
 # não é um mirror do Wikimedia como as de cima), painel admin de tema/
 # homepage/componentes. Ver mediawiki-config/LocalSettings-snippet.php.
+#
+# Cache-bust automático: ao contrário das extensões acima (presas a REL1_43),
+# esta é clonada da branch `main` e muda com frequência. Sem isso, o Docker
+# cacheia a layer do "git clone" pra sempre (o cache é pelo TEXTO da
+# instrução, não pelo conteúdo do remoto), e um `docker compose build` normal
+# NUNCA traz o código novo da extensão. O ADD da API de refs do GitHub baixa
+# o SHA atual da main; quando a extensão recebe um commit novo, o conteúdo
+# baixado muda e invalida o cache daqui pra baixo, forçando o re-clone.
+ADD https://api.github.com/repos/SanNw/religiowiki-customizer/git/refs/heads/main /tmp/rwc-ref.json
 RUN set -eux; \
 	rm -rf ReligiowikiCustomizer; \
 	git clone --depth 1 https://github.com/SanNw/religiowiki-customizer.git ReligiowikiCustomizer; \

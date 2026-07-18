@@ -336,6 +336,10 @@ body.religion-islam .firstHeading { background: #15803D; color: #fff; }
    lado de "Discussão" fica intacta — ela mora em .rw-page-tabs, não aqui. */
 .rw-mainpage #firstHeading { display: none; }
 
+/* Remove o "Disponível em '<permalink>'" (printfooter do MediaWiki, anexado
+   ao final do corpo). Pedido: tirar de todas as páginas, admin ou não. */
+.printfooter { display: none; }
+
 .rw-subtitle, #contentSub {
 	font-size: 0.82rem;
 	color: var(--rw-text-muted);

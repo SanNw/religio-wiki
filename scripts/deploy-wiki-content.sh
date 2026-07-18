@@ -134,6 +134,15 @@ PHPEOF
   echo "  link 'Personalizar wiki' (admin) adicionado ao LocalSettings.php."
 fi
 
+# VisualEditor removido a pedido: a aba "Editar" (VE) depende do Parsoid, que
+# não está configurado, então não funcionava. Comenta o carregamento no
+# LocalSettings.php já existente (o "Editar código-fonte" cobre a edição).
+# Idempotente: só age se a linha ativa (não comentada) ainda existir.
+if grep -qE "^wfLoadExtension\( 'VisualEditor' \);" LocalSettings.php; then
+  sed -i "s|^wfLoadExtension( 'VisualEditor' );|// VisualEditor removido a pedido (VE sem Parsoid nao funciona): wfLoadExtension( 'VisualEditor' );|" LocalSettings.php
+  echo "  VisualEditor desativado (removido a pedido)."
+fi
+
 echo "== 2/4: rebuild da imagem + subindo/reiniciando o container =="
 # Rebuild explícito: "up -d" sozinho NÃO reconstrói a imagem quando só o
 # Dockerfile muda (ex.: skin novo copiado em skins/ReligioWiki, extensões
