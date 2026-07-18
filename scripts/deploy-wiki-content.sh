@@ -202,6 +202,16 @@ while IFS=$'\t' read -r file title; do
   edit_page "$title" "mediawiki-config/pages/$file"
 done < mediawiki-config/pages/manifest.tsv
 
+# Purga as páginas de categoria pra re-renderizarem com a lista de
+# subcategorias atual. Uma categoria criada DEPOIS da categoria-pai deixava o
+# pai com cache antigo, sem mostrar suas religiões (ex.: "I. Xamanismos" e
+# "II. Mitologias" apareciam SEM subcategorias mesmo com o tagueamento certo
+# no banco). --purge bumpa o page_touched e invalida o cache do parser.
+echo "  purgando páginas de categoria (mostrar as religiões/subcategorias)..."
+awk -F'\t' '$2 ~ /^Category:/ { print $2 }' mediawiki-config/pages/manifest.tsv | \
+  $COMPOSE exec -T "$SERVICE" php maintenance/purgeList.php --purge || \
+  echo "  (purge de categorias falhou; segue sem travar)"
+
 # Reconstrói o índice de busca de texto (searchindex) depois de aplicar as
 # páginas — garante que a busca de texto completo encontre artigos como
 # "Cristianismo". A busca por prefixo/título (autocomplete) já funciona sem
