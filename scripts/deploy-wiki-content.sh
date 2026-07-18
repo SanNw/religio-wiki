@@ -34,18 +34,25 @@ fi
 # antes (versões anteriores do snippet, sem alguma dessas configs), garante
 # que cada uma entra de qualquer forma — é o que faz o common.css/common.js
 # baterem com o DOM real da página.
-if grep -q "wgVectorDefaultSkinVersion" LocalSettings.php; then
-  echo "  padrão de skin (Vector clássico) já presente, pulando."
+# Deploys antigos (antes do skin ReligioWiki existir) tinham essas duas
+# linhas forçando Vector clássico — se sobreviveram de uma aplicação
+# anterior do snippet, removê-las evita conflito com wfLoadSkin('ReligioWiki').
+if grep -qF "wgVectorDefaultSkinVersion" LocalSettings.php; then
+  echo "  removendo config antiga do Vector clássico (substituída pelo skin ReligioWiki)..."
+  grep -vE "wgDefaultSkin = 'vector'|wgVectorDefaultSkinVersion" LocalSettings.php > LocalSettings.php.tmp
+  mv LocalSettings.php.tmp LocalSettings.php
+fi
+
+if grep -q "wfLoadSkin( 'ReligioWiki' )" LocalSettings.php; then
+  echo "  skin ReligioWiki já registrado, pulando."
 else
   {
     echo ""
-    echo "// Religio Wiki — força Vector clássico (ver LocalSettings-snippet.php)"
-    echo "\$wgDefaultSkin = 'vector';"
-    echo "\$wgVectorDefaultSkinVersion = '1';"
-    echo "\$wgVectorDefaultSkinVersionForNewAccounts = '1';"
-    echo "\$wgVectorDefaultSkinVersionForExistingAccounts = '1';"
+    echo "// Religio Wiki — skin próprio (ver LocalSettings-snippet.php)"
+    echo "wfLoadSkin( 'ReligioWiki' );"
+    echo "\$wgDefaultSkin = 'religiowiki';"
   } >> LocalSettings.php
-  echo "  padrão de skin (Vector clássico) adicionado ao LocalSettings.php."
+  echo "  skin ReligioWiki registrado no LocalSettings.php."
 fi
 
 if grep -q "wgSkipSkins" LocalSettings.php; then
@@ -54,7 +61,7 @@ else
   {
     echo ""
     echo "// Religio Wiki — remove os outros skins da lista (ver LocalSettings-snippet.php)"
-    echo "\$wgSkipSkins = [ 'vector-2022', 'monobook', 'minerva', 'timeless' ];"
+    echo "\$wgSkipSkins = [ 'vector', 'vector-2022', 'monobook', 'minerva', 'timeless', 'cologneblue', 'modern' ];"
   } >> LocalSettings.php
   echo "  bloqueio dos outros skins adicionado ao LocalSettings.php."
 fi
@@ -103,7 +110,12 @@ SEDEOF
   echo "  WikiSEO desativada (geradores redundantes com a Fase 6 da ReligiowikiCustomizer)."
 fi
 
-echo "== 2/4: subindo/reiniciando o container =="
+echo "== 2/4: rebuild da imagem + subindo/reiniciando o container =="
+# Rebuild explícito: "up -d" sozinho NÃO reconstrói a imagem quando só o
+# Dockerfile muda (ex.: skin novo copiado em skins/ReligioWiki, extensões
+# via Composer) — sem isso, o container continuava rodando a imagem antiga
+# depois do deploy.
+$COMPOSE build "$SERVICE"
 $COMPOSE up -d
 $COMPOSE restart "$SERVICE"
 
@@ -131,23 +143,23 @@ while IFS=$'\t' read -r file title; do
 done < mediawiki-config/pages/manifest.tsv
 
 echo "== 4/4: resetando skin fixado em contas já existentes =="
-# $wgDefaultSkin/$wgVectorDefaultSkinVersion só valem pra quem NUNCA salvou uma
-# preferência própria de aparência. Contas criadas antes dessa configuração
-# (ex.: o Admin do install.php) já têm "Vector (2022)" gravado como escolha
-# pessoal em user_properties, e isso sempre vence sobre o padrão do site —
-# por isso o wiki continua "sem a identidade" mesmo logado como Admin. Limpa
-# essa preferência pra todo mundo, fazendo cair de volta no padrão (Vector
-# clássico). Não apaga conta, senha nem nenhum outro dado — só essa escolha.
+# $wgDefaultSkin só vale pra quem NUNCA salvou uma preferência própria de
+# aparência. Contas criadas antes do skin ReligioWiki existir (ex.: o Admin
+# do install.php) já têm algum outro skin gravado como escolha pessoal em
+# user_properties, e isso sempre vence sobre o padrão do site — por isso o
+# wiki continuaria "sem a identidade" mesmo logado como Admin. Limpa essa
+# preferência pra todo mundo, fazendo cair de volta no padrão (ReligioWiki).
+# Não apaga conta, senha nem nenhum outro dado — só essa escolha.
 $COMPOSE exec -T "$SERVICE" php maintenance/sql.php --query \
   "DELETE FROM user_properties WHERE up_property = 'skin';"
 
 echo
 echo "Pronto. Dê um Ctrl+F5 (hard refresh) no navegador — o MediaWiki cacheia"
-echo "Common.css/Common.js agressivamente via ResourceLoader."
+echo "CSS/JS do skin agressivamente via ResourceLoader."
 echo
-echo "Se ainda aparecer 'Vector (2022)' marcado em Preferências → Aparência pra"
-echo "alguma conta, é porque ela mudou isso de novo manualmente depois deste"
-echo "script rodar — é só marcar 'Vector legado (2010)' e Salvar ali mesmo."
+echo "Se \$wgSkipSkins não bastar pra alguma conta antiga (skin salvo direto"
+echo "no banco por algum outro caminho), é só abrir Preferências → Aparência"
+echo "e confirmar que só 'ReligioWiki' aparece como opção."
 echo
 echo "Confira também 'Gerenciar editores' (Special:UserRights) para colocar seu"
 echo "usuário no grupo 'editor' caso a aba 'Editar' ainda não apareça."

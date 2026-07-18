@@ -1,0 +1,460 @@
+/*
+ * Skin ReligioWiki — resources/skin.css
+ * Portado quase 1:1 do artefato de prévia (religio-wiki-preview.html) pro
+ * DOM real gerado por ReligioWikiTemplate.php (que reaproveita ids nativos
+ * do MediaWiki: #mw-panel, #p-personal, #firstHeading, #toc, #footer).
+ *
+ * O que NÃO foi portado, de propósito:
+ *   - .rw-prefs-* — o artefato simulava Special:Preferences à mão; a versão
+ *     real é a página nativa do MediaWiki (HTMLForm/OOUI), que já herda as
+ *     cores/tipografia daqui por causa das variáveis --rw-* nos elementos
+ *     genéricos de formulário mais abaixo. Não faz sentido recriar a UI.
+ *   - .rw-editor-* / .rw-prompt-* — existiam só porque o artefato é HTML
+ *     estático sem VisualEditor de verdade. Aqui o VisualEditor real já
+ *     está instalado (ver Dockerfile) e tem sua própria UI.
+ *   - .rw-home-* / .rw-donate-* — ficam em MediaWiki:Common.css porque são
+ *     estilo de CONTEÚDO de página (Página principal / Religio Wiki:Doar),
+ *     não estrutura do skin.
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700&family=Noto+Sans+Arabic:wght@400;600;700&family=Noto+Sans+Hebrew:wght@400;600;700&family=Noto+Sans+Greek:wght@400;600;700&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap');
+
+/* ---------- tokens (idênticos ao artefato e ao Common.css) ---------- */
+:root,
+:root[data-theme="light"] {
+	--rw-bg: #FBF3E1;
+	--rw-bg-elevated: #FFFDF7;
+	--rw-text: #241C15;
+	--rw-text-muted: #5C5142;
+	--rw-border: #E2D5B8;
+	--rw-link: #92400E;
+	--rw-visited: #715191;
+}
+:root[data-theme="dark"] {
+	--rw-bg: #1B1712;
+	--rw-bg-elevated: #24201A;
+	--rw-text: #F1E6CF;
+	--rw-text-muted: #C9BBA0;
+	--rw-border: #3A3226;
+	--rw-link: #E0A868;
+	--rw-visited: #B79AD6;
+}
+:root[data-theme="custom"] {
+	--rw-bg: var(--rw-custom-bg, #FBF3E1);
+	--rw-bg-elevated: var(--rw-custom-bg-elevated, #FFFDF7);
+	--rw-text: var(--rw-custom-text, #241C15);
+	--rw-text-muted: var(--rw-custom-text-muted, #5C5142);
+	--rw-border: var(--rw-custom-border, #E2D5B8);
+	--rw-link: var(--rw-custom-link, #92400E);
+	--rw-visited: #715191;
+}
+
+* { box-sizing: border-box; }
+html {
+	-webkit-text-size-adjust: 100%;
+	font-size: 16px;
+	scroll-behavior: smooth;
+}
+html, body { max-width: 100%; overflow-x: hidden; }
+img, svg, table, pre { max-width: 100%; }
+html[data-rw-textsize="small"] { font-size: 87.5%; }
+html[data-rw-textsize="large"] { font-size: 112.5%; }
+body {
+	margin: 0;
+	background: var(--rw-bg);
+	color: var(--rw-text);
+	font-family: "Noto Sans", "Noto Sans Arabic", "Noto Sans Hebrew",
+		"Noto Sans Greek", "Noto Sans Devanagari", -apple-system,
+		"Segoe UI", sans-serif;
+	font-size: 1rem;
+	line-height: 1.6;
+}
+input, textarea, select, button { font-family: inherit; }
+a { color: var(--rw-link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+a.new { color: #BA2828; }
+:root[data-theme="dark"] a.new { color: #E27878; }
+
+/* ---------- barra superior ---------- */
+.rw-topbar {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px;
+	padding: 8px 20px;
+	border-bottom: 1px solid var(--rw-border);
+	background: var(--rw-bg-elevated);
+}
+.rw-brand {
+	display: flex;
+	align-items: baseline;
+	gap: 8px;
+	font-weight: 700;
+	font-size: 1.05rem;
+	color: var(--rw-text);
+	text-decoration: none;
+}
+.rw-brand:hover { text-decoration: none; }
+.rw-brand .mark {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 22px;
+	height: 22px;
+	border: 1.5px solid var(--rw-text);
+	border-radius: 50%;
+	font-size: 0.75rem;
+	font-weight: 700;
+}
+.rw-search { flex: 1; max-width: 360px; }
+.rw-search input {
+	width: 100%;
+	padding: 5px 10px;
+	font: inherit;
+	font-size: 0.9rem;
+	background: var(--rw-bg);
+	color: var(--rw-text);
+	border: 1px solid var(--rw-border);
+	border-radius: 3px;
+}
+.rw-search button { display: none; } /* botão nativo de busca some — o campo já basta */
+
+#p-personal.rw-personal ul {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	font-size: 0.85rem;
+	white-space: nowrap;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+#p-personal.rw-personal li { padding: 0; }
+
+/* ---------- dropdown de ferramentas pessoais e "Mais" (montado por skin.js) ---------- */
+.rw-personal-dropdown { position: relative; }
+.rw-personal-dropdown-toggle {
+	font: inherit;
+	font-size: 0.85rem;
+	background: none;
+	border: none;
+	color: var(--rw-text);
+	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+	gap: 3px;
+	padding: 0;
+}
+.rw-personal-dropdown-toggle:hover { color: var(--rw-link); }
+.rw-personal-dropdown-menu {
+	display: none;
+	position: absolute;
+	top: 100%;
+	right: 0;
+	margin-top: 6px;
+	background: var(--rw-bg-elevated);
+	border: 1px solid var(--rw-border);
+	border-radius: 4px;
+	min-width: 170px;
+	padding: 4px 0;
+	list-style: none;
+	z-index: 60;
+}
+.rw-personal-dropdown.open .rw-personal-dropdown-menu { display: block; }
+.rw-personal-dropdown-menu li a {
+	display: block;
+	padding: 6px 14px;
+	color: var(--rw-text);
+	font-size: 0.85rem;
+}
+.rw-personal-dropdown-menu li a:hover { background: var(--rw-bg); text-decoration: none; }
+.rw-collapse-chevron { font-size: 0.75em; transition: transform 0.15s ease; margin-left: 6px; flex-shrink: 0; }
+.rw-personal-dropdown-toggle[aria-expanded="true"] .rw-collapse-chevron { transform: rotate(180deg); }
+
+/* ---------- barra de abas do artigo ---------- */
+.rw-page-tabs {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 2px;
+	border-bottom: 1px solid var(--rw-border);
+	margin-bottom: 14px;
+	font-size: 0.85rem;
+}
+.rw-tab { padding: 6px 10px; color: var(--rw-text-muted); border-bottom: 2px solid transparent; }
+.rw-tab:hover { color: var(--rw-text); text-decoration: none; }
+.rw-tab-current { color: var(--rw-text); font-weight: 700; border-bottom-color: var(--rw-link); }
+.rw-tab-group { display: flex; align-items: center; gap: 2px; margin-left: auto; }
+.rw-tab-more .rw-personal-dropdown-toggle { padding: 6px 10px; font-size: inherit; color: var(--rw-text-muted); }
+.rw-tab-more .rw-personal-dropdown-toggle:hover { color: var(--rw-link); }
+
+/* ---------- seletor de tema (montado por skin.js) ---------- */
+#rw-theme-switcher { display: flex; gap: 4px; }
+#rw-theme-switcher button {
+	font: inherit;
+	font-size: 0.78rem;
+	padding: 3px 9px;
+	border-radius: 3px;
+	border: 1px solid var(--rw-border);
+	background: var(--rw-bg);
+	color: var(--rw-text);
+	cursor: pointer;
+}
+#rw-theme-switcher button[aria-pressed="true"] { border-color: var(--rw-link); color: var(--rw-link); font-weight: 700; }
+#rw-custom-theme-panel {
+	display: none;
+	gap: 10px;
+	align-items: center;
+	padding: 6px 20px;
+	border-bottom: 1px solid var(--rw-border);
+	background: var(--rw-bg-elevated);
+	font-size: 0.8rem;
+}
+#rw-custom-theme-panel.open { display: flex; }
+#rw-custom-theme-panel label { display: flex; align-items: center; gap: 5px; }
+
+/* ---------- layout principal: sidebar | conteúdo | TOC ---------- */
+.rw-layout {
+	display: grid;
+	grid-template-columns: 190px minmax(0, 780px) 1fr;
+	gap: 0 28px;
+	max-width: 1180px;
+	margin: 0 auto;
+	padding: 24px 20px 60px;
+	min-width: 0;
+	align-items: start;
+}
+html[data-rw-width="wide"] .rw-layout { grid-template-columns: 190px minmax(0, 1fr) 230px; }
+
+#mw-panel.rw-sidebar .portal { margin-bottom: 10px; }
+#mw-panel.rw-sidebar .portal h3 {
+	font-size: 0.72rem;
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+	color: var(--rw-text-muted);
+	margin: 0 0 6px;
+	padding-top: 14px;
+}
+#mw-panel.rw-sidebar .portal .body ul { list-style: none; margin: 0; padding: 0; font-size: 0.85rem; }
+#mw-panel.rw-sidebar .portal li { padding: 1px 0; }
+#mw-panel.rw-sidebar .portal a.current, #mw-panel.rw-sidebar .portal a.selected { font-weight: 700; color: var(--rw-text); }
+
+/* Portlets viram collapse/accordion (montado por skin.js), fechados por padrão. */
+.rw-collapse-toggle {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	width: 100%;
+	font: inherit;
+	font-size: inherit;
+	font-weight: 700;
+	color: var(--rw-text);
+	background: none;
+	border: none;
+	padding: 3px 0;
+	cursor: pointer;
+	text-align: left;
+}
+.rw-collapse-toggle[aria-expanded="true"] .rw-collapse-chevron { transform: rotate(180deg); }
+
+/* ---------- artigo ---------- */
+.firstHeading {
+	font-size: 1.9rem;
+	font-weight: 700;
+	line-height: 1.25;
+	margin: 0 0 4px;
+	padding: 0.35em 0.6em;
+	border-radius: 3px;
+	text-wrap: balance;
+}
+body.religion-cristianismo .firstHeading { background: #DC2626; color: #fff; }
+body.religion-islam .firstHeading { background: #15803D; color: #fff; }
+
+.rw-subtitle, #contentSub {
+	font-size: 0.82rem;
+	color: var(--rw-text-muted);
+	border-bottom: 1px solid var(--rw-border);
+	padding-bottom: 12px;
+	margin-bottom: 16px;
+}
+.rw-article p { margin: 0 0 1em; max-width: 68ch; }
+.rw-article h2 {
+	font-size: 1.2rem;
+	border-bottom: 1px solid var(--rw-border);
+	padding-bottom: 4px;
+	margin: 1.6em 0 0.6em;
+	scroll-margin-top: 16px;
+}
+.rw-article .rw-infobox {
+	float: right;
+	width: 230px;
+	margin: 0 0 16px 20px;
+	border: 1px solid var(--rw-border);
+	background: var(--rw-bg-elevated);
+	font-size: 0.82rem;
+}
+.rw-article .rw-infobox .rw-infobox-title { font-weight: 700; text-align: center; padding: 6px; border-bottom: 1px solid var(--rw-border); }
+.rw-article .rw-infobox dl { margin: 0; padding: 8px 10px; }
+.rw-article .rw-infobox dt { color: var(--rw-text-muted); font-size: 0.75rem; margin-top: 6px; }
+.rw-article .rw-infobox dt:first-child { margin-top: 0; }
+.rw-article .rw-infobox dd { margin: 0; }
+.rw-script { font-size: 1.05em; }
+.rw-script[lang="ar"] { direction: rtl; unicode-bidi: isolate; }
+.rw-script[lang="he"] { direction: rtl; unicode-bidi: isolate; }
+
+#catlinks, .catlinks {
+	margin-top: 2.4em;
+	padding-top: 10px;
+	border-top: 1px solid var(--rw-border);
+	font-size: 0.82rem;
+	color: var(--rw-text-muted);
+}
+#catlinks a, .catlinks a { margin-right: 4px; }
+
+/* ---------- coluna "Neste artigo" / Idiomas / Aparência ---------- */
+.rw-toc { grid-column: 3; min-width: 0; }
+@media (min-width: 852px) { .rw-toc { position: sticky; top: 20px; align-self: start; } }
+@media (max-width: 851px) { .rw-toc { grid-column: auto; position: static; } }
+.rw-toc:empty { display: none; }
+
+/* Índice nativo do MediaWiki (#toc), realocado pro .rw-toc por skin.js —
+   estilizado igual a um .rw-toc-box do artefato. A estrutura interna do
+   #toc pode variar entre versões do MediaWiki (redesenho do TOC em versões
+   recentes) — ver docs/SKIN_STATUS.md. */
+.rw-toc #toc,
+.rw-toc-box {
+	border: 1px solid var(--rw-border);
+	background: var(--rw-bg-elevated);
+	padding: 10px 14px;
+	font-size: 0.82rem;
+	margin-bottom: 14px;
+}
+.rw-toc #toc .toctitle,
+.rw-toc #toc #toctitle,
+.rw-toc-box h2 {
+	font-size: 0.72rem;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	color: var(--rw-text-muted);
+	margin: 0 0 6px;
+}
+.rw-toc #toc ul { list-style: none; margin: 0; padding-left: 1.1em; }
+
+.rw-appearance-panel { margin-top: 14px; border: 1px solid var(--rw-border); background: var(--rw-bg-elevated); padding: 10px 14px; font-size: 0.82rem; }
+.rw-appearance-panel h2 { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--rw-text-muted); margin: 0 0 8px; }
+.rw-appearance-group { margin-bottom: 8px; }
+.rw-appearance-group:last-child { margin-bottom: 0; }
+.rw-appearance-group-label { display: block; font-size: 0.75rem; color: var(--rw-text-muted); margin-bottom: 4px; }
+.rw-appearance-options { display: flex; flex-wrap: wrap; gap: 4px; }
+.rw-appearance-options button { flex: 1 1 auto; min-width: max-content; font: inherit; font-size: 0.78rem; padding: 4px 8px; border: 1px solid var(--rw-border); background: var(--rw-bg); color: var(--rw-text); cursor: pointer; border-radius: 3px; }
+.rw-appearance-options button[aria-pressed="true"] { border-color: var(--rw-link); color: var(--rw-link); font-weight: 700; }
+
+/* ---------- seletor de idioma do artigo ---------- */
+.rw-lang-switcher { margin-bottom: 14px; border: 1px solid var(--rw-border); background: var(--rw-bg-elevated); font-size: 0.82rem; }
+.rw-lang-toggle { display: flex; align-items: center; justify-content: space-between; width: 100%; font: inherit; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--rw-text-muted); background: none; border: none; padding: 10px 14px; cursor: pointer; text-align: left; }
+.rw-lang-toggle .rw-lang-chevron { transition: transform 0.15s ease; font-size: 0.9em; }
+.rw-lang-switcher.open .rw-lang-toggle .rw-lang-chevron { transform: rotate(180deg); }
+.rw-lang-body { display: none; padding: 0 14px 10px; }
+.rw-lang-switcher.open .rw-lang-body { display: block; }
+.rw-lang-list { list-style: none; margin: 0; padding: 0; }
+.rw-lang-list li { padding: 2px 0; }
+.rw-lang-list a.rw-lang-current { font-weight: 700; color: var(--rw-text); pointer-events: none; }
+.rw-lang-list a.rw-lang-missing { color: var(--rw-text-muted); font-style: italic; }
+.rw-lang-add { display: block; margin-top: 6px; padding-top: 6px; border-top: 1px dashed var(--rw-border); font-size: 0.78rem; }
+
+/* ---------- lápis de edição ---------- */
+.rw-edit-pencil { display: none; margin-left: 8px; font-size: 0.55em; vertical-align: middle; text-decoration: none; opacity: 0.8; }
+.rw-edit-pencil:hover { opacity: 1; }
+body.rw-can-edit .rw-edit-pencil { display: inline; }
+.rw-last-edited { margin-top: 2em; padding-top: 8px; border-top: 1px dashed var(--rw-border); font-size: 0.78rem; color: var(--rw-text-muted); }
+
+/* ---------- rodapé ---------- */
+#footer {
+	max-width: 1180px;
+	margin: 0 auto;
+	padding: 16px 20px 40px;
+	border-top: 1px solid var(--rw-border);
+	font-size: 0.78rem;
+	color: var(--rw-text-muted);
+}
+#footer ul { list-style: none; margin: 0 0 6px; padding: 0; display: flex; flex-wrap: wrap; gap: 12px; }
+
+/* ---------- responsivo / hambúrguer (montado por skin.js) ---------- */
+#rw-hamburger { display: none; position: fixed; top: 10px; left: 10px; z-index: 160; font: inherit; font-size: 1.1rem; line-height: 1; padding: 6px 10px; border: 1px solid var(--rw-border); background: var(--rw-bg-elevated); color: var(--rw-text); cursor: pointer; border-radius: 3px; touch-action: manipulation; box-shadow: 0 1px 4px rgba(0,0,0,0.15); }
+#rw-sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 150; }
+@media (max-width: 851px) {
+	#rw-hamburger { display: inline-flex; }
+	#mw-panel.rw-sidebar {
+		display: none;
+		position: fixed;
+		top: 0; left: 0; bottom: 0;
+		width: min(80vw, 300px);
+		max-width: 100%;
+		z-index: 200;
+		overflow-x: hidden;
+		overflow-y: auto;
+		background: var(--rw-bg-elevated);
+		border-right: 1px solid var(--rw-border);
+		padding: 16px;
+		padding-top: 48px;
+		box-sizing: border-box;
+		overscroll-behavior: contain;
+	}
+	#mw-panel.rw-sidebar.rw-sidebar-open { display: block; }
+	#rw-sidebar-overlay.rw-sidebar-open { display: block; }
+	#mw-panel.rw-sidebar, #mw-panel.rw-sidebar * { overflow-wrap: break-word; word-break: break-word; }
+	.rw-layout { grid-template-columns: 1fr; }
+	.rw-topbar { padding-left: 52px; flex-wrap: wrap; row-gap: 6px; }
+}
+@media (max-width: 600px) {
+	.firstHeading { font-size: 1.5rem; }
+	.rw-article .rw-infobox { float: none; width: auto; margin: 0 0 16px; }
+	.rw-search { display: none; }
+	#p-personal.rw-personal ul { font-size: 0.78rem; gap: 8px; }
+}
+
+/* ---------- pop-up de login/cadastro (montado por skin.js, API real) ---------- */
+#rw-auth-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 300; align-items: center; justify-content: center; padding: 16px; overflow: auto; }
+#rw-auth-overlay.open { display: flex; }
+.rw-auth-modal { background: var(--rw-bg); color: var(--rw-text); border: 1px solid var(--rw-border); width: 100%; max-width: 360px; padding: 22px 24px 24px; position: relative; overscroll-behavior: contain; }
+.rw-auth-close { position: absolute; top: 10px; right: 10px; font: inherit; font-size: 0.85rem; border: 1px solid var(--rw-border); background: var(--rw-bg-elevated); color: var(--rw-text); padding: 3px 9px; cursor: pointer; border-radius: 3px; }
+.rw-auth-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+.rw-auth-tabs button { flex: 1 1 auto; min-width: max-content; font: inherit; font-size: 0.88rem; padding: 8px 10px; border: 1px solid var(--rw-border); background: var(--rw-bg-elevated); color: var(--rw-text); cursor: pointer; border-radius: 3px; }
+.rw-auth-tabs button[aria-selected="true"] { background: var(--rw-link); border-color: var(--rw-link); color: var(--rw-bg-elevated); font-weight: 700; }
+.rw-auth-social { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+.rw-auth-social button { font: inherit; font-size: 0.88rem; padding: 9px 12px; border: 1px solid var(--rw-border); background: var(--rw-bg-elevated); color: var(--rw-text); cursor: pointer; border-radius: 3px; text-align: left; }
+.rw-auth-social button:disabled { opacity: 0.5; cursor: not-allowed; }
+.rw-auth-divider { display: flex; align-items: center; gap: 8px; margin: 4px 0 16px; font-size: 0.75rem; color: var(--rw-text-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+.rw-auth-divider::before, .rw-auth-divider::after { content: ""; flex: 1; border-top: 1px solid var(--rw-border); }
+.rw-auth-field { display: block; margin-bottom: 12px; font-size: 0.85rem; }
+.rw-auth-field span { display: block; margin-bottom: 4px; color: var(--rw-text-muted); font-size: 0.78rem; }
+.rw-auth-field input { width: 100%; font: inherit; padding: 8px 10px; border: 1px solid var(--rw-border); background: var(--rw-bg-elevated); color: var(--rw-text); border-radius: 3px; }
+.rw-auth-submit { width: 100%; font: inherit; font-weight: 700; padding: 9px 12px; border: 1px solid var(--rw-link); background: var(--rw-link); color: var(--rw-bg-elevated); cursor: pointer; border-radius: 3px; margin-top: 4px; }
+.rw-auth-submit:disabled { opacity: 0.6; cursor: wait; }
+.rw-auth-error { color: #B42318; font-size: 0.8rem; margin: 0 0 10px; }
+:root[data-theme="dark"] .rw-auth-error { color: #F87171; }
+.rw-auth-note { font-size: 0.72rem; color: var(--rw-text-muted); margin-top: 12px; line-height: 1.5; }
+
+/* ---------- formulários nativos genéricos (Special:Preferences, editar, etc.) ---------- */
+/* Não recria a UI dessas páginas — só garante que herdem a paleta em vez de
+   ficar com fundo branco/tema padrão do navegador destoando do resto. */
+.mw-body, #bodyContent {
+	background: var(--rw-bg);
+	color: var(--rw-text);
+}
+input[type="text"], input[type="password"], input[type="email"], input[type="number"], input[type="search"], textarea, select {
+	background: var(--rw-bg-elevated);
+	color: var(--rw-text);
+	border: 1px solid var(--rw-border);
+	border-radius: 3px;
+	padding: 6px 9px;
+}
+.mw-htmlform-submit, input[type="submit"], button.oo-ui-buttonElement-button {
+	font: inherit;
+	border: 1px solid var(--rw-link);
+	background: var(--rw-link);
+	color: var(--rw-bg-elevated);
+	border-radius: 3px;
+	padding: 7px 14px;
+	cursor: pointer;
+}

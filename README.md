@@ -428,54 +428,42 @@ VPS com os containers já no ar. Ele aplica retroativamente tudo que faltou.
 
 ## Solução de problemas: "o site no ar não está fiel ao projeto"
 
-Sintoma: cores e textos aparecem certos, mas cabeçalho, fontes, menus
-sanfona e o layout em geral estão diferentes do combinado — geralmente
-parecido com o Vector padrão do MediaWiki, sem a identidade da Religio Wiki.
+**Desde a introdução do skin próprio (`skins/ReligioWiki`), o site usa um
+skin escrito especificamente pra este projeto, não mais o Vector do
+MediaWiki com `Common.css`/`Common.js` tentando reconciliar visual por
+cima dele.** Essa era a causa mais comum de divergência antes (o DOM do
+Vector clássico é sutilmente diferente do layout de grid do projeto) — ver
+`skins/ReligioWiki/docs/SKIN_STATUS.md` para o histórico e os pontos de
+risco específicos do skin.
 
-Três causas possíveis, nessa ordem de probabilidade:
+Sintoma: cores e textos aparecem certos, mas cabeçalho, sidebar ou o layout
+em geral estão diferentes do combinado — geralmente parecido com o skin
+padrão do MediaWiki (Vector), sem a identidade da Religio Wiki.
 
-1. **`MediaWiki:Common.css`/`Common.js` nunca foram aplicados.** Esses
-   arquivos só têm efeito quando o conteúdo deles está dentro dessas páginas
-   especiais do próprio wiki — existir em `mediawiki-config/` no repositório
-   não é suficiente. Resolve com `./scripts/deploy-wiki-content.sh`.
-2. **O wiki está rodando o skin Vector 2022 (o moderno), não o Vector
-   clássico.** Instalações novas do MediaWiki (1.36+) vêm com o Vector 2022
-   como padrão — mas todo o `common.css`/`common.js` deste projeto foi
-   escrito em cima do DOM do Vector **clássico** (`#mw-panel`, `#p-personal`,
-   `#pt-login`, `#toc` nativo). Com o Vector 2022 ativo, mesmo aplicando o
-   CSS/JS certos, boa parte dos seletores não bate com nada na página e o
-   layout continua visualmente diferente. Sinal de que é isso: aparece um
-   link "Mudar para aparência antiga" no rodapé do menu lateral — esse link
-   só existe no Vector 2022. Resolve adicionando ao `LocalSettings.php` (já
-   incluído em `LocalSettings-snippet.php` e aplicado automaticamente por
-   `deploy-wiki-content.sh`):
-   ```php
-   $wgDefaultSkin = 'vector';
-   $wgVectorDefaultSkinVersion = '1';
-   $wgVectorDefaultSkinVersionForNewAccounts = '1';
-   $wgVectorDefaultSkinVersionForExistingAccounts = '1';
-   ```
-3. **Sua própria conta já tinha uma preferência de skin salva antes dessa
-   configuração existir.** `$wgDefaultSkin`/`$wgVectorDefaultSkinVersion*`
-   só valem para quem nunca escolheu nada manualmente — contas criadas antes
-   dessa config (tipicamente o `Admin` do `install.php`) ficam com "Vector
-   (2022)" gravado como preferência pessoal em `user_properties`, que sempre
-   vence sobre o padrão do site. Sinal de que é isso: em
-   `Special:Preferences` → aba **Aparência**, o rádio marcado é "Vector
-   (2022)" mesmo com "Vector legado (2010)" aparecendo como "(padrão)" ao
-   lado. Resolve na hora clicando em "Vector legado (2010)" → Salvar nessa
-   mesma tela, ou de uma vez para todas as contas com o passo 4/4 do
-   `deploy-wiki-content.sh` (abaixo).
+Causas possíveis, nessa ordem de probabilidade:
 
-   **Correção definitiva** (recomendada — já incluída em
-   `LocalSettings-snippet.php`): em vez de só trocar o padrão e torcer pra
-   ninguém escolher outro skin de novo, remove os outros skins da lista de
-   opções. Sem isso, nenhuma preferência salva nem link direto
-   (`?useskin=vector-2022`) consegue mais ativar o Vector 2022 — só existe
-   uma opção no wiki inteiro.
-   ```php
-   $wgSkipSkins = [ 'vector-2022', 'monobook', 'minerva', 'timeless' ];
-   ```
+1. **O skin não foi reconstruído na imagem Docker.** O skin mora em
+   `skins/ReligioWiki` e é copiado pra dentro da imagem pelo `Dockerfile`
+   (`COPY skins/ReligioWiki ...`) — uma mudança nele só tem efeito depois
+   de `docker compose build`. `./scripts/deploy-wiki-content.sh` já faz
+   esse rebuild automaticamente (passo 2/4); se você aplicou mudanças sem
+   passar por esse script, rode `docker compose build mediawiki && docker
+   compose up -d` manualmente.
+2. **`Special:Version` não lista "ReligioWiki" entre os skins
+   instalados.** Sinal de que `wfLoadSkin('ReligioWiki')` em
+   `LocalSettings.php` não rodou, ou o skin não chegou na imagem. Confira
+   `docker compose exec mediawiki ls skins/ReligioWiki` e `docker compose
+   exec mediawiki cat LocalSettings.php` (o bloco de
+   `LocalSettings-snippet.php` precisa estar colado no final).
+3. **Sua própria conta já tinha uma preferência de skin salva antes do
+   skin ReligioWiki existir.** `$wgDefaultSkin` só vale para quem nunca
+   escolheu nada manualmente — contas antigas (tipicamente o `Admin` do
+   `install.php`) ficam com outro skin gravado como preferência pessoal em
+   `user_properties`, que sempre vence sobre o padrão do site. Resolve na
+   hora em `Special:Preferences` → aba **Aparência** (só deveria sobrar
+   "ReligioWiki" como opção — `$wgSkipSkins` bloqueia o resto), ou de uma
+   vez para todas as contas com o passo 4/4 do `deploy-wiki-content.sh`.
+
    **Não use `$wgHiddenPrefs`** pra esconder a escolha de tema em
    Preferências (chegamos a testar isso) — foi removido do MediaWiki core há
    algumas versões, e em instalações recentes (1.4x) referenciá-lo derruba o
@@ -487,16 +475,16 @@ Três causas possíveis, nessa ordem de probabilidade:
 
 ```bash
 cd ~/religio-wiki           # pasta do repositório clonado na VPS
-git pull origin main        # traz o LocalSettings-snippet.php e os scripts atualizados
+git pull origin main        # traz o skin, o LocalSettings-snippet.php e os scripts atualizados
 ./scripts/deploy-wiki-content.sh
 ```
 
 Depois:
-- Dê **Ctrl+F5** no navegador (o MediaWiki cacheia Common.css/Common.js
+- Dê **Ctrl+F5** no navegador (o MediaWiki cacheia CSS/JS do skin
   agressivamente via ResourceLoader).
-- Confira `Special:Version` pra ver se o skin ativo mudou pra "Vector"
-  (versão legada), e `Special:Preferences` → aba Aparência pra garantir que
-  sua própria conta não está fixada manualmente no Vector 2022.
+- Confira `Special:Version` pra ver se "ReligioWiki" aparece como skin
+  ativo, e `Special:Preferences` → aba Aparência pra garantir que sua
+  própria conta não está fixada manualmente noutro skin.
 - Se a aba "Editar" ainda não aparecer, confira `Special:UserRights` e
   coloque seu usuário no grupo certo (Admin/sysop já deveria editar por
   padrão — se não conseguir, o bloco de permissões pode não ter sido salvo;

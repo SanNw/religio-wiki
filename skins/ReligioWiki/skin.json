@@ -1,0 +1,59 @@
+{
+	"name": "ReligioWiki",
+	"version": "1.0.0",
+	"author": [
+		"San"
+	],
+	"url": "https://github.com/SanNw/religio-wiki",
+	"descriptionmsg": "religiowiki-skin-desc",
+	"license-name": "MIT",
+	"type": "skin",
+	"requires": {
+		"MediaWiki": ">= 1.39.0"
+	},
+	"ValidSkinNames": {
+		"religiowiki": {
+			"class": "SkinReligioWiki",
+			"args": [
+				{
+					"name": "religiowiki",
+					"style": "1.0",
+					"template": "ReligioWikiTemplate",
+					"responsive": true
+				}
+			]
+		}
+	},
+	"AutoloadClasses": {
+		"SkinReligioWiki": "includes/SkinReligioWiki.php",
+		"ReligioWikiTemplate": "includes/ReligioWikiTemplate.php"
+	},
+	"MessagesDirs": {
+		"ReligioWiki": [
+			"i18n"
+		]
+	},
+	"ResourceModules": {
+		"skins.ReligioWiki": {
+			"styles": [
+				"resources/skin.css"
+			],
+			"scripts": [
+				"resources/skin.js"
+			],
+			"dependencies": [
+				"mediawiki.api",
+				"mediawiki.util"
+			],
+			"targets": [
+				"desktop",
+				"mobile"
+			]
+		}
+	},
+	"ResourceFileModulePaths": {
+		"localBasePath": "",
+		"remoteSkinPath": "ReligioWiki"
+	},
+	"manifest_version": 2
+}

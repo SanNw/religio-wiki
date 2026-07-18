@@ -4,25 +4,19 @@
  * pelo instalador (ver README.md da pasta "Religio Wiki").
  */
 
-// ---------- Skin: força o Vector clássico (não o Vector 2022) ----------
-// Todo o design da Religio Wiki (common.css/common.js) foi escrito em cima
-// do DOM do Vector clássico (#mw-panel, #p-personal, #pt-login, #toc
-// nativo etc.). Instalações novas do MediaWiki (1.36+) vêm com o Vector
-// 2022 como padrão, cujo DOM é bem diferente — se essa configuração não
-// estiver aqui, o wiki fica "parecido, mas não igual" ao projeto (cabeçalho,
-// menus e fontes destoando), mesmo com o Common.css/Common.js corretos.
-$wgDefaultSkin = 'vector';
-$wgVectorDefaultSkinVersion = '1';
-$wgVectorDefaultSkinVersionForNewAccounts = '1';
-$wgVectorDefaultSkinVersionForExistingAccounts = '1';
+// ---------- Skin: ReligioWiki (identidade visual própria) ----------
+// Substitui a abordagem anterior (Vector clássico + Common.css/Common.js
+// tentando reconciliar visual por cima do DOM dele — nunca bateu 100% com
+// o artefato de prévia do projeto). Agora o próprio skin já gera o DOM do
+// jeito certo (skins/ReligioWiki), então não tem mais "quase igual".
+wfLoadSkin( 'ReligioWiki' );
+$wgDefaultSkin = 'religiowiki';
 
-// O padrão acima não é suficiente sozinho: preferência pessoal de skin salva
-// numa conta (Special:Preferences → Aparência) sempre vence sobre o padrão
-// do site, então uma conta antiga (ou alguém clicando sem querer) podia
-// voltar pro Vector 2022. Solução definitiva: remove os outros skins da
-// lista de opções — ninguém tem mais o que escolher além do Vector clássico,
-// nem por preferência salva, nem por link direto (?useskin=...).
-$wgSkipSkins = [ 'vector-2022', 'monobook', 'minerva', 'timeless' ];
+// Mesmo motivo de antes pro $wgSkipSkins: preferência pessoal de skin salva
+// numa conta (Special:Preferences → Aparência) vence sobre o padrão do
+// site. Com só um skin na lista, não sobra outra opção pra escolher, nem
+// por preferência salva antiga nem por link direto (?useskin=...).
+$wgSkipSkins = [ 'vector', 'vector-2022', 'monobook', 'minerva', 'timeless', 'cologneblue', 'modern' ];
 // (não usar $wgHiddenPrefs aqui: foi removido do MediaWiki core há algumas
 // versões — em instalações recentes referenciá-lo pode derrubar o site com
 // um "DomainException" na inicialização. $wgSkipSkins sozinho já é
@@ -178,6 +172,23 @@ $wgHooks['OutputPageBodyAttributes'][] = static function ( $out, $sk, &$bodyAttr
 		$existing = $bodyAttrs['class'] ?? '';
 		$bodyAttrs['class'] = trim( $existing . ' ' . implode( ' ', array_unique( $classes ) ) );
 	}
+};
+
+// ---------- "Criar artigo" na caixa de ferramentas (só quem pode criar) ----------
+// Sem isso, criar um artigo depende de já saber o truque de "busque um
+// título inexistente e clique em criar" — esse atalho deixa explícito.
+// Some da lateral sozinho pra quem não tem o direito 'createpage' (leitor
+// anônimo ou conta sem grupo "editor"), sem precisar de CSS pra esconder.
+$wgHooks['SidebarBeforeOutput'][] = static function ( $sk, &$sidebar ) {
+	if ( !$sk->getAuthority()->isAllowed( 'createpage' ) ) {
+		return;
+	}
+	$searchTitle = SpecialPage::getTitleFor( 'Search' );
+	$sidebar['TOOLBOX']['createarticle'] = [
+		'text' => 'Criar artigo',
+		'href' => $searchTitle->getLocalURL(),
+		'id' => 't-createarticle',
+	];
 };
 
 // ---------- Quem editou por último ----------

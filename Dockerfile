@@ -69,3 +69,10 @@ COPY composer.local.json /var/www/html/composer.local.json
 RUN set -eux; \
 	composer update --no-dev --no-interaction --optimize-autoloader -d /var/www/html; \
 	rm -rf /root/.cache/composer /root/.composer/cache
+
+# Skin ReligioWiki — identidade visual retrô ("papel pólen") portada do
+# artefato de prévia do projeto, mora NESTE repositório (skins/ReligioWiki),
+# então é uma cópia do contexto de build, não um git clone. Substitui o
+# Vector clássico + Common.css/Common.js como forma de reconciliar visual —
+# ver skins/ReligioWiki/docs/SKIN_STATUS.md.
+COPY skins/ReligioWiki /var/www/html/skins/ReligioWiki
