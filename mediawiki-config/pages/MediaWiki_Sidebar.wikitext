@@ -5,10 +5,26 @@
 ** Special:RecentChanges|recentchanges
 ** Special:UserRights|Gerenciar editores
 
-* categorias-religiao-heading
-** Category:I. Xamanismos Hiperbóreos|I. Xamanismos Hiperbóreos
-** Category:II. Mitologias Arianas|II. Mitologias Arianas
-** Category:III. Monoteísmos Semíticos|III. Monoteísmos Semíticos
+* I. Xamanismos Hiperbóreos
+** Category:Taoismo|Taoismo
+** Category:Confucionismo|Confucionismo
+** Category:Xintoísmo|Xintoísmo
+** Category:Xamanismo Siberiano|Xamanismo Siberiano
+** Category:Religião dos Povos Nativos Americanos|Povos Nativos Americanos
+** Category:Bön|Bön
+
+* II. Mitologias Arianas
+** Category:Hinduísmo|Hinduísmo
+** Category:Budismo|Budismo
+** Category:Jainismo|Jainismo
+** Category:Zoroastrismo|Zoroastrismo
+** Category:Religião Greco-Romana|Greco-Romana
+** Category:Religião Germano-Céltica Antiga|Germano-Céltica Antiga
+
+* III. Monoteísmos Semíticos
+** Category:Judaísmo|Judaísmo
+** Category:Cristianismo|Cristianismo
+** Category:Islã|Islã
 
 * SEARCH
 * TOOLBOX
