@@ -17,7 +17,10 @@ class ReligioWikiTemplate extends BaseTemplate {
 		$skin = $this->getSkin();
 		$out = $skin->getOutput();
 		$title = $skin->getTitle();
-		$isArticle = $title && $title->inNamespace( NS_MAIN ) && $skin->getRelevantTitle()->exists();
+		// "Artigo" = página do namespace principal, que EXISTE e NÃO é a página
+		// principal (a home não deve mostrar o índice "Neste artigo" nem os
+		// catlinks "Categorias: ..." no rodapé).
+		$isArticle = $title && $title->inNamespace( NS_MAIN ) && !$title->isMainPage() && $skin->getRelevantTitle()->exists();
 		$isMainPage = $title && $title->isMainPage();
 		// "Admin" = quem tem o direito editinterface (grupos Administradores /
 		// Administradores da interface). Usado pra esconder itens só de admin
@@ -44,9 +47,11 @@ class ReligioWikiTemplate extends BaseTemplate {
 	<a href="<?php echo htmlspecialchars( Title::newMainPage()->getLocalURL() ) ?>" class="rw-brand">
 		<span class="mark">R</span> <?php echo htmlspecialchars( $this->data['sitename'] ) ?>
 	</a>
-	<div class="rw-search">
-		<?php echo $this->makeSearchInput( [ 'placeholder' => 'Buscar na ' . htmlspecialchars( $this->data['sitename'] ) ] ) ?>
-	</div>
+	<form class="rw-search" action="<?php echo htmlspecialchars( $this->data['wgScript'] ?? '/index.php' ) ?>" method="get" role="search">
+		<input type="hidden" name="title" value="Special:Search">
+		<?php echo $this->makeSearchInput( [ 'placeholder' => 'Buscar na ' . htmlspecialchars( $this->data['sitename'] ), 'id' => 'searchInput' ] ) ?>
+		<?php echo $this->makeSearchButton( 'go', [ 'id' => 'searchButton', 'class' => 'rw-search-go' ] ) ?>
+	</form>
 	<div id="p-personal" class="rw-personal">
 		<a id="pt-donate" class="rw-donate" href="<?php echo htmlspecialchars( $donateHref ) ?>"><strong>Doar</strong></a>
 		<ul>
