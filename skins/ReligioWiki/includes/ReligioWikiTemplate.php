@@ -28,7 +28,7 @@ class ReligioWikiTemplate extends BaseTemplate {
 		$isAdmin = $skin->getAuthority()->isAllowed( 'editinterface' );
 		// Itens da lateral (MediaWiki:Sidebar) que só admin deve ver — casados
 		// pelo rótulo exato definido no wikitext da sidebar.
-		$adminOnlySidebar = [ 'Criar novo artigo', 'Mudanças recentes', 'Gerenciar editores' ];
+		$adminOnlySidebar = [ 'Criar novo artigo', 'Mudanças recentes', 'Gerenciar editores', 'Artigos' ];
 		// Link "Doar" renderizado direto aqui (e não via hook PersonalUrls, que
 		// deixou de ser chamado no MediaWiki 1.43 — buildPersonalUrls() não o
 		// dispara, então o botão nunca aparecia). Aponta para Religio Wiki:Doar.

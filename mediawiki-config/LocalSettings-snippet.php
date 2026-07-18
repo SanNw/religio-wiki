@@ -116,6 +116,21 @@ $wgFileExtensions = array_merge( $wgFileExtensions, [ 'pdf', 'svg', 'webp' ] );
 $wgUseImageMagick = true;
 $wgImageMagickConvertCommand = '/usr/bin/convert';
 
+// ---------- Espaço nominal "Rascunho" (artigos não publicados) ----------
+// Rascunhos ficam no espaço "Rascunho:", separados dos artigos publicados
+// (espaço principal). O painel Special:Artigos (extensão ReligiowikiCustomizer)
+// lista os dois em abas separadas e permite "Publicar" um rascunho — que nada
+// mais é do que mover Rascunho:X → X (espaço principal). NÃO é espaço de
+// conteúdo de propósito: rascunhos não entram na contagem de artigos
+// ({{NUMBEROFARTICLES}}) nem na página principal, e não aparecem na busca
+// padrão dos leitores (o admin acha tudo por Special:Artigos).
+define( 'NS_RASCUNHO', 3000 );
+define( 'NS_RASCUNHO_TALK', 3001 );
+$wgExtraNamespaces[NS_RASCUNHO] = 'Rascunho';
+$wgExtraNamespaces[NS_RASCUNHO_TALK] = 'Rascunho_Discussão';
+$wgNamespacesWithSubpages[NS_RASCUNHO] = true;
+$wgNamespacesToBeSearchedDefault[NS_RASCUNHO] = false;
+
 // ---------- Botão "Doar" ----------
 // Aparece como o primeiro item da barra pessoal — ou seja, sempre à
 // esquerda de "Entrar"/"Criar conta" — em todas as páginas. Leva para
