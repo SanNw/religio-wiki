@@ -19,13 +19,7 @@ class ReligioWikiTemplate extends BaseTemplate {
 		$title = $skin->getTitle();
 		$isArticle = $title && $title->inNamespace( NS_MAIN ) && $skin->getRelevantTitle()->exists();
 		?>
-<!DOCTYPE html>
-<html<?php $this->html( 'htmlattrs' ) ?>>
-<head>
 <?php $this->html( 'headelement' ) ?>
-</head>
-<body<?php $this->html( 'bodyattrs' ) ?>>
-
 <div class="rw-topbar">
 	<a href="<?php echo htmlspecialchars( Title::newMainPage()->getLocalURL() ) ?>" class="rw-brand">
 		<span class="mark">R</span> <?php echo htmlspecialchars( $this->data['sitename'] ) ?>
@@ -139,7 +133,7 @@ class ReligioWikiTemplate extends BaseTemplate {
 
 <button type="button" id="rw-hamburger" aria-label="Abrir menu de navegação">☰</button>
 
-<div id="footer"<?php $this->html( 'footerStyle' ) ?>>
+<div id="footer">
 <?php foreach ( $this->getFooterLinks() as $category => $links ) { ?>
 	<ul id="footer-<?php echo htmlspecialchars( $category ) ?>">
 		<?php foreach ( $links as $key ) { ?>
