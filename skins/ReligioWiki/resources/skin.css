@@ -117,7 +117,7 @@ a.new { color: #BA2828; }
 	border: 1px solid var(--rw-border);
 	border-radius: 3px;
 }
-.rw-search button { display: none; } /* botão nativo de busca some — o campo já basta */
+.rw-search button, .rw-search .rw-search-go, .rw-search input[type="submit"] { display: none; } /* botão de busca some — Enter já busca */
 
 /* #p-personal é flex pra deixar "Doar", o dropdown "Admin" e o dropdown
    "Tema" todos na MESMA linha. Antes o flex ficava só no <ul>, e o dropdown
@@ -409,6 +409,13 @@ body.religion-islam .firstHeading { background: #15803D; color: #fff; }
 	margin: 0 0 6px;
 }
 .rw-toc #toc ul { list-style: none; margin: 0; padding-left: 1.1em; }
+/* Títulos longos no índice quebram dentro da caixa em vez de vazar. */
+.rw-toc, .rw-toc #toc, .rw-toc #toc a, .rw-toc-box {
+	min-width: 0;
+	overflow-wrap: break-word;
+	word-break: break-word;
+}
+.rw-toc #toc a { display: inline-block; max-width: 100%; }
 
 .rw-appearance-panel { margin-top: 14px; border: 1px solid var(--rw-border); background: var(--rw-bg-elevated); padding: 10px 14px; font-size: 0.82rem; }
 .rw-appearance-panel h2 { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--rw-text-muted); margin: 0 0 8px; }
@@ -543,6 +550,21 @@ input[type="text"], input[type="password"], input[type="email"], input[type="num
 	border-radius: 3px;
 	padding: 7px 14px;
 	cursor: pointer;
+}
+/* Botões "Salvar" do OOUI (progressive/primary): o OOUI os renderiza como
+   <a>/<span> com azul/cinza próprios, então o seletor de <button> acima não
+   pega e eles ficavam fora da identidade. Força a cor do tema com !important
+   (a especificidade do CSS do OOUI é alta). */
+.oo-ui-flaggedElement-progressive > .oo-ui-buttonElement-button,
+.oo-ui-flaggedElement-primary > .oo-ui-buttonElement-button {
+	background-color: var(--rw-link) !important;
+	border-color: var(--rw-link) !important;
+	color: #fff !important;
+}
+.oo-ui-flaggedElement-progressive > .oo-ui-buttonElement-button:hover,
+.oo-ui-flaggedElement-primary > .oo-ui-buttonElement-button:hover {
+	background-color: var(--rw-text) !important;
+	border-color: var(--rw-text) !important;
 }
 
 /* ---------- tabelas de formulário (Page Forms: Form:Artigo etc.) ---------- */

@@ -452,7 +452,9 @@
 	'use strict';
 
 	function mount() {
-		if ( !document.body.classList.contains( 'rw-can-edit' ) ) {
+		// Lápis só em artigos (namespace principal, fora da home) — não em
+		// páginas de projeto/especiais como "Religio Wiki:Doar".
+		if ( !document.body.classList.contains( 'rw-can-edit' ) || typeof mw === 'undefined' || mw.config.get( 'wgNamespaceNumber' ) !== 0 || mw.config.get( 'wgIsMainPage' ) ) {
 			return;
 		}
 		var heading = document.getElementById( 'firstHeading' );

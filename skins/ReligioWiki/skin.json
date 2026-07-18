@@ -43,7 +43,8 @@
 			],
 			"dependencies": [
 				"mediawiki.api",
-				"mediawiki.util"
+				"mediawiki.util",
+				"mediawiki.searchSuggest"
 			],
 			"targets": [
 				"desktop",

@@ -344,9 +344,14 @@ $wgExternalDataSources['*']['allowed urls'] = [ 'https://' ];
 // de mais configuração para o uso básico com <templatestyles src="..." />.
 wfLoadExtension( 'TemplateStyles' );
 
-// ---------- CodeMirror (editor padrão com destaque de sintaxe) ----------
+// ---------- CodeMirror (destaque de sintaxe, DESLIGADO por padrão) ----------
+// O CodeMirror substitui o <textarea> nativo (wpTextbox1) pelo editor dele.
+// A barra de edição da ReligiowikiCustomizer (botões Card/Alerta/Formatação)
+// insere texto direto no textarea, e com o CodeMirror ativo isso não reflete
+// no editor visível — os botões "não funcionam". Fica DESLIGADO por padrão
+// (usecodemirror=0); quem quiser highlight liga em Preferências → Edição.
 wfLoadExtension( 'CodeMirror' );
-$wgDefaultUserOptions['usecodemirror'] = 1;
+$wgDefaultUserOptions['usecodemirror'] = 0;
 
 // ---------- Header Tabs ----------
 // <headertabs /> no fim da página transforma cada ==Seção== em aba. Ativado
