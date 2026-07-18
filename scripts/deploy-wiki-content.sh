@@ -199,48 +199,15 @@ PHPEOF
   echo "  TemplateWizard carregado no LocalSettings.php."
 fi
 
-# Lote de extensões estilo Wikipédia. Bloco único guardado por marcador porque
-# o snippet principal só é colado uma vez — instalações já existentes não
-# pegariam esses wfLoadExtension novos de outra forma.
-if ! grep -q "rw-extensions-batch-2" LocalSettings.php; then
-  cat >> LocalSettings.php << 'PHPEOF'
-
-// Religio Wiki — rw-extensions-batch-2 (lote de extensões estilo Wikipédia).
-// Ver mediawiki-config/LocalSettings-snippet.php.
-wfLoadExtension( 'PageImages' );
-wfLoadExtension( 'TextExtracts' );
-wfLoadExtension( 'Popups' );
-wfLoadExtension( 'Echo' );
-wfLoadExtension( 'UniversalLanguageSelector' );
-wfLoadExtension( 'Interwiki' );
-$wgGroupPermissions['sysop']['interwiki'] = true;
-wfLoadExtension( 'MultimediaViewer' );
-wfLoadExtension( 'ImageMap' );
-wfLoadExtension( 'Poem' );
-wfLoadExtension( 'CharInsert' );
-wfLoadExtension( 'Kartographer' );
-wfLoadExtension( 'TimedMediaHandler' );
-$wgFFmpegLocation = '/usr/bin/ffmpeg';
-$wgFileExtensions = array_merge( $wgFileExtensions, [ 'ogg', 'ogv', 'oga', 'webm', 'mp3', 'mp4', 'wav', 'flac' ] );
-wfLoadExtension( 'PdfHandler' );
-wfLoadExtension( 'AbuseFilter' );
-$wgGroupPermissions['sysop']['abusefilter-modify'] = true;
-$wgGroupPermissions['sysop']['abusefilter-view'] = true;
-$wgGroupPermissions['sysop']['abusefilter-log'] = true;
-$wgGroupPermissions['sysop']['abusefilter-log-detail'] = true;
-wfLoadExtension( 'SpamBlacklist' );
-wfLoadExtension( 'TitleBlacklist' );
-wfLoadExtension( 'CheckUser' );
-$wgGroupPermissions['sysop']['checkuser'] = true;
-$wgGroupPermissions['sysop']['checkuser-log'] = true;
-wfLoadExtension( 'SecurePoll' );
-wfLoadExtension( 'Renameuser' );
-$wgGroupPermissions['sysop']['renameuser'] = true;
-wfLoadExtension( 'Nuke' );
-wfLoadExtension( 'DeleteBatch' );
-$wgGroupPermissions['sysop']['deletebatch'] = true;
-PHPEOF
-  echo "  lote de extensões (batch-2) carregado no LocalSettings.php."
+# RECUPERAÇÃO: o lote rw-extensions-batch-2 (carregado de uma vez) derrubou o
+# site — uma das 21 extensões falha ao carregar e o MediaWiki entra em loop de
+# erro. Remove o bloco quebrado do LocalSettings.php ao vivo (do marcador até o
+# fim do arquivo, já que é o último bloco) pra restaurar o site. As extensões
+# voltam depois, em sub-lotes verificados, para isolar a culpada. Os arquivos
+# das extensões continuam na imagem (inofensivos enquanto não forem carregados).
+if grep -q "rw-extensions-batch-2" LocalSettings.php; then
+  sed -i '/rw-extensions-batch-2/,$d' LocalSettings.php
+  echo "  bloco rw-extensions-batch-2 (quebrado) removido do LocalSettings.php."
 fi
 
 echo "== 2/4: rebuild da imagem + subindo/reiniciando o container =="
