@@ -162,6 +162,14 @@ PHPEOF
   echo "  'Criar artigo' (Ferramentas) apontado pro formulário guiado."
 fi
 
+# CodeMirror desligado por padrão: ele substitui o textarea nativo e quebra os
+# botões de inserção da barra de edição da extensão. Idempotente: só troca a
+# linha ativa =1 por =0.
+if grep -qF "\$wgDefaultUserOptions['usecodemirror'] = 1;" LocalSettings.php; then
+  sed -i "s|\$wgDefaultUserOptions\['usecodemirror'\] = 1;|\$wgDefaultUserOptions['usecodemirror'] = 0; // desligado: quebrava os botoes da barra de edicao|" LocalSettings.php
+  echo "  CodeMirror desligado por padrão (usecodemirror=0)."
+fi
+
 echo "== 2/4: rebuild da imagem + subindo/reiniciando o container =="
 # Rebuild explícito: "up -d" sozinho NÃO reconstrói a imagem quando só o
 # Dockerfile muda (ex.: skin novo copiado em skins/ReligioWiki, extensões
@@ -193,6 +201,14 @@ while IFS=$'\t' read -r file title; do
   [ -z "$file" ] && continue
   edit_page "$title" "mediawiki-config/pages/$file"
 done < mediawiki-config/pages/manifest.tsv
+
+# Reconstrói o índice de busca de texto (searchindex) depois de aplicar as
+# páginas — garante que a busca de texto completo encontre artigos como
+# "Cristianismo". A busca por prefixo/título (autocomplete) já funciona sem
+# isso, mas o índice de texto pode ficar vazio em imports via edit.php.
+echo "  reconstruindo índice de busca..."
+$COMPOSE exec -T "$SERVICE" php maintenance/rebuildtextindex.php || \
+  echo "  (rebuildtextindex falhou — provável backend de busca sem índice MySQL; segue sem travar)"
 
 echo "== 4/4: resetando skin fixado em contas já existentes =="
 # $wgDefaultSkin só vale pra quem NUNCA salvou uma preferência própria de
