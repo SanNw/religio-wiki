@@ -170,6 +170,35 @@ if grep -qF "\$wgDefaultUserOptions['usecodemirror'] = 1;" LocalSettings.php; th
   echo "  CodeMirror desligado por padrão (usecodemirror=0)."
 fi
 
+# Espaço nominal "Rascunho" (artigos não publicados, usados pelo painel
+# Special:Artigos da ReligiowikiCustomizer). Checagem própria porque o bloco
+# principal do snippet só é colado uma vez (marcador no topo), então
+# instalações onde ele já existia não pegariam essas linhas novas.
+if ! grep -q "NS_RASCUNHO" LocalSettings.php; then
+  cat >> LocalSettings.php << 'PHPEOF'
+
+// Religio Wiki — espaço nominal "Rascunho" (Special:Artigos). Ver LocalSettings-snippet.php.
+define( 'NS_RASCUNHO', 3000 );
+define( 'NS_RASCUNHO_TALK', 3001 );
+$wgExtraNamespaces[NS_RASCUNHO] = 'Rascunho';
+$wgExtraNamespaces[NS_RASCUNHO_TALK] = 'Rascunho_Discussão';
+$wgNamespacesWithSubpages[NS_RASCUNHO] = true;
+$wgNamespacesToBeSearchedDefault[NS_RASCUNHO] = false;
+PHPEOF
+  echo "  espaço nominal Rascunho adicionado ao LocalSettings.php."
+fi
+
+# TemplateWizard: assistente de inserção de predefinições na barra do
+# WikiEditor. Idempotente pelo próprio wfLoadExtension.
+if ! grep -q "wfLoadExtension( 'TemplateWizard' )" LocalSettings.php; then
+  cat >> LocalSettings.php << 'PHPEOF'
+
+// Religio Wiki — TemplateWizard (assistente de predefinições). Ver LocalSettings-snippet.php.
+wfLoadExtension( 'TemplateWizard' );
+PHPEOF
+  echo "  TemplateWizard carregado no LocalSettings.php."
+fi
+
 echo "== 2/4: rebuild da imagem + subindo/reiniciando o container =="
 # Rebuild explícito: "up -d" sozinho NÃO reconstrói a imagem quando só o
 # Dockerfile muda (ex.: skin novo copiado em skins/ReligioWiki, extensões
