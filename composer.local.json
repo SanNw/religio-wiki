@@ -13,7 +13,11 @@
 		"merge-plugin": {
 			"include": [
 				"extensions/TemplateStyles/composer.json",
-				"extensions/ExternalData/composer.json"
+				"extensions/ExternalData/composer.json",
+				"extensions/AbuseFilter/composer.json",
+				"extensions/CheckUser/composer.json",
+				"extensions/TimedMediaHandler/composer.json",
+				"extensions/Kartographer/composer.json"
 			]
 		}
 	}
