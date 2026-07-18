@@ -25,7 +25,7 @@ COPY --from=composer /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www/html/extensions
 
 RUN set -eux; \
-	for ext in Cite ParserFunctions WikiEditor VisualEditor TemplateData Scribunto PluggableAuth OpenIDConnect; do \
+	for ext in Cite ParserFunctions WikiEditor VisualEditor TemplateData TemplateWizard Scribunto PluggableAuth OpenIDConnect; do \
 		rm -rf "${ext}"; \
 		git clone --depth 1 --branch "${MW_BRANCH}" \
 			"https://github.com/wikimedia/mediawiki-extensions-${ext}.git" "${ext}"; \
