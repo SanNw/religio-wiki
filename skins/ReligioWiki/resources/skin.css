@@ -474,13 +474,29 @@ body.rw-can-edit .rw-edit-pencil { display: inline; }
 	#rw-sidebar-overlay.rw-sidebar-open { display: block; }
 	#mw-panel.rw-sidebar, #mw-panel.rw-sidebar * { overflow-wrap: break-word; word-break: break-word; }
 	.rw-layout { grid-template-columns: 1fr; }
-	.rw-topbar { padding-left: 52px; flex-wrap: wrap; row-gap: 6px; }
+	.rw-topbar { padding-left: 52px; flex-wrap: wrap; row-gap: 8px; }
+	/* Controles do topo (Doar, Admin ▾, Tema ▾, Entrar/Criar conta) quebram
+	   em linha em vez de estourar/serem cortados pelo overflow-x:hidden. */
+	#p-personal.rw-personal { flex-wrap: wrap; row-gap: 6px; }
+	#p-personal.rw-personal ul { flex-wrap: wrap; row-gap: 6px; }
+	/* Os menus dropdown nunca ultrapassam a largura da tela. */
+	.rw-personal-dropdown-menu { max-width: calc( 100vw - 24px ); }
 }
 @media (max-width: 600px) {
 	.firstHeading { font-size: 1.5rem; }
 	.rw-article .rw-infobox { float: none; width: auto; margin: 0 0 16px; }
-	.rw-search { display: none; }
-	#p-personal.rw-personal ul { font-size: 0.78rem; gap: 8px; }
+	/* Busca continua acessível no celular — vai pra uma linha inteira em vez
+	   de sumir (antes era display:none, deixando o mobile sem busca alguma). */
+	.rw-search { flex: 1 1 100%; max-width: 100%; }
+	#p-personal.rw-personal { gap: 12px; }
+	#p-personal.rw-personal ul { font-size: 0.82rem; gap: 12px; }
+	/* Alvos de toque um pouco maiores nos controles/links do topo. */
+	.rw-donate,
+	.rw-personal-dropdown-toggle,
+	#p-personal.rw-personal li a { padding-top: 4px; padding-bottom: 4px; }
+	/* Conteúdo largo (tabelas, blocos de código) rola dentro de si em vez de
+	   empurrar a página inteira. */
+	.rw-article table, .rw-article pre { display: block; max-width: 100%; overflow-x: auto; }
 }
 
 /* ---------- pop-up de login/cadastro (montado por skin.js, API real) ---------- */
