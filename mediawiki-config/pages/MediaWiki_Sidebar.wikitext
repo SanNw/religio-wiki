@@ -4,6 +4,7 @@
 ** Special:Random|randompage
 ** Special:RecentChanges|recentchanges
 ** Special:UserRights|Gerenciar editores
+** Special:Artigos|Artigos
 
 * categorias-religiao-heading
 ** Category:I. Xamanismos Hiperbóreos|I. Xamanismos Hiperbóreos
