@@ -442,3 +442,75 @@ $egMapsLeafletLayer = 'OpenStreetMap';
 // Cards e Schema.org.
 wfLoadExtension( 'WikiSEO' );
 $wgMetadataGenerators = [ 'OpenGraph', 'Twitter', 'SchemaOrg' ];
+
+// ================================================================
+// Lote de extensões estilo Wikipédia (rw-extensions-batch-2). Baixadas pelo
+// Dockerfile (git clone REL1_43). CirrusSearch e Graph ficaram de fora de
+// propósito; DiscussionTools é tratada à parte (depende do VisualEditor).
+// ================================================================
+
+// Prévia ao passar o mouse (page previews) — precisa de PageImages + TextExtracts.
+wfLoadExtension( 'PageImages' );
+wfLoadExtension( 'TextExtracts' );
+wfLoadExtension( 'Popups' );
+
+// Notificações (sino no topo).
+wfLoadExtension( 'Echo' );
+
+// Seletor de idiomas e métodos de entrada.
+wfLoadExtension( 'UniversalLanguageSelector' );
+
+// Links entre wikis (Special:Interwiki) — administração só para admin.
+wfLoadExtension( 'Interwiki' );
+$wgGroupPermissions['sysop']['interwiki'] = true;
+
+// Visualizador moderno de imagens (lightbox).
+wfLoadExtension( 'MultimediaViewer' );
+
+// Áreas clicáveis em imagens (<imagemap>).
+wfLoadExtension( 'ImageMap' );
+
+// Poemas (<poem>).
+wfLoadExtension( 'Poem' );
+
+// Inserção de caracteres especiais (<charinsert> + botão na barra de edição).
+wfLoadExtension( 'CharInsert' );
+
+// Mapas interativos (<mapframe> / <maplink>).
+wfLoadExtension( 'Kartographer' );
+
+// Vídeo e áudio (precisa do ffmpeg, instalado no Dockerfile).
+wfLoadExtension( 'TimedMediaHandler' );
+$wgFFmpegLocation = '/usr/bin/ffmpeg';
+$wgFileExtensions = array_merge( $wgFileExtensions, [ 'ogg', 'ogv', 'oga', 'webm', 'mp3', 'mp4', 'wav', 'flac' ] );
+
+// Visualização de PDFs (precisa de poppler-utils + ghostscript, no Dockerfile).
+wfLoadExtension( 'PdfHandler' );
+
+// Filtro anti-vandalismo (Special:AbuseFilter) — administração só para admin.
+wfLoadExtension( 'AbuseFilter' );
+$wgGroupPermissions['sysop']['abusefilter-modify'] = true;
+$wgGroupPermissions['sysop']['abusefilter-view'] = true;
+$wgGroupPermissions['sysop']['abusefilter-log'] = true;
+$wgGroupPermissions['sysop']['abusefilter-log-detail'] = true;
+
+// Bloqueio de spam por URL e de títulos.
+wfLoadExtension( 'SpamBlacklist' );
+wfLoadExtension( 'TitleBlacklist' );
+
+// Verificação de usuários (restrita ao admin).
+wfLoadExtension( 'CheckUser' );
+$wgGroupPermissions['sysop']['checkuser'] = true;
+$wgGroupPermissions['sysop']['checkuser-log'] = true;
+
+// Votações seguras (Special:SecurePoll).
+wfLoadExtension( 'SecurePoll' );
+
+// Renomear usuários (Special:RenameUser) — só admin.
+wfLoadExtension( 'Renameuser' );
+$wgGroupPermissions['sysop']['renameuser'] = true;
+
+// Exclusão em massa (Special:Nuke por usuário/IP; Special:DeleteBatch por lista).
+wfLoadExtension( 'Nuke' );
+wfLoadExtension( 'DeleteBatch' );
+$wgGroupPermissions['sysop']['deletebatch'] = true;
