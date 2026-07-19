@@ -90,6 +90,17 @@ wfLoadExtension( 'Linter' );
 // tópico, assinar tópicos). Depende de VisualEditor + Linter, carregados acima.
 wfLoadExtension( 'DiscussionTools' );
 
+// A aba "Editar" do VisualEditor não é usada na Religio Wiki (a edição fica no
+// editor de código-fonte, que funciona sempre); o VE fica carregado só como
+// dependência do DiscussionTools. Este hook remove a aba do VE da navegação e
+// deixa o único botão de edição como "Editar" (em vez de "Editar código-fonte").
+$wgHooks['SkinTemplateNavigation::Universal'][] = static function ( $sktemplate, &$links ) {
+	unset( $links['views']['ve-edit'] );
+	if ( isset( $links['views']['edit']['text'] ) ) {
+		$links['views']['edit']['text'] = 'Editar';
+	}
+};
+
 // TemplateData: documentação estruturada de templates, usada pelo
 // VisualEditor para mostrar os campos de um template (ex.: template de
 // citação) num formulário em vez de wikitexto cru.
