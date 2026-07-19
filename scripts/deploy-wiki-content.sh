@@ -154,6 +154,24 @@ PHPEOF
   echo "  VisualEditor + DiscussionTools (editor moderno) ativados no LocalSettings.php."
 fi
 
+# Esconde a aba "Editar" do VisualEditor (não usada — a edição fica no
+# código-fonte), mantendo o VE só como dependência do DiscussionTools.
+# Idempotente pelo marcador rw-hide-ve-tab.
+if ! grep -q "rw-hide-ve-tab" LocalSettings.php; then
+  cat >> LocalSettings.php << 'PHPEOF'
+
+// Religio Wiki — rw-hide-ve-tab: remove a aba "Editar" do VisualEditor e
+// renomeia o botão de código-fonte para "Editar". Ver LocalSettings-snippet.php.
+$wgHooks['SkinTemplateNavigation::Universal'][] = static function ( $sktemplate, &$links ) {
+	unset( $links['views']['ve-edit'] );
+	if ( isset( $links['views']['edit']['text'] ) ) {
+		$links['views']['edit']['text'] = 'Editar';
+	}
+};
+PHPEOF
+  echo "  aba do VisualEditor escondida (rw-hide-ve-tab)."
+fi
+
 # "Criar artigo" (Ferramentas) aponta pro formulário guiado Religio Wiki:Criar
 # artigo (Page Forms). Hook adicional que roda DEPOIS do original (do bloco
 # principal) e sobrescreve só o href do item t-createarticle na instalação já
