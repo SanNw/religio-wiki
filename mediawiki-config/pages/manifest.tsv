@@ -32,3 +32,7 @@ Category_Classificação_das_religiões.wikitext	Category:Classificação das re
 Template_Artigo.wikitext	Template:Artigo
 Form_Artigo.wikitext	Form:Artigo
 Religio_Wiki_Criar_artigo.wikitext	Religio Wiki:Criar artigo
+Modulo_Arguments.lua	Module:Arguments
+Modulo_Yesno.lua	Module:Yesno
+Modulo_TableTools.lua	Module:TableTools
+Modulo_Exponential_search.lua	Module:Exponential search
