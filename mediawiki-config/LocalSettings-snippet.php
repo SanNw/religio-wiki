@@ -527,8 +527,8 @@ $wgAdvancedSearchDeepcategoryEnabled = false;
 // A criação de conta já é aberta (ver bloco de acesso no topo). Aqui liga a
 // CONFIRMAÇÃO de e-mail: quem cria conta e informa e-mail recebe um link de
 // confirmação (Special:ConfirmEmail / "confirmar endereço de e-mail"). O envio
-// depende do SMTP abaixo. A biblioteca PEAR Mail (pear/mail) é instalada via
-// composer.local.json — sem ela o $wgSMTP daria "Class 'Mail' not found".
+// depende do SMTP abaixo. A biblioteca PEAR Mail (pear/mail), usada pelo
+// $wgSMTP, já vem como dependência do MediaWiki core — não precisa adicionar.
 $wgEnableEmail = true;
 $wgEnableUserEmail = true;
 $wgEmailAuthentication = true;   // ativa o fluxo de confirmação por link
