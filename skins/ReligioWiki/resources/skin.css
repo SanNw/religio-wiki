@@ -652,6 +652,23 @@ input[type="text"], input[type="password"], input[type="email"], input[type="num
 }
 
 /* ---------- Sino de notificações (Echo) como ícone no topo ---------- */
+/* Histórico: as duas primeiras tentativas de corrigir isso zeravam
+   font-size/color no <a> pra "esconder o rótulo de texto do Echo" — e é
+   EXATAMENTE isso que fazia o ícone sumir de vez em quando. O ícone real
+   do Echo (span .oo-ui-iconElement-icon, dentro do <a>.mw-echo-
+   notifications-badge que o JS do ext.echo.init monta em cima do <li>
+   original) é um widget OOUI: em várias versões ele é dimensionado em
+   `em` RELATIVO ao font-size do container (então `font-size:0` no pai
+   colapsava o ícone pra 0×0 — invisível de verdade, não só "sem estilo")
+   e/ou pintado via `background-color: currentColor` (mask), que
+   `color:transparent` no pai também apagava por herança. Nenhum dos dois
+   é problema de contraste — o ícone simplesmente deixava de ter tamanho
+   ou cor nenhuma. A correção: nunca zerar font-size/color aqui; esconder
+   só o RÓTULO de texto do OOUI (elemento próprio, não afeta o ícone) e
+   forçar a cor do ícone via --rw-link (identidade do projeto), do mesmo
+   jeito que já se faz pros outros ícones OOUI mais abaixo neste arquivo
+   (".oo-ui-image-progressive").
+*/
 .rw-notif-icons {
 	display: inline-flex;
 	align-items: center;
@@ -660,6 +677,7 @@ input[type="text"], input[type="password"], input[type="email"], input[type="num
 	margin: 0 4px 0 0;
 	padding: 0;
 	vertical-align: middle;
+	font-size: 0.85rem; /* base normal — NUNCA 0, ver comentário acima */
 }
 .rw-notif-icons li { display: inline-flex; margin: 0; }
 /* Cada badge do Echo vira um botão-ícone limpo, com o número por cima. */
@@ -671,22 +689,34 @@ input[type="text"], input[type="password"], input[type="email"], input[type="num
 	width: 32px;
 	height: 32px;
 	border-radius: 4px;
-	text-indent: 0;
-	font-size: 0; /* esconde qualquer rótulo textual do Echo */
-	color: transparent;
+	color: var(--rw-text); /* nunca transparent — ver comentário acima */
 	text-decoration: none;
 }
 .rw-notif-icons li a:hover { background: var(--rw-surface, rgba(0,0,0,0.06)); }
+/* Rótulo de texto do OOUI (o número por extenso ao lado do ícone) e a
+   setinha de indicador — escondidos como ELEMENTOS PRÓPRIOS (display:none
+   num filho), não zerando font-size do link inteiro. */
+.rw-notif-icons li a .oo-ui-labelElement-label,
+.rw-notif-icons li a .oo-ui-indicatorElement-indicator {
+	display: none;
+}
+/* O ícone do Echo em si (sino/bandeja), na cor de identidade do projeto —
+   funciona tanto pro ícone clássico (background-image fixo, esta regra só
+   não faz nada visível) quanto pro ícone em mask/currentColor (recolore
+   de verdade), sem precisar saber qual dos dois esta versão usa. */
+.rw-notif-icons li a .oo-ui-iconElement-icon {
+	background-color: var(--rw-link) !important;
+	opacity: 1 !important;
+}
+/* Emoji de reserva (🔔), só enquanto o JS do Echo ainda não montou o ícone
+   de verdade — :has() detecta o ícone real e desliga o fallback sozinho,
+   sem precisar adivinhar o nome exato de classe que esta versão usa. */
 .rw-notif-icons li a::before {
-	content: "\1F514"; /* 🔔 fallback caso o ícone do Echo não carregue */
+	content: "\1F514";
 	font-size: 16px;
 	color: var(--rw-text);
 }
-/* Quando o Echo carrega o próprio ícone (mw-echo), usa o dele e esconde o sino
-   fallback pra não duplicar. */
-.rw-notif-icons li a.mw-echo-notifications-badge { font-size: 0; }
-.rw-notif-icons li a.mw-echo-notifications-badge::before { content: none; }
-.rw-notif-icons .mw-echo-notifications-badge.oo-ui-icon-bell { color: var(--rw-text); }
+.rw-notif-icons li a:has(.oo-ui-iconElement-icon)::before { content: none; }
 /* Contador de não lidas visível por cima do ícone. */
 .rw-notif-icons .mw-echo-unread-notifications::after {
 	content: attr(data-counter-text);
