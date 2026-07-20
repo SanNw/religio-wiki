@@ -392,6 +392,143 @@ PHPEOF
   echo "  lote de extensões (batch-3, com JsonConfig) carregado no LocalSettings.php."
 fi
 
+# VE por SEÇÃO (cada ==Título== do artigo): o bloco principal já esconde a
+# aba do TOPO (rw-hide-ve-tab acima), mas o VE adiciona seu PRÓPRIO link
+# "editar" a cada seção por um caminho totalmente separado (hook
+# SkinEditSectionLinks) — sem isso ele sobrevive e aparece em dobro
+# ("editar | editar código-fonte" em cada título). Idempotente pelo
+# marcador rw-hide-ve-section-edit.
+if ! grep -q "rw-hide-ve-section-edit" LocalSettings.php; then
+  cat >> LocalSettings.php << 'PHPEOF'
+
+// Religio Wiki — rw-hide-ve-section-edit: remove o link de edição do VE por
+// SEÇÃO (não só a aba do topo). Ver LocalSettings-snippet.php.
+$wgHooks['SkinEditSectionLinks'][] = static function ( $skin, $title, $section, $tooltip, &$result, $lang ) {
+	unset( $result['veeditsection'] );
+};
+PHPEOF
+  echo "  link de edição do VE por seção removido (rw-hide-ve-section-edit)."
+fi
+
+# Fonte (Google Fonts) via <link> assíncrono no <head> em vez de @import
+# bloqueante dentro do skin.css (causa mais provável do "CSS demorando pra
+# carregar" — @import força dois requests em série antes de renderizar
+# qualquer coisa). Idempotente pelo marcador rw-font-async.
+if ! grep -q "rw-font-async" LocalSettings.php; then
+  cat >> LocalSettings.php << 'PHPEOF'
+
+// Religio Wiki — rw-font-async: fonte carregada via <link> assíncrono, sem
+// bloquear a renderização. Ver LocalSettings-snippet.php.
+$wgHooks['BeforePageDisplay'][] = static function ( $out ) {
+	$href = 'https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700' .
+		'&family=Noto+Sans+Arabic:wght@400;600;700' .
+		'&family=Noto+Sans+Hebrew:wght@400;600;700' .
+		'&family=Noto+Sans+Greek:wght@400;600;700' .
+		'&family=Noto+Sans+Devanagari:wght@400;600;700' .
+		'&display=swap';
+	$out->addHeadItem( 'rw-font-preconnect',
+		'<link rel="preconnect" href="https://fonts.googleapis.com">' .
+		'<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
+	);
+	$out->addHeadItem( 'rw-font-async',
+		'<link rel="stylesheet" href="' . htmlspecialchars( $href ) . '" media="print" ' .
+		'onload="this.media=\'all\'">' .
+		'<noscript><link rel="stylesheet" href="' . htmlspecialchars( $href ) . '"></noscript>'
+	);
+};
+PHPEOF
+  echo "  fonte assíncrona configurada (rw-font-async)."
+fi
+
+# Contador "N artigos publicados" (home): exclui a própria Página principal
+# da contagem (ela mora no espaço principal e contém links, então por
+# padrão o MediaWiki a contava como se fosse mais um artigo publicado).
+# Idempotente pelo marcador rw-article-count-mainpage.
+if ! grep -q "rw-article-count-mainpage" LocalSettings.php; then
+  cat >> LocalSettings.php << 'PHPEOF'
+
+// Religio Wiki — rw-article-count-mainpage: Página principal não conta como
+// artigo publicado. Ver LocalSettings-snippet.php.
+$wgHooks['ArticleIsCountable'][] = static function ( $article, &$result ) {
+	if ( $article->getTitle()->isMainPage() ) {
+		$result = false;
+	}
+};
+PHPEOF
+  echo "  Página principal excluída da contagem de artigos (rw-article-count-mainpage)."
+fi
+
+# Invalida o cache da Página principal a cada artigo criado/editado/apagado
+# — sem isso, {{NUMBEROFARTICLES}} só atualiza na tela quando o cache de
+# parser dela expira sozinho (até 1 dia) ou alguém edita a home direto, daí
+# a sensação de "o contador não muda sozinho". Idempotente pelo marcador
+# rw-home-cache-invalidate.
+if ! grep -q "rw-home-cache-invalidate" LocalSettings.php; then
+  cat >> LocalSettings.php << 'PHPEOF'
+
+// Religio Wiki — rw-home-cache-invalidate: home reparseia na hora quando um
+// artigo é publicado/editado/apagado. Ver LocalSettings-snippet.php.
+$wgHooks['PageSaveComplete'][] = static function ( $wikiPage, $user, $summary, $flags, $revisionRecord, $editResult ) {
+	$title = $wikiPage->getTitle();
+	if ( $title->inNamespace( NS_MAIN ) && !$title->isMainPage() ) {
+		$mainPage = Title::newMainPage();
+		if ( $mainPage ) {
+			$mainPage->invalidateCache();
+		}
+	}
+};
+$wgHooks['ArticleDeleteComplete'][] = static function ( $article ) {
+	$title = $article->getTitle();
+	if ( $title->inNamespace( NS_MAIN ) && !$title->isMainPage() ) {
+		$mainPage = Title::newMainPage();
+		if ( $mainPage ) {
+			$mainPage->invalidateCache();
+		}
+	}
+};
+PHPEOF
+  echo "  cache da home invalidado a cada publicação (rw-home-cache-invalidate)."
+fi
+
+# "Artigo em destaque" (mais lido do dia) e "Imagem do dia" (rotação 24h)
+# automáticos — {{#artigoemdestaque:}}/{{#imagemdodia:}}, classe
+# RwPageViews.php (já entra pelo rebuild da imagem, só a ligação em
+# LocalSettings.php precisa deste patch). SEM isso, as duas sub-páginas da
+# home mostram o texto {{#artigoemdestaque:}}/{{#imagemdodia:}} CRU na tela
+# (parser function não registrada) em vez de processado. Idempotente pelo
+# marcador rw-pageviews.
+if ! grep -q "rw-pageviews" LocalSettings.php; then
+  cat >> LocalSettings.php << 'PHPEOF'
+
+// Religio Wiki — rw-pageviews: "Artigo em destaque"/"Imagem do dia"
+// automáticos (RwPageViews.php). Ver LocalSettings-snippet.php.
+$wgHooks['LoadExtensionSchemaUpdates'][] = [ 'RwPageViews', 'onLoadExtensionSchemaUpdates' ];
+$wgHooks['BeforePageDisplay'][] = static function ( $out ) {
+	RwPageViews::recordView( $out );
+};
+$wgHooks['ParserFirstCallInit'][] = static function ( Parser $parser ) {
+	$parser->setFunctionHook( 'artigoemdestaque', [ 'RwPageViews', 'renderFeaturedArticle' ] );
+	$parser->setFunctionHook( 'imagemdodia', [ 'RwPageViews', 'renderImageOfDay' ] );
+};
+PHPEOF
+  echo "  Artigo em destaque / Imagem do dia automáticos ligados (rw-pageviews)."
+fi
+
+# Cache de objeto/parser via CACHE_DB (tabela objectcache nativa) — sem
+# Memcached/Redis configurado (não há serviço de cache no docker-compose.yml),
+# o MediaWiki ficava efetivamente sem cache nenhum, reparseando tudo a cada
+# visita. Idempotente pelo marcador rw-cache-db.
+if ! grep -q "rw-cache-db" LocalSettings.php; then
+  cat >> LocalSettings.php << 'PHPEOF'
+
+// Religio Wiki — rw-cache-db: cache de objeto/parser via CACHE_DB, sem
+// precisar de serviço novo. Ver LocalSettings-snippet.php.
+$wgMainCacheType = CACHE_DB;
+$wgParserCacheType = CACHE_DB;
+PHPEOF
+  echo "  cache de objeto/parser ligado (rw-cache-db)."
+fi
+
 echo "== 2/4: rebuild da imagem + subindo/reiniciando o container =="
 # Rebuild explícito: "up -d" sozinho NÃO reconstrói a imagem quando só o
 # Dockerfile muda (ex.: skin novo copiado em skins/ReligioWiki, extensões

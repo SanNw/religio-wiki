@@ -319,42 +319,48 @@ habilitada) pra listar as notas de rodapé do corpo do texto.
 
 ## Responsivo / versão mobile
 
-O skin legacy Vector (o que a instalação usa) não foi desenhado pra tela
-pequena — essas regras (seção 13 do `common.css`) adaptam o que dá.
+Esta seção era sobre adaptar o skin Vector legado por cima com
+`common.css`/`common.js` — desatualizada desde que o skin próprio
+(`skins/ReligioWiki`) passou a existir e assumiu toda a estrutura
+(`resources/skin.css`/`skin.js`). O comportamento abaixo reflete o skin
+atual.
 
 **Rolamento lateral corrigido**: `html, body { max-width: 100%; overflow-x:
 hidden; }` como rede de segurança, mais `overflow-wrap`/`word-break` na
 barra lateral pra nome comprido de religião quebrar linha em vez de esticar
-o menu, mais `max-width:100%` em imagem/SVG/tabela. Na prévia do navegador
-a causa principal era um bug específico do grid CSS ali (um item com
-`grid-column: 3` numa grade que só tinha 1 coluna em tela estreita, o que
-fazia o navegador criar colunas extras pra caber — corrigido lá também).
+o menu, mais `max-width:100%` em imagem/SVG/tabela.
 
 - Abaixo de 851px, a barra lateral fixa (`#mw-panel`) some e vira um menu
-  hambúrguer (☰, canto superior esquerdo, `common.js` "Menu hambúrguer") —
-  abre como painel deslizante por cima do conteúdo, com fundo escurecido
-  atrás; fecha ao clicar fora, apertar Esc, ou clicar num link do menu.
+  hambúrguer — botão **fixo (`position: fixed`), no canto superior
+  DIREITO**, na mesma altura do logo "Religio Wiki" (`skin.js`, bloco "menu
+  hambúrguer"; CSS em `#rw-hamburger`) — abre como painel deslizante por
+  cima do conteúdo, com fundo escurecido atrás; fecha ao clicar fora,
+  apertar Esc, ou clicar num link do menu. O ícone alterna ☰/✕ conforme
+  abre/fecha, e o scroll do conteúdo por trás fica travado
+  (`body.rw-noscroll`) enquanto o menu está aberto — sem isso, um arraste
+  vertical sobre a área escurecida ainda rolava a página de baixo.
 - **Cada bloco da lateral vira collapse/accordion, fechado por padrão**
-  (`common.js`, função `collapsePortlets`) — é o que deixa a lateral
+  (`skin.js`, função `collapsePortlets`) — é o que deixa a lateral
   compacta em vez de uma lista comprida: "Categorias", "Navegação" etc.
   ficam recolhidos até o leitor tocar no título de cada um. Funciona em
   qualquer tela, não só no menu mobile.
 - Na página principal, "Artigo em destaque" e "Imagem do dia" (lado a lado
-  no desktop) empilham em coluna única abaixo de 720px — isso já existia
-  desde a primeira versão da página principal.
-- Abaixo de 600px: título do artigo com fonte menor, cabeçalho da página
-  principal empilha em vez de ficar lado a lado com o contador de artigos,
-  a grade de valores da doação vira 2 colunas em vez de 3, e o infobox para
-  de flutuar ao lado do texto (ocupa a largura toda, no fluxo normal) —
-  senão ele fica apertado demais numa tela de celular.
+  no desktop) empilham em coluna única abaixo de 720px.
+- Abaixo de 600px: título do artigo com fonte menor, a grade de valores da
+  doação vira 2 colunas em vez de 3, o infobox para de flutuar ao lado do
+  texto (ocupa a largura toda, no fluxo normal) — senão ele fica apertado
+  demais numa tela de celular —, os campos de `Form:Artigo` empilham
+  rótulo acima do campo (2 colunas ficam apertadas), e os links de "editar"
+  por seção ganham uma área de toque um pouco maior (não têm `:hover` pra
+  "revelar" num toque, então ficam sempre no opacity reduzido).
 
 **Isso não é o mesmo que a Wikipédia tem de verdade no celular** — a
 Wikipédia usa a extensão `MobileFrontend`, com um skin próprio (Minerva)
-feito do zero pra mobile, algo bem mais completo do que adaptar o Vector
-com CSS. O que fiz aqui deixa o Vector *utilizável* em tela pequena; se no
-futuro quiser uma experiência mobile realmente nativa (like a Wikipédia
-em m.wikipedia.org), aí vale a pena avaliar instalar o MobileFrontend — é
-um projeto à parte, não incluído nesta rodada.
+feito do zero pra mobile, algo bem mais completo do que adaptar um skin de
+desktop com CSS responsivo. O que existe aqui deixa o skin *utilizável* em
+tela pequena; se no futuro quiser uma experiência mobile realmente nativa
+(como a Wikipédia em m.wikipedia.org), aí vale a pena avaliar instalar o
+MobileFrontend — é um projeto à parte, não incluído nesta rodada.
 
 ## Login e cadastro
 

@@ -502,15 +502,26 @@
 			return;
 		}
 
-		function close() {
-			panel.classList.remove( 'rw-sidebar-open' );
-			overlay.classList.remove( 'rw-sidebar-open' );
-			btn.setAttribute( 'aria-expanded', 'false' );
-		}
-		function toggle() {
-			var isOpen = panel.classList.toggle( 'rw-sidebar-open' );
+		function setOpen( isOpen ) {
+			panel.classList.toggle( 'rw-sidebar-open', isOpen );
 			overlay.classList.toggle( 'rw-sidebar-open', isOpen );
 			btn.setAttribute( 'aria-expanded', String( isOpen ) );
+			// ☰ vira ✕ enquanto o menu está aberto — deixa claro que o mesmo
+			// botão fecha (sem isso, o ícone não mudava e não dava pra saber
+			// só de olhar que apertar de novo fecha o menu).
+			btn.textContent = isOpen ? '✕' : '☰';
+			// Trava o scroll do <body> por trás do menu aberto — sem isso, um
+			// arraste vertical sobre a área do overlay ainda rolava a página de
+			// baixo (o painel tem overflow-y próprio, mas o body continuava
+			// rolável ao mesmo tempo), um problema clássico de "menu gaveta"
+			// mal implementado no mobile.
+			document.body.classList.toggle( 'rw-noscroll', isOpen );
+		}
+		function close() {
+			setOpen( false );
+		}
+		function toggle() {
+			setOpen( !panel.classList.contains( 'rw-sidebar-open' ) );
 		}
 		btn.addEventListener( 'click', toggle );
 		overlay.addEventListener( 'click', close );

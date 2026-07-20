@@ -491,8 +491,34 @@ body.rw-can-edit .rw-edit-pencil { display: inline; }
 #footer ul { list-style: none; margin: 0 0 6px; padding: 0; display: flex; flex-wrap: wrap; gap: 12px; }
 
 /* ---------- responsivo / hambúrguer (montado por skin.js) ---------- */
-#rw-hamburger { display: none; position: fixed; top: 10px; left: 10px; z-index: 160; font: inherit; font-size: 1.1rem; line-height: 1; padding: 6px 10px; border: 1px solid var(--rw-border); background: var(--rw-bg-elevated); color: var(--rw-text); cursor: pointer; border-radius: 3px; touch-action: manipulation; box-shadow: 0 1px 4px rgba(0,0,0,0.15); }
+/* Fixo (position:fixed — não some ao rolar a página) e no canto superior
+   DIREITO, alinhado com a mesma linha/altura do logo "Religio Wiki" em
+   .rw-topbar: o topbar tem padding-top 8px antes do conteúdo do logo
+   começar, então "top" aqui usa o mesmo valor — os dois ficam no mesmo
+   nível quando a página está no topo. Tamanho de toque ~40px (perto do
+   mínimo de 44px recomendado), maior que o alvo antigo. */
+#rw-hamburger {
+	display: none;
+	position: fixed;
+	top: 8px;
+	right: 12px;
+	z-index: 210; /* acima até do painel lateral (200) — continua clicável (fecha) com o menu aberto */
+	font: inherit;
+	font-size: 1.3rem;
+	line-height: 1;
+	padding: 8px 12px;
+	border: 1px solid var(--rw-border);
+	background: var(--rw-bg-elevated);
+	color: var(--rw-text);
+	cursor: pointer;
+	border-radius: 3px;
+	touch-action: manipulation;
+	box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+}
 #rw-sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 150; }
+/* Trava o scroll do conteúdo por trás enquanto o menu lateral (gaveta) está
+   aberto — ver skin.js, bloco "menu hambúrguer". */
+body.rw-noscroll { overflow: hidden; }
 @media (max-width: 851px) {
 	#rw-hamburger { display: inline-flex; }
 	#mw-panel.rw-sidebar {
@@ -507,7 +533,6 @@ body.rw-can-edit .rw-edit-pencil { display: inline; }
 		background: var(--rw-bg-elevated);
 		border-right: 1px solid var(--rw-border);
 		padding: 16px;
-		padding-top: 48px;
 		box-sizing: border-box;
 		overscroll-behavior: contain;
 	}
@@ -515,16 +540,36 @@ body.rw-can-edit .rw-edit-pencil { display: inline; }
 	#rw-sidebar-overlay.rw-sidebar-open { display: block; }
 	#mw-panel.rw-sidebar, #mw-panel.rw-sidebar * { overflow-wrap: break-word; word-break: break-word; }
 	.rw-layout { grid-template-columns: 1fr; }
-	.rw-topbar { padding-left: 52px; flex-wrap: wrap; row-gap: 8px; }
+	/* Reserva espaço à DIREITA (não mais à esquerda) pro hambúrguer, que
+	   agora mora nesse canto — sem isso, "Doar"/"Entrar"/"Tema ▾" no fim da
+	   barra pessoal ficariam embaixo do botão fixo. */
+	.rw-topbar { padding-right: 56px; flex-wrap: wrap; row-gap: 8px; }
 	/* Controles do topo (Doar, Admin ▾, Tema ▾, Entrar/Criar conta) quebram
 	   em linha em vez de estourar/serem cortados pelo overflow-x:hidden. */
 	#p-personal.rw-personal { flex-wrap: wrap; row-gap: 6px; }
 	#p-personal.rw-personal ul { flex-wrap: wrap; row-gap: 6px; }
 	/* Os menus dropdown nunca ultrapassam a largura da tela. */
 	.rw-personal-dropdown-menu { max-width: calc( 100vw - 24px ); }
+	/* Abas do artigo: no desktop o "Mais ▾" é empurrado pro extremo direito
+	   (margin-left:auto) pra ficar longe do grupo Ler/Editar/Ver histórico —
+	   faz sentido numa barra larga. No mobile, como a barra quebra em duas
+	   linhas, esse "auto" cria um vão enorme e vazio antes do "Mais ▾" na
+	   segunda linha (parece desalinhado). Tira o empurrão só aqui: os itens
+	   ficam juntos, fluindo da esquerda, como o resto da interface mobile. */
+	.rw-tab-group { margin-left: 0; }
 }
 @media (max-width: 600px) {
 	.firstHeading { font-size: 1.5rem; }
+	/* Título com fonte menor quebra em 2+ linhas com mais facilidade — o link
+	   de "editar" (inline, grudado na última palavra) ficava espremido contra
+	   o texto do título, parecendo desalinhado. Vira bloco próprio, numa
+	   linha abaixo do título inteiro, em vez de tentar caber ao lado dele. */
+	.firstHeading .mw-editsection,
+	h2 .mw-editsection, h3 .mw-editsection, h4 .mw-editsection {
+		display: block;
+		margin-left: 0;
+		margin-top: 4px;
+	}
 	.rw-article .rw-infobox { float: none; width: auto; margin: 0 0 16px; }
 	/* Busca continua acessível no celular — vai pra uma linha inteira em vez
 	   de sumir (antes era display:none, deixando o mobile sem busca alguma). */
@@ -535,6 +580,11 @@ body.rw-can-edit .rw-edit-pencil { display: inline; }
 	.rw-donate,
 	.rw-personal-dropdown-toggle,
 	#p-personal.rw-personal li a { padding-top: 4px; padding-bottom: 4px; }
+	/* Link de "editar" por seção: sem :hover no touch, ele fica sempre no
+	   opacity reduzido (não é o :hover que revela) — dá uma área de toque
+	   maior pra não errar o dedo nele. */
+	.mw-editsection { font-size: 0.72em; }
+	.mw-editsection a { padding: 3px 2px; display: inline-block; }
 	/* Conteúdo largo (tabelas, blocos de código) rola dentro de si em vez de
 	   empurrar a página inteira. */
 	.rw-article table, .rw-article pre { display: block; max-width: 100%; overflow-x: auto; }
@@ -619,6 +669,23 @@ input[type="text"], input[type="password"], input[type="email"], input[type="num
 }
 
 /* ---------- Sino de notificações (Echo) como ícone no topo ---------- */
+/* Histórico: as duas primeiras tentativas de corrigir isso zeravam
+   font-size/color no <a> pra "esconder o rótulo de texto do Echo" — e é
+   EXATAMENTE isso que fazia o ícone sumir de vez em quando. O ícone real
+   do Echo (span .oo-ui-iconElement-icon, dentro do <a>.mw-echo-
+   notifications-badge que o JS do ext.echo.init monta em cima do <li>
+   original) é um widget OOUI: em várias versões ele é dimensionado em
+   `em` RELATIVO ao font-size do container (então `font-size:0` no pai
+   colapsava o ícone pra 0×0 — invisível de verdade, não só "sem estilo")
+   e/ou pintado via `background-color: currentColor` (mask), que
+   `color:transparent` no pai também apagava por herança. Nenhum dos dois
+   é problema de contraste — o ícone simplesmente deixava de ter tamanho
+   ou cor nenhuma. A correção: nunca zerar font-size/color aqui; esconder
+   só o RÓTULO de texto do OOUI (elemento próprio, não afeta o ícone) e
+   forçar a cor do ícone via --rw-link (identidade do projeto), do mesmo
+   jeito que já se faz pros outros ícones OOUI mais abaixo neste arquivo
+   (".oo-ui-image-progressive").
+*/
 .rw-notif-icons {
 	display: inline-flex;
 	align-items: center;
@@ -627,6 +694,7 @@ input[type="text"], input[type="password"], input[type="email"], input[type="num
 	margin: 0 4px 0 0;
 	padding: 0;
 	vertical-align: middle;
+	font-size: 0.85rem; /* base normal — NUNCA 0, ver comentário acima */
 }
 .rw-notif-icons li { display: inline-flex; margin: 0; }
 /* Cada badge do Echo vira um botão-ícone limpo, com o número por cima. */
@@ -638,22 +706,34 @@ input[type="text"], input[type="password"], input[type="email"], input[type="num
 	width: 32px;
 	height: 32px;
 	border-radius: 4px;
-	text-indent: 0;
-	font-size: 0; /* esconde qualquer rótulo textual do Echo */
-	color: transparent;
+	color: var(--rw-text); /* nunca transparent — ver comentário acima */
 	text-decoration: none;
 }
 .rw-notif-icons li a:hover { background: var(--rw-surface, rgba(0,0,0,0.06)); }
+/* Rótulo de texto do OOUI (o número por extenso ao lado do ícone) e a
+   setinha de indicador — escondidos como ELEMENTOS PRÓPRIOS (display:none
+   num filho), não zerando font-size do link inteiro. */
+.rw-notif-icons li a .oo-ui-labelElement-label,
+.rw-notif-icons li a .oo-ui-indicatorElement-indicator {
+	display: none;
+}
+/* O ícone do Echo em si (sino/bandeja), na cor de identidade do projeto —
+   funciona tanto pro ícone clássico (background-image fixo, esta regra só
+   não faz nada visível) quanto pro ícone em mask/currentColor (recolore
+   de verdade), sem precisar saber qual dos dois esta versão usa. */
+.rw-notif-icons li a .oo-ui-iconElement-icon {
+	background-color: var(--rw-link) !important;
+	opacity: 1 !important;
+}
+/* Emoji de reserva (🔔), só enquanto o JS do Echo ainda não montou o ícone
+   de verdade — :has() detecta o ícone real e desliga o fallback sozinho,
+   sem precisar adivinhar o nome exato de classe que esta versão usa. */
 .rw-notif-icons li a::before {
-	content: "\1F514"; /* 🔔 fallback caso o ícone do Echo não carregue */
+	content: "\1F514";
 	font-size: 16px;
 	color: var(--rw-text);
 }
-/* Quando o Echo carrega o próprio ícone (mw-echo), usa o dele e esconde o sino
-   fallback pra não duplicar. */
-.rw-notif-icons li a.mw-echo-notifications-badge { font-size: 0; }
-.rw-notif-icons li a.mw-echo-notifications-badge::before { content: none; }
-.rw-notif-icons .mw-echo-notifications-badge.oo-ui-icon-bell { color: var(--rw-text); }
+.rw-notif-icons li a:has(.oo-ui-iconElement-icon)::before { content: none; }
 /* Contador de não lidas visível por cima do ícone. */
 .rw-notif-icons .mw-echo-unread-notifications::after {
 	content: attr(data-counter-text);

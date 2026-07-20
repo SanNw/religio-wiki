@@ -2,6 +2,22 @@
 /**
  * Religio Wiki — trechos para colar no final do LocalSettings.php gerado
  * pelo instalador (ver README.md da pasta "Religio Wiki").
+ *
+ * ⚠️ ARMADILHA (já mordeu uma vez): scripts/deploy-wiki-content.sh só cola
+ * este arquivo INTEIRO no LocalSettings.php da VPS UMA VEZ — ele checa um
+ * marcador fixo ("Religio Wiki — trechos para colar") e, se já existir,
+ * PULA o resto da vida, mesmo que este arquivo mude depois. Em um wiki já
+ * no ar (o caso normal, depois do primeiro deploy), editar algo aqui
+ * NÃO tem efeito nenhum sozinho — o site continua rodando a versão colada
+ * na primeira vez.
+ *
+ * Por isso: toda mudança feita AQUI que precise valer pra um deploy já
+ * existente também precisa de um bloco PRÓPRIO e idempotente (com seu
+ * próprio marcador único, tipo "rw-nome-da-coisa") em
+ * scripts/deploy-wiki-content.sh, na seção de "Checagens separadas" —
+ * mesmo padrão dos blocos rw-pageviews/rw-cache-db/rw-font-async etc. que
+ * já estão lá. Sem isso, a mudança só chega em instalações NOVAS (que
+ * ainda vão colar este arquivo pela primeira vez).
  */
 
 // ---------- Skin: ReligioWiki (identidade visual própria) ----------
