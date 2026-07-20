@@ -566,6 +566,82 @@ input[type="text"], input[type="password"], input[type="email"], input[type="num
 	background-color: var(--rw-text) !important;
 	border-color: var(--rw-text) !important;
 }
+/* Botões "+" e links azuis dos DIÁLOGOS (TemplateWizard, VisualEditor, upload):
+   são frameless progressive — o azul do OOUI no ícone e no texto destoava da
+   identidade. Troca por --rw-link (o fundo dos diálogos continua o do tema). */
+.oo-ui-buttonElement-frameless.oo-ui-flaggedElement-progressive > .oo-ui-buttonElement-button,
+.oo-ui-buttonElement-frameless.oo-ui-flaggedElement-progressive > .oo-ui-buttonElement-button .oo-ui-labelElement-label,
+.oo-ui-buttonElement-frameless.oo-ui-flaggedElement-progressive > .oo-ui-buttonElement-button:hover .oo-ui-labelElement-label {
+	color: var(--rw-link) !important;
+}
+.oo-ui-buttonElement-frameless.oo-ui-flaggedElement-progressive > .oo-ui-buttonElement-button .oo-ui-iconElement-icon,
+.oo-ui-image-progressive {
+	background-color: var(--rw-link) !important;
+}
+/* Diálogos OOUI em geral (cabeçalho do TemplateWizard/upload) na identidade. */
+.oo-ui-processDialog-location .oo-ui-labelElement-label,
+.oo-ui-window-head .oo-ui-labelElement-label {
+	color: var(--rw-text);
+}
+
+/* ---------- Sino de notificações (Echo) como ícone no topo ---------- */
+.rw-notif-icons {
+	display: inline-flex;
+	align-items: center;
+	gap: 2px;
+	list-style: none;
+	margin: 0 4px 0 0;
+	padding: 0;
+	vertical-align: middle;
+}
+.rw-notif-icons li { display: inline-flex; margin: 0; }
+/* Cada badge do Echo vira um botão-ícone limpo, com o número por cima. */
+.rw-notif-icons li a {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	position: relative;
+	width: 32px;
+	height: 32px;
+	border-radius: 4px;
+	text-indent: 0;
+	font-size: 0; /* esconde qualquer rótulo textual do Echo */
+	color: transparent;
+	text-decoration: none;
+}
+.rw-notif-icons li a:hover { background: var(--rw-surface, rgba(0,0,0,0.06)); }
+.rw-notif-icons li a::before {
+	content: "\1F514"; /* 🔔 fallback caso o ícone do Echo não carregue */
+	font-size: 16px;
+	color: var(--rw-text);
+}
+/* Quando o Echo carrega o próprio ícone (mw-echo), usa o dele e esconde o sino
+   fallback pra não duplicar. */
+.rw-notif-icons li a.mw-echo-notifications-badge { font-size: 0; }
+.rw-notif-icons li a.mw-echo-notifications-badge::before { content: none; }
+.rw-notif-icons .mw-echo-notifications-badge.oo-ui-icon-bell { color: var(--rw-text); }
+/* Contador de não lidas visível por cima do ícone. */
+.rw-notif-icons .mw-echo-unread-notifications::after {
+	content: attr(data-counter-text);
+	position: absolute;
+	top: 0; right: 0;
+	background: var(--rw-link);
+	color: #fff;
+	font-size: 10px;
+	line-height: 1;
+	padding: 2px 4px;
+	border-radius: 8px;
+}
+
+/* Esconde a área social do login quando nenhum provedor está configurado. */
+.rw-auth-social:empty { display: none; }
+
+/* Seletor de idioma do ULS (UniversalLanguageSelector): esconde o gatilho
+   grande "português do Brasil" da barra pessoal — fica só um ícone de idioma
+   limpo (o seletor de idioma do artigo, quando houver). */
+.uls-trigger,
+#pt-uls,
+.mw-interlanguage-selector { display: none !important; }
 
 /* ---------- tabelas de formulário (Page Forms: Form:Artigo etc.) ---------- */
 .rw-form-table { border-collapse: collapse; width: 100%; max-width: 640px; }

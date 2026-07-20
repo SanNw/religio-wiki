@@ -360,7 +360,12 @@ $wgCaptchaQuestions = [
 ];
 $wgCaptchaTriggers['edit'] = true;
 $wgCaptchaTriggers['create'] = true;
-$wgCaptchaTriggers['createaccount'] = true;
+// CAPTCHA DESLIGADO na criação de conta: o pop-up de cadastro próprio do skin
+// não renderiza a pergunta do QuestyCaptcha, então o cadastro sempre falhava
+// com "Código CAPTCHA incorreto ou não preenchido". Como a edição é só por
+// convite (grupo "editor") e agora há confirmação de e-mail, o spam já está
+// barrado sem depender do CAPTCHA aqui. Continua ligado em edit/create/addurl.
+$wgCaptchaTriggers['createaccount'] = false;
 $wgCaptchaTriggers['addurl'] = true;
 
 // ---------- ReplaceText: permissão só para sysop ----------
@@ -486,6 +491,10 @@ $wgHooks['BeforePageDisplay'][] = static function ( $out ) {
 	}
 };
 wfLoadExtension( 'UniversalLanguageSelector' );
+// Tira o gatilho grande de idioma ("português do Brasil") da barra pessoal —
+// fica fora do topo (posição "interlanguage"), deixando a interface mais limpa
+// e só um controle de idioma. O ULS continua ativo (métodos de entrada etc.).
+$wgULSPosition = 'interlanguage';
 wfLoadExtension( 'Interwiki' );
 $wgGroupPermissions['sysop']['interwiki'] = true;
 wfLoadExtension( 'MultimediaViewer' );
