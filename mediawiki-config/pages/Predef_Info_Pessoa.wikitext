@@ -1,0 +1,94 @@
+<includeonly><div class="rw-infobox">
+<div class="rw-infobox-title">{{{nome|{{PAGENAME}}}}}</div>
+{{#if:{{{imagem|}}}|<div class="rw-infobox-image">[[Arquivo:{{{imagem}}}|frameless|center|upright=1.2]]{{#if:{{{legenda|}}}|<div class="rw-infobox-caption">{{{legenda}}}</div>}}</div>}}
+<dl>
+{{#if:{{{nascimento|}}}|<dt>Nascimento</dt><dd>{{{nascimento}}}</dd>}}
+{{#if:{{{morte|}}}|<dt>Falecimento</dt><dd>{{{morte}}}</dd>}}
+{{#if:{{{nacionalidade|}}}|<dt>Nacionalidade</dt><dd>{{{nacionalidade}}}</dd>}}
+{{#if:{{{religiao|}}}|<dt>Religião</dt><dd>{{{religiao}}}</dd>}}
+{{#if:{{{tradicao|}}}|<dt>Tradição/escola</dt><dd>{{{tradicao}}}</dd>}}
+{{#if:{{{cargo|}}}|<dt>Cargo/título</dt><dd>{{{cargo}}}</dd>}}
+{{#if:{{{conhecido|}}}|<dt>Conhecido por</dt><dd>{{{conhecido}}}</dd>}}
+{{#if:{{{obras|}}}|<dt>Obras principais</dt><dd>{{{obras}}}</dd>}}
+</dl>
+</div></includeonly><noinclude>
+Infocaixa de uma pessoa (figura religiosa, líder, autor, santo etc.).
+<templatedata>
+{
+ "description": "Infocaixa de uma pessoa (figura religiosa, líder, autor, santo etc.).",
+ "format": "block",
+ "params": {
+  "nome": {
+   "label": "Nome/título",
+   "type": "string",
+   "description": "Nome exibido no topo. Se vazio, usa o título da página.",
+   "suggested": true
+  },
+  "imagem": {
+   "label": "Imagem",
+   "type": "wiki-file-name",
+   "description": "Nome do arquivo já enviado (sem \"Arquivo:\")."
+  },
+  "legenda": {
+   "label": "Legenda",
+   "type": "string",
+   "description": "Legenda abaixo da imagem."
+  },
+  "nascimento": {
+   "label": "Nascimento",
+   "type": "string",
+   "description": "Nascimento"
+  },
+  "morte": {
+   "label": "Falecimento",
+   "type": "string",
+   "description": "Falecimento"
+  },
+  "nacionalidade": {
+   "label": "Nacionalidade",
+   "type": "string",
+   "description": "Nacionalidade"
+  },
+  "religiao": {
+   "label": "Religião",
+   "type": "string",
+   "description": "Religião"
+  },
+  "tradicao": {
+   "label": "Tradição/escola",
+   "type": "string",
+   "description": "Tradição/escola"
+  },
+  "cargo": {
+   "label": "Cargo/título",
+   "type": "string",
+   "description": "Cargo/título"
+  },
+  "conhecido": {
+   "label": "Conhecido por",
+   "type": "content",
+   "description": "Conhecido por"
+  },
+  "obras": {
+   "label": "Obras principais",
+   "type": "content",
+   "description": "Obras principais"
+  }
+ },
+ "paramOrder": [
+  "nome",
+  "imagem",
+  "legenda",
+  "nascimento",
+  "morte",
+  "nacionalidade",
+  "religiao",
+  "tradicao",
+  "cargo",
+  "conhecido",
+  "obras"
+ ]
+}
+</templatedata>
+[[Categoria:Predefinições de infocaixa]]
+</noinclude>

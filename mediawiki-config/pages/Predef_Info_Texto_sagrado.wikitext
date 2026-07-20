@@ -1,0 +1,80 @@
+<includeonly><div class="rw-infobox">
+<div class="rw-infobox-title">{{{titulo|{{PAGENAME}}}}}</div>
+{{#if:{{{imagem|}}}|<div class="rw-infobox-image">[[Arquivo:{{{imagem}}}|frameless|center|upright=1.2]]{{#if:{{{legenda|}}}|<div class="rw-infobox-caption">{{{legenda}}}</div>}}</div>}}
+<dl>
+{{#if:{{{religiao|}}}|<dt>Religião</dt><dd>{{{religiao}}}</dd>}}
+{{#if:{{{lingua|}}}|<dt>Língua original</dt><dd>{{{lingua}}}</dd>}}
+{{#if:{{{periodo|}}}|<dt>Período</dt><dd>{{{periodo}}}</dd>}}
+{{#if:{{{autoria|}}}|<dt>Autoria/atribuição</dt><dd>{{{autoria}}}</dd>}}
+{{#if:{{{genero|}}}|<dt>Gênero</dt><dd>{{{genero}}}</dd>}}
+{{#if:{{{partes|}}}|<dt>Divisões/partes</dt><dd>{{{partes}}}</dd>}}
+</dl>
+</div></includeonly><noinclude>
+Infocaixa de um texto ou documento sagrado (escritura, obra doutrinária).
+<templatedata>
+{
+ "description": "Infocaixa de um texto ou documento sagrado (escritura, obra doutrinária).",
+ "format": "block",
+ "params": {
+  "titulo": {
+   "label": "Nome/título",
+   "type": "string",
+   "description": "Nome exibido no topo. Se vazio, usa o título da página.",
+   "suggested": true
+  },
+  "imagem": {
+   "label": "Imagem",
+   "type": "wiki-file-name",
+   "description": "Nome do arquivo já enviado (sem \"Arquivo:\")."
+  },
+  "legenda": {
+   "label": "Legenda",
+   "type": "string",
+   "description": "Legenda abaixo da imagem."
+  },
+  "religiao": {
+   "label": "Religião",
+   "type": "string",
+   "description": "Religião"
+  },
+  "lingua": {
+   "label": "Língua original",
+   "type": "string",
+   "description": "Língua original"
+  },
+  "periodo": {
+   "label": "Período",
+   "type": "string",
+   "description": "Período"
+  },
+  "autoria": {
+   "label": "Autoria/atribuição",
+   "type": "content",
+   "description": "Autoria/atribuição"
+  },
+  "genero": {
+   "label": "Gênero",
+   "type": "string",
+   "description": "Gênero"
+  },
+  "partes": {
+   "label": "Divisões/partes",
+   "type": "content",
+   "description": "Divisões/partes"
+  }
+ },
+ "paramOrder": [
+  "titulo",
+  "imagem",
+  "legenda",
+  "religiao",
+  "lingua",
+  "periodo",
+  "autoria",
+  "genero",
+  "partes"
+ ]
+}
+</templatedata>
+[[Categoria:Predefinições de infocaixa]]
+</noinclude>

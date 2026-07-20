@@ -1,0 +1,94 @@
+<includeonly><div class="rw-infobox">
+<div class="rw-infobox-title">{{{nome|{{PAGENAME}}}}}</div>
+{{#if:{{{imagem|}}}|<div class="rw-infobox-image">[[Arquivo:{{{imagem}}}|frameless|center|upright=1.2]]{{#if:{{{legenda|}}}|<div class="rw-infobox-caption">{{{legenda}}}</div>}}</div>}}
+<dl>
+{{#if:{{{tipo|}}}|<dt>Tipo</dt><dd>{{{tipo}}}</dd>}}
+{{#if:{{{fundacao|}}}|<dt>Fundação</dt><dd>{{{fundacao}}}</dd>}}
+{{#if:{{{fundador|}}}|<dt>Fundador(es)</dt><dd>{{{fundador}}}</dd>}}
+{{#if:{{{sede|}}}|<dt>Sede</dt><dd>{{{sede}}}</dd>}}
+{{#if:{{{religiao|}}}|<dt>Religião/tradição</dt><dd>{{{religiao}}}</dd>}}
+{{#if:{{{lideranca|}}}|<dt>Liderança</dt><dd>{{{lideranca}}}</dd>}}
+{{#if:{{{membros|}}}|<dt>Membros</dt><dd>{{{membros}}}</dd>}}
+{{#if:{{{site|}}}|<dt>Site oficial</dt><dd>{{{site}}}</dd>}}
+</dl>
+</div></includeonly><noinclude>
+Infocaixa de uma organização ou instituição (igreja, ordem, movimento).
+<templatedata>
+{
+ "description": "Infocaixa de uma organização ou instituição (igreja, ordem, movimento).",
+ "format": "block",
+ "params": {
+  "nome": {
+   "label": "Nome/título",
+   "type": "string",
+   "description": "Nome exibido no topo. Se vazio, usa o título da página.",
+   "suggested": true
+  },
+  "imagem": {
+   "label": "Imagem",
+   "type": "wiki-file-name",
+   "description": "Nome do arquivo já enviado (sem \"Arquivo:\")."
+  },
+  "legenda": {
+   "label": "Legenda",
+   "type": "string",
+   "description": "Legenda abaixo da imagem."
+  },
+  "tipo": {
+   "label": "Tipo",
+   "type": "string",
+   "description": "Tipo"
+  },
+  "fundacao": {
+   "label": "Fundação",
+   "type": "string",
+   "description": "Fundação"
+  },
+  "fundador": {
+   "label": "Fundador(es)",
+   "type": "content",
+   "description": "Fundador(es)"
+  },
+  "sede": {
+   "label": "Sede",
+   "type": "string",
+   "description": "Sede"
+  },
+  "religiao": {
+   "label": "Religião/tradição",
+   "type": "string",
+   "description": "Religião/tradição"
+  },
+  "lideranca": {
+   "label": "Liderança",
+   "type": "content",
+   "description": "Liderança"
+  },
+  "membros": {
+   "label": "Membros",
+   "type": "string",
+   "description": "Membros"
+  },
+  "site": {
+   "label": "Site oficial",
+   "type": "string",
+   "description": "Site oficial"
+  }
+ },
+ "paramOrder": [
+  "nome",
+  "imagem",
+  "legenda",
+  "tipo",
+  "fundacao",
+  "fundador",
+  "sede",
+  "religiao",
+  "lideranca",
+  "membros",
+  "site"
+ ]
+}
+</templatedata>
+[[Categoria:Predefinições de infocaixa]]
+</noinclude>

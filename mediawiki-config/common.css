@@ -287,6 +287,16 @@
 .rw-infobox dt:first-child { margin-top: 0; }
 .rw-infobox dd { margin: 0; }
 
+/* Imagem e legenda das infocaixas (Predefinição:Info/*). */
+.rw-infobox .rw-infobox-image { padding: 8px 8px 0; }
+.rw-infobox .rw-infobox-image img { max-width: 100%; height: auto; }
+.rw-infobox .rw-infobox-caption {
+	font-size: 0.75rem;
+	color: var(--rw-text-muted);
+	text-align: center;
+	padding: 4px 6px 0;
+}
+
 .rw-citation-needed {
 	color: var(--rw-link);
 	font-size: 0.75em;
