@@ -85,6 +85,20 @@ $wgDefaultUserOptions['visualeditor-enable'] = 0;
 // Editor de wikitexto 2017 (mesma engine do VE) — usado pela ferramenta de
 // resposta do DiscussionTools.
 $wgVisualEditorEnableWikitext = true;
+// VE disponível SÓ nas páginas de discussão (para o DiscussionTools). Em
+// artigos ele não oferece edição — assim a aba/link "editar" do VE some de
+// vez, independente de preferência salva. É o interruptor definitivo (a
+// preferência visualeditor-enable e o skin já ajudavam, mas isto garante).
+$wgVisualEditorAvailableNamespaces = [
+	NS_TALK => true,
+	NS_USER_TALK => true,
+	NS_PROJECT_TALK => true,
+	NS_TEMPLATE_TALK => true,
+	NS_HELP_TALK => true,
+	NS_CATEGORY_TALK => true,
+];
+// Sem edição de seção pelo VE (o "editar" extra ao lado dos títulos).
+$wgVisualEditorEnableVisualSectionEditing = false;
 
 // Linter: pré-requisito do DiscussionTools; marca erros de wikitexto
 // (Special:LintErrors). Sem interface intrusiva no leitor.

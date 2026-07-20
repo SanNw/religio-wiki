@@ -271,6 +271,20 @@ PHPEOF
   echo "  atalho 'Imagens enviadas' adicionado ao LocalSettings.php."
 fi
 
+# VE só nas discussões (some a aba/link "editar" do VE em artigos). Idempotente.
+if ! grep -q "rw-ve-namespaces" LocalSettings.php; then
+  cat >> LocalSettings.php << 'PHPEOF'
+
+// Religio Wiki — rw-ve-namespaces: VE só em discussão (DiscussionTools); some a aba/link "editar" do VE em artigos.
+$wgVisualEditorAvailableNamespaces = [
+	NS_TALK => true, NS_USER_TALK => true, NS_PROJECT_TALK => true,
+	NS_TEMPLATE_TALK => true, NS_HELP_TALK => true, NS_CATEGORY_TALK => true,
+];
+$wgVisualEditorEnableVisualSectionEditing = false;
+PHPEOF
+  echo "  VE restrito a discussões (some a aba editar do VE)."
+fi
+
 # "Criar artigo" (Ferramentas) aponta pro formulário guiado Religio Wiki:Criar
 # artigo (Page Forms). Hook adicional que roda DEPOIS do original (do bloco
 # principal) e sobrescreve só o href do item t-createarticle na instalação já

@@ -566,23 +566,18 @@ input[type="text"], input[type="password"], input[type="email"], input[type="num
 	background-color: var(--rw-text) !important;
 	border-color: var(--rw-text) !important;
 }
-/* Botões "+" e links azuis dos DIÁLOGOS (TemplateWizard, VisualEditor, upload):
-   são frameless progressive — o azul do OOUI no ícone e no texto destoava da
-   identidade. Troca por --rw-link (o fundo dos diálogos continua o do tema). */
-.oo-ui-buttonElement-frameless.oo-ui-flaggedElement-progressive > .oo-ui-buttonElement-button,
-.oo-ui-buttonElement-frameless.oo-ui-flaggedElement-progressive > .oo-ui-buttonElement-button .oo-ui-labelElement-label,
-.oo-ui-buttonElement-frameless.oo-ui-flaggedElement-progressive > .oo-ui-buttonElement-button:hover .oo-ui-labelElement-label {
-	color: var(--rw-link) !important;
+/* Botões "+" e links progressivos dos DIÁLOGOS (TemplateWizard/VE/upload):
+   só o TEXTO azul do OOUI passa para a cor da identidade. NÃO mexe em fundo
+   nem em ícone — a regra global anterior (.oo-ui-image-progressive) pintava
+   ícones de marrom sobre fundo marrom e deixava áreas ilegíveis. */
+.oo-ui-buttonElement-frameless.oo-ui-flaggedElement-progressive > .oo-ui-buttonElement-button .oo-ui-labelElement-label {
+	color: var( --rw-link );
 }
-.oo-ui-buttonElement-frameless.oo-ui-flaggedElement-progressive > .oo-ui-buttonElement-button .oo-ui-iconElement-icon,
-.oo-ui-image-progressive {
-	background-color: var(--rw-link) !important;
-}
-/* Diálogos OOUI em geral (cabeçalho do TemplateWizard/upload) na identidade. */
-.oo-ui-processDialog-location .oo-ui-labelElement-label,
-.oo-ui-window-head .oo-ui-labelElement-label {
-	color: var(--rw-text);
-}
+
+/* Link "editar" do VisualEditor nas seções (aparecia como "editar | editar
+   código-fonte" ao lado dos títulos): escondido — a edição é só por
+   código-fonte. Reforça a config $wgVisualEditorAvailableNamespaces. */
+.mw-editsection-visualeditor { display: none !important; }
 
 /* ---------- Sino de notificações (Echo) como ícone no topo ---------- */
 .rw-notif-icons {
@@ -609,22 +604,20 @@ input[type="text"], input[type="password"], input[type="email"], input[type="num
 	color: transparent;
 	text-decoration: none;
 }
-.rw-notif-icons li a:hover { background: var(--rw-surface, rgba(0,0,0,0.06)); }
+.rw-notif-icons li a:hover { background: var(--rw-bg, rgba(0,0,0,0.06)); }
+/* SEMPRE mostra o sino (o ícone próprio do Echo não estava carregando no skin,
+   então nada de escondê-lo — senão o botão fica invisível, foi o bug). Cor
+   --rw-text: escura sobre a barra clara (--rw-bg-elevated), legível. */
 .rw-notif-icons li a::before {
-	content: "\1F514"; /* 🔔 fallback caso o ícone do Echo não carregue */
-	font-size: 16px;
+	content: "\1F514"; /* 🔔 */
+	font-size: 17px;
 	color: var(--rw-text);
 }
-/* Quando o Echo carrega o próprio ícone (mw-echo), usa o dele e esconde o sino
-   fallback pra não duplicar. */
-.rw-notif-icons li a.mw-echo-notifications-badge { font-size: 0; }
-.rw-notif-icons li a.mw-echo-notifications-badge::before { content: none; }
-.rw-notif-icons .mw-echo-notifications-badge.oo-ui-icon-bell { color: var(--rw-text); }
-/* Contador de não lidas visível por cima do ícone. */
+/* Contador de não lidas (bolha) por cima do sino, quando o Echo informa. */
 .rw-notif-icons .mw-echo-unread-notifications::after {
 	content: attr(data-counter-text);
 	position: absolute;
-	top: 0; right: 0;
+	top: -2px; right: -2px;
 	background: var(--rw-link);
 	color: #fff;
 	font-size: 10px;
