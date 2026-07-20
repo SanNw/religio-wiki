@@ -522,3 +522,32 @@ $wgGroupPermissions['sysop']['deletebatch'] = true;
 // profunda é desligada porque depende do CirrusSearch (que não usamos).
 wfLoadExtension( 'AdvancedSearch' );
 $wgAdvancedSearchDeepcategoryEnabled = false;
+
+// ---------- E-mail e confirmação de conta ----------
+// A criação de conta já é aberta (ver bloco de acesso no topo). Aqui liga a
+// CONFIRMAÇÃO de e-mail: quem cria conta e informa e-mail recebe um link de
+// confirmação (Special:ConfirmEmail / "confirmar endereço de e-mail"). O envio
+// depende do SMTP abaixo. A biblioteca PEAR Mail (pear/mail) é instalada via
+// composer.local.json — sem ela o $wgSMTP daria "Class 'Mail' not found".
+$wgEnableEmail = true;
+$wgEnableUserEmail = true;
+$wgEmailAuthentication = true;   // ativa o fluxo de confirmação por link
+$wgAllowHTMLEmail = false;
+$rwMailFrom = getenv( 'RW_MAIL_FROM' ) ?: 'no-reply@religiowiki.com';
+$wgPasswordSender = $rwMailFrom;
+$wgEmergencyContact = $rwMailFrom;
+$wgNoReplyAddress = $rwMailFrom;
+// Credenciais SMTP lidas de variáveis de ambiente (definidas no .env da VPS,
+// NUNCA no repositório, que é público). Enquanto RW_SMTP_HOST estiver vazio, o
+// $wgSMTP não é configurado e a confirmação de e-mail não envia — preencha o
+// .env (ver README) para ativar de verdade.
+if ( getenv( 'RW_SMTP_HOST' ) ) {
+	$wgSMTP = [
+		'host' => getenv( 'RW_SMTP_HOST' ),
+		'IDHost' => getenv( 'RW_SMTP_IDHOST' ) ?: 'religiowiki.com',
+		'port' => (int)( getenv( 'RW_SMTP_PORT' ) ?: 587 ),
+		'auth' => true,
+		'username' => (string)getenv( 'RW_SMTP_USER' ),
+		'password' => (string)getenv( 'RW_SMTP_PASS' ),
+	];
+}

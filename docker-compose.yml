@@ -17,6 +17,17 @@ services:
       - db
     ports:
       - "8080:80"
+    environment:
+      # Envio de e-mail (SMTP) para a confirmação de conta. Os VALORES ficam no
+      # arquivo .env da VPS (NÃO commitado — repositório é público); aqui só o
+      # repasse. Enquanto RW_SMTP_HOST estiver vazio, o wiki não tenta enviar
+      # e-mail (o LocalSettings só ativa o $wgSMTP quando a variável existe).
+      RW_SMTP_HOST: ${RW_SMTP_HOST:-}
+      RW_SMTP_PORT: ${RW_SMTP_PORT:-587}
+      RW_SMTP_USER: ${RW_SMTP_USER:-}
+      RW_SMTP_PASS: ${RW_SMTP_PASS:-}
+      RW_SMTP_IDHOST: ${RW_SMTP_IDHOST:-religiowiki.com}
+      RW_MAIL_FROM: ${RW_MAIL_FROM:-no-reply@religiowiki.com}
     volumes:
       - ./LocalSettings.php:/var/www/html/LocalSettings.php
       - wiki_images:/var/www/html/images

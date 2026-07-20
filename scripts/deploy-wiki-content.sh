@@ -208,6 +208,34 @@ PHPEOF
   echo "  ícone de notificações (Echo) corrigido no LocalSettings.php."
 fi
 
+# E-mail + confirmação de conta. SMTP lido de variáveis de ambiente (definidas
+# no .env da VPS, não no repo). Idempotente pelo marcador rw-email-smtp.
+if ! grep -q "rw-email-smtp" LocalSettings.php; then
+  cat >> LocalSettings.php << 'PHPEOF'
+
+// Religio Wiki — rw-email-smtp: e-mail e confirmação de conta (SMTP via ambiente).
+$wgEnableEmail = true;
+$wgEnableUserEmail = true;
+$wgEmailAuthentication = true;
+$wgAllowHTMLEmail = false;
+$rwMailFrom = getenv( 'RW_MAIL_FROM' ) ?: 'no-reply@religiowiki.com';
+$wgPasswordSender = $rwMailFrom;
+$wgEmergencyContact = $rwMailFrom;
+$wgNoReplyAddress = $rwMailFrom;
+if ( getenv( 'RW_SMTP_HOST' ) ) {
+	$wgSMTP = [
+		'host' => getenv( 'RW_SMTP_HOST' ),
+		'IDHost' => getenv( 'RW_SMTP_IDHOST' ) ?: 'religiowiki.com',
+		'port' => (int)( getenv( 'RW_SMTP_PORT' ) ?: 587 ),
+		'auth' => true,
+		'username' => (string)getenv( 'RW_SMTP_USER' ),
+		'password' => (string)getenv( 'RW_SMTP_PASS' ),
+	];
+}
+PHPEOF
+  echo "  e-mail/SMTP (confirmação de conta) configurado no LocalSettings.php."
+fi
+
 # "Criar artigo" (Ferramentas) aponta pro formulário guiado Religio Wiki:Criar
 # artigo (Page Forms). Hook adicional que roda DEPOIS do original (do bloco
 # principal) e sobrescreve só o href do item t-createarticle na instalação já
