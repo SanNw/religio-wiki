@@ -292,6 +292,13 @@ $wgHooks['LoadExtensionSchemaUpdates'][] = [ 'RwPageViews', 'onLoadExtensionSche
 $wgHooks['BeforePageDisplay'][] = static function ( $out ) {
 	RwPageViews::recordView( $out );
 };
+// Parser::setFunctionHook() exige que o id já exista como magic word
+// REGISTRADA antes de ganchar — sem isso, MagicWordFactory::get() lança
+// "Error: invalid magic word" pra QUALQUER Parser novo criado no site
+// inteiro (não só quando a página usa a função de verdade), o que derruba
+// TODA página com erro 500. Arquivo legado porque isto não é uma extensão
+// de verdade com extension.json (que teria a chave "MagicWords" moderna).
+$wgExtensionMessagesFiles['ReligioWikiMagic'] = __DIR__ . '/skins/ReligioWiki/i18n/RwPageViews.magic.php';
 $wgHooks['ParserFirstCallInit'][] = static function ( Parser $parser ) {
 	$parser->setFunctionHook( 'artigoemdestaque', [ 'RwPageViews', 'renderFeaturedArticle' ] );
 	$parser->setFunctionHook( 'imagemdodia', [ 'RwPageViews', 'renderImageOfDay' ] );

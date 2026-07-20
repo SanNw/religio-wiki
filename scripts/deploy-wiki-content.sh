@@ -506,12 +506,34 @@ $wgHooks['LoadExtensionSchemaUpdates'][] = [ 'RwPageViews', 'onLoadExtensionSche
 $wgHooks['BeforePageDisplay'][] = static function ( $out ) {
 	RwPageViews::recordView( $out );
 };
+$wgExtensionMessagesFiles['ReligioWikiMagic'] = __DIR__ . '/skins/ReligioWiki/i18n/RwPageViews.magic.php';
 $wgHooks['ParserFirstCallInit'][] = static function ( Parser $parser ) {
 	$parser->setFunctionHook( 'artigoemdestaque', [ 'RwPageViews', 'renderFeaturedArticle' ] );
 	$parser->setFunctionHook( 'imagemdodia', [ 'RwPageViews', 'renderImageOfDay' ] );
 };
 PHPEOF
   echo "  Artigo em destaque / Imagem do dia automáticos ligados (rw-pageviews)."
+fi
+
+# HOTFIX: o bloco rw-pageviews acima (versão aplicada num deploy anterior,
+# ANTES desta correção) registrava setFunctionHook('artigoemdestaque', ...)
+# sem a palavra mágica correspondente estar registrada — Parser::
+# setFunctionHook() exige isso, e sem ela MagicWordFactory::get() lança
+# "Error: invalid magic word" pra QUALQUER Parser criado no site inteiro,
+# derrubando TODA página com erro 500 (aconteceu de verdade em produção).
+# Bloco à parte (marcador PRÓPRIO, novo) porque o marcador "rw-pageviews"
+# já existe num LocalSettings.php que rodou o deploy quebrado — o bloco
+# acima seria pulado e o servidor continuaria com o hook sem a palavra
+# mágica pra sempre. Idempotente pelo marcador rw-pageviews-magicwords.
+if ! grep -q "rw-pageviews-magicwords" LocalSettings.php; then
+  cat >> LocalSettings.php << 'PHPEOF'
+
+// Religio Wiki — rw-pageviews-magicwords: registra as palavras mágicas de
+// {{#artigoemdestaque:}}/{{#imagemdodia:}} (hotfix — ver
+// skins/ReligioWiki/i18n/RwPageViews.magic.php e LocalSettings-snippet.php).
+$wgExtensionMessagesFiles['ReligioWikiMagic'] = __DIR__ . '/skins/ReligioWiki/i18n/RwPageViews.magic.php';
+PHPEOF
+  echo "  HOTFIX: palavras mágicas de Artigo em destaque/Imagem do dia registradas (rw-pageviews-magicwords)."
 fi
 
 # Cache de objeto/parser via CACHE_DB (tabela objectcache nativa) — sem
