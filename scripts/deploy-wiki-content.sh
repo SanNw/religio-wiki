@@ -253,6 +253,24 @@ PHPEOF
   echo "  ULS movido para fora da barra pessoal."
 fi
 
+# Atalho "Imagens enviadas" (Special:ListFiles) na caixa de ferramentas, pra
+# quem envia imagem. Idempotente pelo marcador rw-images-link.
+if ! grep -q "rw-images-link" LocalSettings.php; then
+  cat >> LocalSettings.php << 'PHPEOF'
+
+// Religio Wiki — rw-images-link: atalho "Imagens enviadas" (Special:ListFiles).
+$wgHooks['SidebarBeforeOutput'][] = static function ( $sk, &$sidebar ) {
+	if ( !$sk->getAuthority()->isAllowed( 'upload' ) ) { return; }
+	$sidebar['TOOLBOX']['rw-images'] = [
+		'text' => 'Imagens enviadas',
+		'href' => SpecialPage::getTitleFor( 'ListFiles' )->getLocalURL(),
+		'id' => 't-rw-images',
+	];
+};
+PHPEOF
+  echo "  atalho 'Imagens enviadas' adicionado ao LocalSettings.php."
+fi
+
 # "Criar artigo" (Ferramentas) aponta pro formulário guiado Religio Wiki:Criar
 # artigo (Page Forms). Hook adicional que roda DEPOIS do original (do bloco
 # principal) e sobrescreve só o href do item t-createarticle na instalação já
