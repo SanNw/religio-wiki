@@ -1,0 +1,16 @@
+<div class="rw-sisterbox">[[File:Commons-logo.svg|15px|link=]] O [[commons:Special:Search/{{{1|{{PAGENAME}}}}}|Wikimedia Commons]] possui multimídia sobre '''{{{1|{{PAGENAME}}}}}'''.</div><noinclude>
+Caixa que aponta para mídia no Wikimedia Commons.
+<templatedata>
+{
+ "description": "Link para o Commons.",
+ "format": "inline",
+ "params": {
+  "1": {
+   "label": "Categoria/termo no Commons",
+   "type": "string"
+  }
+ }
+}
+</templatedata>
+[[Categoria:Predefinições de navegação]]
+</noinclude>

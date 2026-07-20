@@ -1,0 +1,21 @@
+<span id="{{{1}}}">{{#if:{{{2|}}}|<span id="{{{2}}}"></span>}}</span><noinclude>
+Cria uma âncora de link dentro da página (para [[Página#Âncora]]).
+<templatedata>
+{
+ "description": "Âncora invisível para links internos.",
+ "format": "inline",
+ "params": {
+  "1": {
+   "label": "Nome da âncora",
+   "type": "string",
+   "required": true
+  },
+  "2": {
+   "label": "Âncora 2",
+   "type": "string"
+  }
+ }
+}
+</templatedata>
+[[Categoria:Predefinições de navegação]]
+</noinclude>

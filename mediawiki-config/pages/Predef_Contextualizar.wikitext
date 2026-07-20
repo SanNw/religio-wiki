@@ -1,0 +1,10 @@
+<div class="rw-mbox"><div class="rw-mbox-icon">🧭</div><div class="rw-mbox-text">'''Este artigo precisa de mais contexto''' para o leitor que não conhece o assunto.</div></div>{{#ifeq:{{NAMESPACE}}|||[[Categoria:!Artigos a contextualizar]]}}<noinclude>
+<templatedata>
+{
+ "description": "Aviso de manutenção no topo do artigo.",
+ "format": "inline",
+ "params": {}
+}
+</templatedata>
+[[Categoria:Predefinições de aviso]]
+</noinclude>

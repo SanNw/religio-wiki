@@ -297,6 +297,76 @@
 	padding: 4px 6px 0;
 }
 
+/* ---- Predefinições de navegação/formatação/aviso (Fase 2.4) ---- */
+
+/* Lista horizontal (Predefinição:Lista horizontal). */
+.rw-hlist ul { list-style: none; margin: 0; padding: 0; }
+.rw-hlist li { display: inline; }
+.rw-hlist li:not(:last-child)::after { content: " · "; color: var(--rw-text-muted); }
+
+/* Notas de topo (Artigo principal / Artigos relacionados). */
+.rw-hatnote {
+	font-style: italic;
+	color: var(--rw-text-muted);
+	padding: 2px 0 6px 1.6em;
+	margin-bottom: 6px;
+}
+
+/* Caixa de projeto-irmão (Commons). */
+.rw-sisterbox {
+	border: 1px solid var(--rw-border);
+	background: var(--rw-bg-elevated);
+	padding: 6px 10px;
+	font-size: 0.85rem;
+	margin: 8px 0;
+}
+
+/* Caixa de aviso de manutenção (avisos). */
+.rw-mbox {
+	display: flex;
+	align-items: flex-start;
+	gap: 10px;
+	border: 1px solid var(--rw-border);
+	border-left: 4px solid var(--rw-link);
+	background: var(--rw-bg-elevated);
+	padding: 8px 12px;
+	margin: 8px 0;
+	font-size: 0.9rem;
+}
+.rw-mbox-icon { font-size: 1.3em; line-height: 1.2; }
+.rw-mbox-text { flex: 1; }
+
+/* Caixa de navegação recolhível (Navbox). */
+.rw-navbox {
+	border: 1px solid var(--rw-border);
+	background: var(--rw-bg-elevated);
+	margin: 12px 0;
+	font-size: 0.85rem;
+	clear: both;
+}
+.rw-navbox-title {
+	text-align: center;
+	font-weight: 700;
+	padding: 5px 28px;
+	background: var(--rw-surface, var(--rw-bg-elevated));
+	border-bottom: 1px solid var(--rw-border);
+	position: relative;
+}
+.rw-navbox-body { padding: 0; }
+.rw-navbox-row { display: flex; border-top: 1px solid var(--rw-border); }
+.rw-navbox-row:first-child { border-top: none; }
+.rw-navbox-group {
+	flex: 0 0 auto;
+	min-width: 90px;
+	max-width: 40%;
+	font-weight: 700;
+	padding: 5px 10px;
+	background: var(--rw-surface, var(--rw-bg-elevated));
+	border-right: 1px solid var(--rw-border);
+	color: var(--rw-text-muted);
+}
+.rw-navbox-list { flex: 1; padding: 5px 10px; }
+
 .rw-citation-needed {
 	color: var(--rw-link);
 	font-size: 0.75em;

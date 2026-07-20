@@ -1,0 +1,19 @@
+<div class="rw-hlist">
+{{{1}}}
+</div><noinclude>
+Transforma uma lista com <code>*</code> numa lista horizontal (itens separados por ·).
+<templatedata>
+{
+ "description": "Lista horizontal. Passe uma lista com * itens.",
+ "format": "block",
+ "params": {
+  "1": {
+   "label": "Lista",
+   "type": "content",
+   "required": true
+  }
+ }
+}
+</templatedata>
+[[Categoria:Predefinições de formatação]]
+</noinclude>

@@ -1,0 +1,17 @@
+<span style="font-size:larger;">{{{1}}}</span><noinclude>
+Exibe o texto em tamanho maior.
+<templatedata>
+{
+ "description": "Texto maior.",
+ "format": "inline",
+ "params": {
+  "1": {
+   "label": "Texto",
+   "type": "content",
+   "required": true
+  }
+ }
+}
+</templatedata>
+[[Categoria:Predefinições de formatação]]
+</noinclude>

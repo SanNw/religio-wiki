@@ -1,0 +1,17 @@
+<small>{{{1}}}</small><noinclude>
+Exibe o texto em tamanho reduzido.
+<templatedata>
+{
+ "description": "Texto menor.",
+ "format": "inline",
+ "params": {
+  "1": {
+   "label": "Texto",
+   "type": "content",
+   "required": true
+  }
+ }
+}
+</templatedata>
+[[Categoria:Predefinições de formatação]]
+</noinclude>

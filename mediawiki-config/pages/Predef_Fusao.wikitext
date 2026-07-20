@@ -1,0 +1,10 @@
+<div class="rw-mbox"><div class="rw-mbox-icon">🔀</div><div class="rw-mbox-text">'''Foi proposta a fusão deste artigo com {{#if:{{{1|}}}|[[{{{1}}}]]|outro artigo}}.'''</div></div>{{#ifeq:{{NAMESPACE}}|||[[Categoria:!Artigos a fundir]]}}<noinclude>
+<templatedata>
+{
+ "description": "Aviso de manutenção no topo do artigo.",
+ "format": "inline",
+ "params": {}
+}
+</templatedata>
+[[Categoria:Predefinições de aviso]]
+</noinclude>

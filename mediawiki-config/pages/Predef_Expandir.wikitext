@@ -1,0 +1,10 @@
+<div class="rw-mbox"><div class="rw-mbox-icon">➕</div><div class="rw-mbox-text">'''Este artigo é um esboço.''' Você pode ajudar a Religio Wiki expandindo-o.</div></div>{{#ifeq:{{NAMESPACE}}|||[[Categoria:!Esboços]]}}<noinclude>
+<templatedata>
+{
+ "description": "Aviso de manutenção no topo do artigo.",
+ "format": "inline",
+ "params": {}
+}
+</templatedata>
+[[Categoria:Predefinições de aviso]]
+</noinclude>

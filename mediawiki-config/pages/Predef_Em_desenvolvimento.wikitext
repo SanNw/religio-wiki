@@ -1,0 +1,10 @@
+<div class="rw-mbox"><div class="rw-mbox-icon">🚧</div><div class="rw-mbox-text">'''Este artigo ou secção está a ser trabalhado no momento.''' O conteúdo pode mudar com frequência.</div></div>{{#ifeq:{{NAMESPACE}}|||[[Categoria:!Artigos em desenvolvimento]]}}<noinclude>
+<templatedata>
+{
+ "description": "Aviso de manutenção no topo do artigo.",
+ "format": "inline",
+ "params": {}
+}
+</templatedata>
+[[Categoria:Predefinições de aviso]]
+</noinclude>
