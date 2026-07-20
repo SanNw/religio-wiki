@@ -77,7 +77,11 @@ wfLoadExtension( 'WikiEditor' );
 // É também pré-requisito do DiscussionTools (ver abaixo). O "Editar
 // código-fonte" (wikitexto) continua disponível em paralelo.
 wfLoadExtension( 'VisualEditor' );
-$wgDefaultUserOptions['visualeditor-enable'] = 1;
+// VE fica carregado (o DiscussionTools exige), mas DESLIGADO por padrão para o
+// usuário — é isso que remove a aba "Editar" do VE, deixando só o "Editar"
+// (editor de código-fonte). Não usar hook/CSS pra esconder a aba: desligar a
+// preferência é a forma correta e não deixa a aba "vazar" em nenhum caminho.
+$wgDefaultUserOptions['visualeditor-enable'] = 0;
 // Editor de wikitexto 2017 (mesma engine do VE) — usado pela ferramenta de
 // resposta do DiscussionTools.
 $wgVisualEditorEnableWikitext = true;
@@ -471,6 +475,16 @@ wfLoadExtension( 'PageImages' );
 wfLoadExtension( 'TextExtracts' );
 wfLoadExtension( 'Popups' );
 wfLoadExtension( 'Echo' );
+// O skin próprio (ReligioWiki) não é um dos skins que o Echo estiliza
+// automaticamente, então o "sino" de notificações aparecia como um número solto
+// (sem ícone). Força o carregamento dos estilos e do JS do badge para quem está
+// logado — aí o ícone e o popup de notificações voltam a funcionar no menu.
+$wgHooks['BeforePageDisplay'][] = static function ( $out ) {
+	if ( $out->getUser()->isRegistered() ) {
+		$out->addModuleStyles( 'ext.echo.styles.badge' );
+		$out->addModules( 'ext.echo.init' );
+	}
+};
 wfLoadExtension( 'UniversalLanguageSelector' );
 wfLoadExtension( 'Interwiki' );
 $wgGroupPermissions['sysop']['interwiki'] = true;

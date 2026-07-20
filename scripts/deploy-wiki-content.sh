@@ -184,6 +184,30 @@ PHPEOF
   echo "  AdvancedSearch carregado no LocalSettings.php."
 fi
 
+# Desliga o VisualEditor por padrão do usuário (remove a aba "Editar" do VE,
+# mantendo o VE só como dependência do DiscussionTools). Idempotente: só troca
+# a linha ativa =1 por =0.
+if grep -qF "\$wgDefaultUserOptions['visualeditor-enable'] = 1;" LocalSettings.php; then
+  sed -i "s|\$wgDefaultUserOptions\['visualeditor-enable'\] = 1;|\$wgDefaultUserOptions['visualeditor-enable'] = 0; // desligado: some com a aba Editar do VE|" LocalSettings.php
+  echo "  VisualEditor desligado por padrão (some a aba Editar do VE)."
+fi
+
+# Corrige o "sino" de notificações (Echo) no skin próprio: força os estilos/JS
+# do badge para quem está logado. Idempotente pelo marcador rw-echo-badge-fix.
+if ! grep -q "rw-echo-badge-fix" LocalSettings.php; then
+  cat >> LocalSettings.php << 'PHPEOF'
+
+// Religio Wiki — rw-echo-badge-fix: ícone de notificações (Echo) no skin próprio.
+$wgHooks['BeforePageDisplay'][] = static function ( $out ) {
+	if ( $out->getUser()->isRegistered() ) {
+		$out->addModuleStyles( 'ext.echo.styles.badge' );
+		$out->addModules( 'ext.echo.init' );
+	}
+};
+PHPEOF
+  echo "  ícone de notificações (Echo) corrigido no LocalSettings.php."
+fi
+
 # "Criar artigo" (Ferramentas) aponta pro formulário guiado Religio Wiki:Criar
 # artigo (Page Forms). Hook adicional que roda DEPOIS do original (do bloco
 # principal) e sobrescreve só o href do item t-createarticle na instalação já
