@@ -257,6 +257,22 @@ $wgHooks['SidebarBeforeOutput'][] = static function ( $sk, &$sidebar ) {
 	];
 };
 
+// ---------- "Imagens enviadas" na caixa de ferramentas (quem envia imagem) ----------
+// Atalho para Special:ListFiles (Especial:ListaDeArquivos): lista TODAS as
+// imagens já enviadas, com busca por nome e miniaturas — facilita achar o nome
+// do arquivo pra inserir num artigo ou numa infocaixa. Aparece só pra quem tem
+// direito de upload (grupo "editor" e admin).
+$wgHooks['SidebarBeforeOutput'][] = static function ( $sk, &$sidebar ) {
+	if ( !$sk->getAuthority()->isAllowed( 'upload' ) ) {
+		return;
+	}
+	$sidebar['TOOLBOX']['rw-images'] = [
+		'text' => 'Imagens enviadas',
+		'href' => SpecialPage::getTitleFor( 'ListFiles' )->getLocalURL(),
+		'id' => 't-rw-images',
+	];
+};
+
 // ---------- Quem editou por último ----------
 // Mostra "Esta página foi editada pela última vez às [hora], em [data], por
 // [usuário]" no rodapé de cada artigo — nativo do MediaWiki, só precisa
