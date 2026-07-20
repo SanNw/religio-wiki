@@ -1,0 +1,10 @@
+<div class="rw-mbox"><div class="rw-mbox-icon">📚</div><div class="rw-mbox-text">'''Este artigo não cita fontes fiáveis.''' Ajude a inseri-las — conteúdo sem fontes pode ser removido.</div></div>{{#ifeq:{{NAMESPACE}}|||[[Categoria:!Artigos sem fontes]]}}<noinclude>
+<templatedata>
+{
+ "description": "Aviso de manutenção no topo do artigo.",
+ "format": "inline",
+ "params": {}
+}
+</templatedata>
+[[Categoria:Predefinições de aviso]]
+</noinclude>

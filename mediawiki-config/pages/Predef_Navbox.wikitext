@@ -1,0 +1,70 @@
+<div class="rw-navbox mw-collapsible{{#if:{{{recolhido|}}}| mw-collapsed}}">
+<div class="rw-navbox-title">{{{título|{{{titulo|Navegação}}}}}}</div>
+<div class="rw-navbox-body mw-collapsible-content">
+{{#if:{{{grupo1|}}}|<div class="rw-navbox-row"><div class="rw-navbox-group">{{{grupo1}}}</div><div class="rw-navbox-list">{{{lista1|}}}</div></div>}}
+{{#if:{{{grupo2|}}}|<div class="rw-navbox-row"><div class="rw-navbox-group">{{{grupo2}}}</div><div class="rw-navbox-list">{{{lista2|}}}</div></div>}}
+{{#if:{{{grupo3|}}}|<div class="rw-navbox-row"><div class="rw-navbox-group">{{{grupo3}}}</div><div class="rw-navbox-list">{{{lista3|}}}</div></div>}}
+{{#if:{{{grupo4|}}}|<div class="rw-navbox-row"><div class="rw-navbox-group">{{{grupo4}}}</div><div class="rw-navbox-list">{{{lista4|}}}</div></div>}}
+{{#if:{{{grupo5|}}}|<div class="rw-navbox-row"><div class="rw-navbox-group">{{{grupo5}}}</div><div class="rw-navbox-list">{{{lista5|}}}</div></div>}}
+</div>
+</div><noinclude>
+Caixa de navegação recolhível no rodapé dos artigos. Preencha título e pares grupo/lista.
+<templatedata>
+{
+ "description": "Caixa de navegação recolhível.",
+ "format": "block",
+ "params": {
+  "título": {
+   "label": "Título",
+   "type": "string",
+   "suggested": true
+  },
+  "recolhido": {
+   "label": "Começar recolhido (qualquer valor)",
+   "type": "string"
+  },
+  "grupo1": {
+   "label": "Grupo 1",
+   "type": "string"
+  },
+  "lista1": {
+   "label": "Lista 1",
+   "type": "content"
+  },
+  "grupo2": {
+   "label": "Grupo 2",
+   "type": "string"
+  },
+  "lista2": {
+   "label": "Lista 2",
+   "type": "content"
+  },
+  "grupo3": {
+   "label": "Grupo 3",
+   "type": "string"
+  },
+  "lista3": {
+   "label": "Lista 3",
+   "type": "content"
+  },
+  "grupo4": {
+   "label": "Grupo 4",
+   "type": "string"
+  },
+  "lista4": {
+   "label": "Lista 4",
+   "type": "content"
+  },
+  "grupo5": {
+   "label": "Grupo 5",
+   "type": "string"
+  },
+  "lista5": {
+   "label": "Lista 5",
+   "type": "content"
+  }
+ }
+}
+</templatedata>
+[[Categoria:Predefinições de navegação]]
+</noinclude>

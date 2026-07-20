@@ -1,0 +1,17 @@
+<span class="nowrap" style="white-space:nowrap;">{{{1}}}</span><noinclude>
+Impede que o texto quebre em várias linhas.
+<templatedata>
+{
+ "description": "Mantém o texto todo na mesma linha.",
+ "format": "inline",
+ "params": {
+  "1": {
+   "label": "Texto",
+   "type": "content",
+   "required": true
+  }
+ }
+}
+</templatedata>
+[[Categoria:Predefinições de formatação]]
+</noinclude>

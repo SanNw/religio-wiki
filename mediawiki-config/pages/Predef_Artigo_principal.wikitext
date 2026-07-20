@@ -1,0 +1,25 @@
+<div class="rw-hatnote">''{{#if:{{{2|}}}|Ver artigos principais|Ver artigo principal}}: [[{{{1}}}]]{{#if:{{{2|}}}| e [[{{{2}}}]]}}{{#if:{{{3|}}}|, [[{{{3}}}]]}}''</div><noinclude>
+Aponta para o artigo principal de uma seção.
+<templatedata>
+{
+ "description": "Nota de artigo principal.",
+ "format": "inline",
+ "params": {
+  "1": {
+   "label": "Artigo 1",
+   "type": "wiki-page-name",
+   "required": true
+  },
+  "2": {
+   "label": "Artigo 2",
+   "type": "wiki-page-name"
+  },
+  "3": {
+   "label": "Artigo 3",
+   "type": "wiki-page-name"
+  }
+ }
+}
+</templatedata>
+[[Categoria:Predefinições de navegação]]
+</noinclude>
