@@ -36,3 +36,29 @@ Modulo_Arguments.lua	Module:Arguments
 Modulo_Yesno.lua	Module:Yesno
 Modulo_TableTools.lua	Module:TableTools
 Modulo_Exponential_search.lua	Module:Exponential search
+Modulo_Citacao_CS1.lua	Módulo:Citação/CS1
+Modulo_Citacao_CS1_COinS.lua	Módulo:Citação/CS1/COinS
+Modulo_Citacao_CS1_Configuracao.lua	Módulo:Citação/CS1/Configuração
+Modulo_Citacao_CS1_Identificadores.lua	Módulo:Citação/CS1/Identificadores
+Modulo_Citacao_CS1_Utilidades.lua	Módulo:Citação/CS1/Utilidades
+Modulo_Citacao_CS1_ValidacaoDatas.lua	Módulo:Citação/CS1/ValidaçãoDatas
+Modulo_Citacao_CS1_Whitelist.lua	Módulo:Citação/CS1/Whitelist
+Modulo_Citacao_CS1_Sugestoes.lua	Módulo:Citação/CS1/Sugestões
+Modulo_Conversor_de_data.lua	Módulo:Conversor de data
+Modulo_Citar_web.lua	Módulo:Citar web
+Modulo_Citar_livro.lua	Módulo:Citar livro
+Modulo_Citar_periodico.lua	Módulo:Citar periódico
+Modulo_Citar_tese.lua	Módulo:Citar tese
+Modulo_Citar_conferencia.lua	Módulo:Citar conferência
+Modulo_Citar_enciclopedia.lua	Módulo:Citar enciclopédia
+Modulo_Citar_audiovisual.lua	Módulo:Citar audiovisual
+Predef_Citar_web.wikitext	Predefinição:Citar web
+Predef_Citar_livro.wikitext	Predefinição:Citar livro
+Predef_Citar_periodico.wikitext	Predefinição:Citar periódico
+Predef_Citar_tese.wikitext	Predefinição:Citar tese
+Predef_Citar_conferencia.wikitext	Predefinição:Citar conferência
+Predef_Citar_enciclopedia.wikitext	Predefinição:Citar enciclopédia
+Predef_Citar_jornal.wikitext	Predefinição:Citar jornal
+Predef_Citar_video.wikitext	Predefinição:Citar vídeo
+Predef_Citar_podcast.wikitext	Predefinição:Citar podcast
+Predef_Citar_noticia.wikitext	Predefinição:Citar notícia

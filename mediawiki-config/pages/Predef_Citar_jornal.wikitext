@@ -1,0 +1,5 @@
+<includeonly>{{#invoke:Citar periódico|jornal}}</includeonly><noinclude>
+<!-- Predefinição de citação importada da Wikipédia em português (CC BY-SA 4.0). Usa o Módulo:Citação/CS1. -->
+''Predefinição de citação (estilo CS1).''
+[[Categoria:Predefinições de citação]]
+</noinclude>
