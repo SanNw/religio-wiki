@@ -172,6 +172,18 @@ PHPEOF
   echo "  aba do VisualEditor escondida (rw-hide-ve-tab)."
 fi
 
+# AdvancedSearch: interface de busca com filtros, sobre a busca nativa (sem
+# CirrusSearch). Idempotente pelo marcador rw-advancedsearch.
+if ! grep -q "rw-advancedsearch" LocalSettings.php; then
+  cat >> LocalSettings.php << 'PHPEOF'
+
+// Religio Wiki — rw-advancedsearch: interface de busca com filtros (busca nativa).
+wfLoadExtension( 'AdvancedSearch' );
+$wgAdvancedSearchDeepcategoryEnabled = false;
+PHPEOF
+  echo "  AdvancedSearch carregado no LocalSettings.php."
+fi
+
 # "Criar artigo" (Ferramentas) aponta pro formulário guiado Religio Wiki:Criar
 # artigo (Page Forms). Hook adicional que roda DEPOIS do original (do bloco
 # principal) e sobrescreve só o href do item t-createarticle na instalação já

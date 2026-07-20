@@ -500,3 +500,11 @@ $wgGroupPermissions['sysop']['renameuser'] = true;
 wfLoadExtension( 'Nuke' );
 wfLoadExtension( 'DeleteBatch' );
 $wgGroupPermissions['sysop']['deletebatch'] = true;
+
+// ---------- Busca: AdvancedSearch (interface com filtros) ----------
+// Melhora Special:Search com um formulário de filtros (namespace, ordenação,
+// tipo). Extensão leve, só frontend — funciona sobre a busca NATIVA do
+// MediaWiki, sem exigir Elasticsearch/CirrusSearch. A busca de categoria
+// profunda é desligada porque depende do CirrusSearch (que não usamos).
+wfLoadExtension( 'AdvancedSearch' );
+$wgAdvancedSearchDeepcategoryEnabled = false;
