@@ -550,9 +550,26 @@ body.rw-noscroll { overflow: hidden; }
 	#p-personal.rw-personal ul { flex-wrap: wrap; row-gap: 6px; }
 	/* Os menus dropdown nunca ultrapassam a largura da tela. */
 	.rw-personal-dropdown-menu { max-width: calc( 100vw - 24px ); }
+	/* Abas do artigo: no desktop o "Mais ▾" é empurrado pro extremo direito
+	   (margin-left:auto) pra ficar longe do grupo Ler/Editar/Ver histórico —
+	   faz sentido numa barra larga. No mobile, como a barra quebra em duas
+	   linhas, esse "auto" cria um vão enorme e vazio antes do "Mais ▾" na
+	   segunda linha (parece desalinhado). Tira o empurrão só aqui: os itens
+	   ficam juntos, fluindo da esquerda, como o resto da interface mobile. */
+	.rw-tab-group { margin-left: 0; }
 }
 @media (max-width: 600px) {
 	.firstHeading { font-size: 1.5rem; }
+	/* Título com fonte menor quebra em 2+ linhas com mais facilidade — o link
+	   de "editar" (inline, grudado na última palavra) ficava espremido contra
+	   o texto do título, parecendo desalinhado. Vira bloco próprio, numa
+	   linha abaixo do título inteiro, em vez de tentar caber ao lado dele. */
+	.firstHeading .mw-editsection,
+	h2 .mw-editsection, h3 .mw-editsection, h4 .mw-editsection {
+		display: block;
+		margin-left: 0;
+		margin-top: 4px;
+	}
 	.rw-article .rw-infobox { float: none; width: auto; margin: 0 0 16px; }
 	/* Busca continua acessível no celular — vai pra uma linha inteira em vez
 	   de sumir (antes era display:none, deixando o mobile sem busca alguma). */
