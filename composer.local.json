@@ -7,9 +7,7 @@
 		"mediawiki/simple-batch-upload": "3.0.2",
 		"mediawiki/maps": "13.0.2",
 		"octfx/wiki-seo": "2.7.0",
-		"starcitizenwiki/embedvideo": "4.1.0",
-		"pear/mail": "^1.5",
-		"pear/net_smtp": "^1.11"
+		"starcitizenwiki/embedvideo": "4.1.0"
 	},
 	"extra": {
 		"merge-plugin": {
