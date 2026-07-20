@@ -22,6 +22,53 @@ $wgSkipSkins = [ 'vector', 'vector-2022', 'monobook', 'minerva', 'timeless', 'co
 // um "DomainException" na inicialização. $wgSkipSkins sozinho já é
 // suficiente: com só um skin na lista, não sobra nada pra "esconder".)
 
+// ---------- Fonte: carregamento assíncrono (não bloqueia a renderização) ----------
+// A fonte (Noto Sans + scripts não-latinos) ficava num @import DENTRO do
+// skin.css — isso força o navegador a baixar e parsear o CSS do skin via
+// load.php primeiro, só então descobrir a URL da fonte e disparar UM
+// SEGUNDO request bloqueante pra fonts.googleapis.com, antes de qualquer
+// texto aparecer. É a causa mais provável do "CSS demorando pra carregar":
+// o load.php em si é rápido, o que demora é essa segunda ida ao Google
+// encadeada depois dele. Em vez disso, o <link> da fonte entra direto no
+// <head> (sem depender do skin.css terminar) e usa o truque
+// media="print" → "all" no onload: o navegador busca o CSS da fonte em
+// paralelo, SEM bloquear a primeira renderização da página (que usa a
+// fonte de fallback do sistema até a real terminar de carregar).
+$wgHooks['BeforePageDisplay'][] = static function ( $out ) {
+	$href = 'https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700' .
+		'&family=Noto+Sans+Arabic:wght@400;600;700' .
+		'&family=Noto+Sans+Hebrew:wght@400;600;700' .
+		'&family=Noto+Sans+Greek:wght@400;600;700' .
+		'&family=Noto+Sans+Devanagari:wght@400;600;700' .
+		'&display=swap';
+	$out->addHeadItem( 'rw-font-preconnect',
+		'<link rel="preconnect" href="https://fonts.googleapis.com">' .
+		'<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
+	);
+	$out->addHeadItem( 'rw-font-async',
+		'<link rel="stylesheet" href="' . htmlspecialchars( $href ) . '" media="print" ' .
+		'onload="this.media=\'all\'">' .
+		'<noscript><link rel="stylesheet" href="' . htmlspecialchars( $href ) . '"></noscript>'
+	);
+};
+
+// ---------- Performance: cache de objeto/parser (sem depender de serviço novo) ----------
+// Sem isso, $wgMainCacheType/$wgParserCacheType ficam no padrão do MediaWiki
+// (efetivamente SEM cache nenhum quando não há Memcached/Redis configurado
+// — que é o caso aqui: docker-compose.yml só tem db + mediawiki, nenhum
+// serviço de cache) — toda página reparseia do zero a cada visita e cada
+// sessão bate no banco pra tudo. CACHE_DB usa a própria tabela objectcache
+// (nativa, já criada por update.php) como backend — sem precisar adicionar
+// container/extensão nova. Não é tão rápido quanto Memcached/Redis de
+// verdade, mas é uma melhora real sobre "sem cache nenhum" com zero risco
+// de infraestrutura a mais pra manter.
+// ($wgSessionCacheType fica de fora de propósito: sessão/login é a parte
+// mais sensível a regressão silenciosa — CACHE_DB nem sempre se comporta
+// bem pra sessão dependendo da versão, e o ganho de performance aqui é
+// pequeno perto do risco de deslogar todo mundo sem aviso.)
+$wgMainCacheType = CACHE_DB;
+$wgParserCacheType = CACHE_DB;
+
 // ---------- Acesso: leitura pública/anônima, edição só por convite ----------
 // Qualquer pessoa lê sem login ("modo anônimo") E pode criar a própria
 // conta livremente — mas ter conta não dá direito de editar. Edição
@@ -105,6 +152,17 @@ $wgHooks['SkinTemplateNavigation::Universal'][] = static function ( $sktemplate,
 	}
 };
 
+// A mesma limpeza acima só cobre a aba do TOPO da página. O VisualEditor
+// adiciona seu PRÓPRIO link "editar" a cada seção (ao lado do "editar
+// código-fonte" nativo, entre colchetes junto de cada ==Título==) por um
+// caminho totalmente separado (hook 'SkinEditSectionLinks', chave
+// 'veeditsection' no array de resultado) — por isso sobrevivia mesmo com o
+// hook acima, aparecendo em dobro ("editar | editar código-fonte") em cada
+// seção para quem tem o VE habilitado nas preferências pessoais.
+$wgHooks['SkinEditSectionLinks'][] = static function ( $skin, $title, $section, $tooltip, &$result, $lang ) {
+	unset( $result['veeditsection'] );
+};
+
 // TemplateData: documentação estruturada de templates, usada pelo
 // VisualEditor para mostrar os campos de um template (ex.: template de
 // citação) num formulário em vez de wikitexto cru.
@@ -161,6 +219,67 @@ $wgExtraNamespaces[NS_RASCUNHO] = 'Rascunho';
 $wgExtraNamespaces[NS_RASCUNHO_TALK] = 'Rascunho_Discussão';
 $wgNamespacesWithSubpages[NS_RASCUNHO] = true;
 $wgNamespacesToBeSearchedDefault[NS_RASCUNHO] = false;
+
+// ---------- Contador "N artigos publicados" (home) não conta a própria home ----------
+// {{NUMBEROFARTICLES}}, usado na Página principal, já só conta o espaço
+// principal (namespace 0) por padrão — Rascunho (acima), "Religio Wiki:"
+// (Sobre, Doar, Criar artigo, Idiomas) e páginas de categoria/predefinição
+// já ficam de fora sozinhos, por estarem em outros espaços nominais. A ÚNICA
+// exceção é a própria "Página principal": ela mora no espaço principal (é
+// assim que o MediaWiki identifica a home) e contém links, então por padrão
+// o MediaWiki a contava como se fosse mais um artigo publicado — inflando o
+// número em 1. Este hook tira especificamente ela da contagem, sem tocar em
+// nenhum outro critério nativo (link method continua igual pros artigos de
+// verdade).
+$wgHooks['ArticleIsCountable'][] = static function ( $article, &$result ) {
+	if ( $article->getTitle()->isMainPage() ) {
+		$result = false;
+	}
+};
+
+// {{NUMBEROFARTICLES}} muda no banco (site_stats) na hora, mas a Página
+// principal em si só REPARSEIA (e portanto só mostra o número novo) quando o
+// cache de parser dela expira sozinho (até 1 dia, $wgParserCacheExpireTime) ou
+// quando alguém a edita — daí a sensação de "o contador não atualiza
+// sozinho" mesmo depois de publicar um artigo novo. Este hook invalida o
+// cache da Página principal toda vez que um artigo de verdade (espaço
+// principal, publicado, não é ela mesma) é criado/editado/apagado, forçando
+// reparse — e portanto o número certo — já na próxima visita à home, sem
+// esperar o TTL do cache.
+$wgHooks['PageSaveComplete'][] = static function ( $wikiPage, $user, $summary, $flags, $revisionRecord, $editResult ) {
+	$title = $wikiPage->getTitle();
+	if ( $title->inNamespace( NS_MAIN ) && !$title->isMainPage() ) {
+		$mainPage = Title::newMainPage();
+		if ( $mainPage ) {
+			$mainPage->invalidateCache();
+		}
+	}
+};
+$wgHooks['ArticleDeleteComplete'][] = static function ( $article ) {
+	$title = $article->getTitle();
+	if ( $title->inNamespace( NS_MAIN ) && !$title->isMainPage() ) {
+		$mainPage = Title::newMainPage();
+		if ( $mainPage ) {
+			$mainPage->invalidateCache();
+		}
+	}
+};
+
+// ---------- "Artigo em destaque" (mais lido do dia) e "Imagem do dia" (24h) ----------
+// Lógica em skins/ReligioWiki/includes/RwPageViews.php (autoload via
+// skin.json). Registra {{#artigoemdestaque:}} e {{#imagemdodia:}} — usados
+// nas sub-páginas "Página principal/Artigo em destaque" e "Página
+// principal/Imagem do dia" (ver mediawiki-config/pagina-principal.wikitext)
+// — e conta visualizações diárias de artigo numa tabela própria
+// (rw_pageviews) pra saber qual foi o mais lido hoje.
+$wgHooks['LoadExtensionSchemaUpdates'][] = [ 'RwPageViews', 'onLoadExtensionSchemaUpdates' ];
+$wgHooks['BeforePageDisplay'][] = static function ( $out ) {
+	RwPageViews::recordView( $out );
+};
+$wgHooks['ParserFirstCallInit'][] = static function ( Parser $parser ) {
+	$parser->setFunctionHook( 'artigoemdestaque', [ 'RwPageViews', 'renderFeaturedArticle' ] );
+	$parser->setFunctionHook( 'imagemdodia', [ 'RwPageViews', 'renderImageOfDay' ] );
+};
 
 // ---------- Botão "Doar" ----------
 // Aparece como o primeiro item da barra pessoal — ou seja, sempre à

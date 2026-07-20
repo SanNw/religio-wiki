@@ -26,7 +26,8 @@
 	},
 	"AutoloadClasses": {
 		"SkinReligioWiki": "includes/SkinReligioWiki.php",
-		"ReligioWikiTemplate": "includes/ReligioWikiTemplate.php"
+		"ReligioWikiTemplate": "includes/ReligioWikiTemplate.php",
+		"RwPageViews": "includes/RwPageViews.php"
 	},
 	"MessagesDirs": {
 		"ReligioWiki": [

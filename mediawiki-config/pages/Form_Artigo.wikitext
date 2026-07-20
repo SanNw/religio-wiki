@@ -6,7 +6,7 @@ ou [[Special:FormEdit/Artigo]].
 {| class="rw-form-table"
 |-
 ! Categoria
-| {{{field|categoria|input type=combobox|autocomplete on namespace=Category|existing values only=false|placeholder=Ex.: Cristianismo — ou digite uma categoria nova}}}
+| {{{field|categoria|input type=combobox|values from namespace=Category|existing values only=false|placeholder=Ex.: Cristianismo — ou digite uma categoria nova}}}
 |-
 ! Resumo
 | {{{field|resumo|input type=textarea|rows=3|placeholder=Uma ou duas frases de introdução.}}}
