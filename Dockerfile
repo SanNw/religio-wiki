@@ -80,7 +80,7 @@ RUN set -eux; \
 		MultimediaViewer ImageMap Poem CharInsert JsonConfig Kartographer \
 		TimedMediaHandler PdfHandler AbuseFilter SpamBlacklist TitleBlacklist \
 		CheckUser SecurePoll Renameuser Nuke DeleteBatch \
-		Linter DiscussionTools; do \
+		Linter DiscussionTools AdvancedSearch; do \
 		rm -rf "${ext}"; \
 		git clone --depth 1 --branch "${MW_BRANCH}" \
 			"https://github.com/wikimedia/mediawiki-extensions-${ext}.git" "${ext}"; \
