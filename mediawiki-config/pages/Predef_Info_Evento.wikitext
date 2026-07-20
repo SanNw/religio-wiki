@@ -1,0 +1,80 @@
+<includeonly><div class="rw-infobox">
+<div class="rw-infobox-title">{{{nome|{{PAGENAME}}}}}</div>
+{{#if:{{{imagem|}}}|<div class="rw-infobox-image">[[Arquivo:{{{imagem}}}|frameless|center|upright=1.2]]{{#if:{{{legenda|}}}|<div class="rw-infobox-caption">{{{legenda}}}</div>}}</div>}}
+<dl>
+{{#if:{{{tipo|}}}|<dt>Tipo</dt><dd>{{{tipo}}}</dd>}}
+{{#if:{{{data|}}}|<dt>Data</dt><dd>{{{data}}}</dd>}}
+{{#if:{{{local|}}}|<dt>Local</dt><dd>{{{local}}}</dd>}}
+{{#if:{{{religiao|}}}|<dt>Religião/tradição</dt><dd>{{{religiao}}}</dd>}}
+{{#if:{{{participantes|}}}|<dt>Participantes</dt><dd>{{{participantes}}}</dd>}}
+{{#if:{{{resultado|}}}|<dt>Resultado</dt><dd>{{{resultado}}}</dd>}}
+</dl>
+</div></includeonly><noinclude>
+Infocaixa de um evento (concílio, festa, peregrinação, cisma).
+<templatedata>
+{
+ "description": "Infocaixa de um evento (concílio, festa, peregrinação, cisma).",
+ "format": "block",
+ "params": {
+  "nome": {
+   "label": "Nome/título",
+   "type": "string",
+   "description": "Nome exibido no topo. Se vazio, usa o título da página.",
+   "suggested": true
+  },
+  "imagem": {
+   "label": "Imagem",
+   "type": "wiki-file-name",
+   "description": "Nome do arquivo já enviado (sem \"Arquivo:\")."
+  },
+  "legenda": {
+   "label": "Legenda",
+   "type": "string",
+   "description": "Legenda abaixo da imagem."
+  },
+  "tipo": {
+   "label": "Tipo",
+   "type": "string",
+   "description": "Tipo"
+  },
+  "data": {
+   "label": "Data",
+   "type": "string",
+   "description": "Data"
+  },
+  "local": {
+   "label": "Local",
+   "type": "string",
+   "description": "Local"
+  },
+  "religiao": {
+   "label": "Religião/tradição",
+   "type": "string",
+   "description": "Religião/tradição"
+  },
+  "participantes": {
+   "label": "Participantes",
+   "type": "content",
+   "description": "Participantes"
+  },
+  "resultado": {
+   "label": "Resultado",
+   "type": "content",
+   "description": "Resultado"
+  }
+ },
+ "paramOrder": [
+  "nome",
+  "imagem",
+  "legenda",
+  "tipo",
+  "data",
+  "local",
+  "religiao",
+  "participantes",
+  "resultado"
+ ]
+}
+</templatedata>
+[[Categoria:Predefinições de infocaixa]]
+</noinclude>

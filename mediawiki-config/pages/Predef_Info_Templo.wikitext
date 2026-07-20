@@ -1,0 +1,80 @@
+<includeonly><div class="rw-infobox">
+<div class="rw-infobox-title">{{{nome|{{PAGENAME}}}}}</div>
+{{#if:{{{imagem|}}}|<div class="rw-infobox-image">[[Arquivo:{{{imagem}}}|frameless|center|upright=1.2]]{{#if:{{{legenda|}}}|<div class="rw-infobox-caption">{{{legenda}}}</div>}}</div>}}
+<dl>
+{{#if:{{{tipo|}}}|<dt>Tipo</dt><dd>{{{tipo}}}</dd>}}
+{{#if:{{{religiao|}}}|<dt>Religião</dt><dd>{{{religiao}}}</dd>}}
+{{#if:{{{localizacao|}}}|<dt>Localização</dt><dd>{{{localizacao}}}</dd>}}
+{{#if:{{{construcao|}}}|<dt>Construção</dt><dd>{{{construcao}}}</dd>}}
+{{#if:{{{estilo|}}}|<dt>Estilo arquitetônico</dt><dd>{{{estilo}}}</dd>}}
+{{#if:{{{estado|}}}|<dt>Estado atual</dt><dd>{{{estado}}}</dd>}}
+</dl>
+</div></includeonly><noinclude>
+Infocaixa de um edifício ou local sagrado (templo, igreja, mesquita, sinagoga).
+<templatedata>
+{
+ "description": "Infocaixa de um edifício ou local sagrado (templo, igreja, mesquita, sinagoga).",
+ "format": "block",
+ "params": {
+  "nome": {
+   "label": "Nome/título",
+   "type": "string",
+   "description": "Nome exibido no topo. Se vazio, usa o título da página.",
+   "suggested": true
+  },
+  "imagem": {
+   "label": "Imagem",
+   "type": "wiki-file-name",
+   "description": "Nome do arquivo já enviado (sem \"Arquivo:\")."
+  },
+  "legenda": {
+   "label": "Legenda",
+   "type": "string",
+   "description": "Legenda abaixo da imagem."
+  },
+  "tipo": {
+   "label": "Tipo",
+   "type": "string",
+   "description": "Tipo"
+  },
+  "religiao": {
+   "label": "Religião",
+   "type": "string",
+   "description": "Religião"
+  },
+  "localizacao": {
+   "label": "Localização",
+   "type": "string",
+   "description": "Localização"
+  },
+  "construcao": {
+   "label": "Construção",
+   "type": "string",
+   "description": "Construção"
+  },
+  "estilo": {
+   "label": "Estilo arquitetônico",
+   "type": "string",
+   "description": "Estilo arquitetônico"
+  },
+  "estado": {
+   "label": "Estado atual",
+   "type": "string",
+   "description": "Estado atual"
+  }
+ },
+ "paramOrder": [
+  "nome",
+  "imagem",
+  "legenda",
+  "tipo",
+  "religiao",
+  "localizacao",
+  "construcao",
+  "estilo",
+  "estado"
+ ]
+}
+</templatedata>
+[[Categoria:Predefinições de infocaixa]]
+</noinclude>

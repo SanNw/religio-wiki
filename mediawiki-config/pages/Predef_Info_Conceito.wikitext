@@ -1,0 +1,66 @@
+<includeonly><div class="rw-infobox">
+<div class="rw-infobox-title">{{{nome|{{PAGENAME}}}}}</div>
+{{#if:{{{imagem|}}}|<div class="rw-infobox-image">[[Arquivo:{{{imagem}}}|frameless|center|upright=1.2]]{{#if:{{{legenda|}}}|<div class="rw-infobox-caption">{{{legenda}}}</div>}}</div>}}
+<dl>
+{{#if:{{{religiao|}}}|<dt>Religião/tradição</dt><dd>{{{religiao}}}</dd>}}
+{{#if:{{{origem|}}}|<dt>Origem</dt><dd>{{{origem}}}</dd>}}
+{{#if:{{{termo_original|}}}|<dt>Termo original</dt><dd>{{{termo_original}}}</dd>}}
+{{#if:{{{relacionados|}}}|<dt>Conceitos relacionados</dt><dd>{{{relacionados}}}</dd>}}
+</dl>
+</div></includeonly><noinclude>
+Infocaixa de um conceito ou doutrina (teológico, filosófico).
+<templatedata>
+{
+ "description": "Infocaixa de um conceito ou doutrina (teológico, filosófico).",
+ "format": "block",
+ "params": {
+  "nome": {
+   "label": "Nome/título",
+   "type": "string",
+   "description": "Nome exibido no topo. Se vazio, usa o título da página.",
+   "suggested": true
+  },
+  "imagem": {
+   "label": "Imagem",
+   "type": "wiki-file-name",
+   "description": "Nome do arquivo já enviado (sem \"Arquivo:\")."
+  },
+  "legenda": {
+   "label": "Legenda",
+   "type": "string",
+   "description": "Legenda abaixo da imagem."
+  },
+  "religiao": {
+   "label": "Religião/tradição",
+   "type": "string",
+   "description": "Religião/tradição"
+  },
+  "origem": {
+   "label": "Origem",
+   "type": "string",
+   "description": "Origem"
+  },
+  "termo_original": {
+   "label": "Termo original",
+   "type": "string",
+   "description": "Termo original"
+  },
+  "relacionados": {
+   "label": "Conceitos relacionados",
+   "type": "content",
+   "description": "Conceitos relacionados"
+  }
+ },
+ "paramOrder": [
+  "nome",
+  "imagem",
+  "legenda",
+  "religiao",
+  "origem",
+  "termo_original",
+  "relacionados"
+ ]
+}
+</templatedata>
+[[Categoria:Predefinições de infocaixa]]
+</noinclude>
