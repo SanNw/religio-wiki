@@ -173,6 +173,20 @@
 		}
 		list.dataset.rwGrouped = '1';
 
+		// Sino de notificações (Echo): tira de dentro do dropdown "Fulano ▾"
+		// (onde ficava escondido) e põe como ÍCONE no topo, antes do botão
+		// "Tema", sem texto. O ícone/estilo vem do CSS (.rw-notif-icons).
+		var notif = document.createElement( 'ul' );
+		notif.className = 'rw-notif-icons';
+		[ 'pt-notifications-alert', 'pt-notifications-notice' ].forEach( function ( id ) {
+			var li = document.getElementById( id );
+			if ( li ) { notif.appendChild( li ); }
+		} );
+		if ( notif.childNodes.length ) {
+			var themeDd = personal.querySelector( '.rw-theme-dropdown' );
+			if ( themeDd ) { personal.insertBefore( notif, themeDd ); } else { personal.appendChild( notif ); }
+		}
+
 		var wrapper = document.createElement( 'div' );
 		wrapper.className = 'rw-personal-dropdown rw-admin-personal';
 
@@ -608,19 +622,20 @@
 		var configured = ( typeof mw !== 'undefined' && mw.config.get( 'wgRWSocialProviders' ) ) || [];
 
 		SOCIAL_PROVIDERS.forEach( function ( p ) {
+			// Só mostra o botão do provedor se ele estiver REALMENTE configurado
+			// (wgRWSocialProviders). Sem isso, botões desativados de Google/GitHub
+			// só confundiam e levavam à página Especial:Autenticar-se sem efeito.
+			if ( configured.indexOf( p.id ) === -1 ) {
+				return;
+			}
 			var btn = document.createElement( 'button' );
 			btn.type = 'button';
 			btn.textContent = p.label;
-			if ( configured.indexOf( p.id ) === -1 ) {
-				btn.disabled = true;
-				btn.title = 'Não configurado ainda — ver PluggableAuth em LocalSettings.php';
-			} else {
-				btn.addEventListener( 'click', function () {
-					location.href = mw.util.getUrl( 'Special:UserLogin', {
-						returnto: mw.config.get( 'wgPageName' )
-					} );
+			btn.addEventListener( 'click', function () {
+				location.href = mw.util.getUrl( 'Special:UserLogin', {
+					returnto: mw.config.get( 'wgPageName' )
 				} );
-			}
+			} );
 			wrap.appendChild( btn );
 		} );
 		return wrap;

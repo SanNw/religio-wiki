@@ -236,6 +236,23 @@ PHPEOF
   echo "  e-mail/SMTP (confirmação de conta) configurado no LocalSettings.php."
 fi
 
+# CAPTCHA desligado na criação de conta (o pop-up próprio não renderiza a
+# pergunta). Idempotente: só troca a linha ativa =true por =false.
+if grep -qF "\$wgCaptchaTriggers['createaccount'] = true;" LocalSettings.php; then
+  sed -i "s|\$wgCaptchaTriggers\['createaccount'\] = true;|\$wgCaptchaTriggers['createaccount'] = false; // desligado: pop-up de cadastro nao renderiza o captcha|" LocalSettings.php
+  echo "  CAPTCHA desligado na criação de conta."
+fi
+
+# ULS fora da barra pessoal (posição interlanguage). Idempotente pelo marcador.
+if ! grep -q "rw-uls-position" LocalSettings.php; then
+  cat >> LocalSettings.php << 'PHPEOF'
+
+// Religio Wiki — rw-uls-position: tira o gatilho de idioma do topo.
+$wgULSPosition = 'interlanguage';
+PHPEOF
+  echo "  ULS movido para fora da barra pessoal."
+fi
+
 # "Criar artigo" (Ferramentas) aponta pro formulário guiado Religio Wiki:Criar
 # artigo (Page Forms). Hook adicional que roda DEPOIS do original (do bloco
 # principal) e sobrescreve só o href do item t-createarticle na instalação já

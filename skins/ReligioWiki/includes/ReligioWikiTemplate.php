@@ -110,9 +110,14 @@ class ReligioWikiTemplate extends BaseTemplate {
 		if ( $views || $actions ) {
 			echo '<span class="rw-tab-group">' . "\n";
 			foreach ( $views as $key => $tab ) {
+				// A aba do VisualEditor ("ve-edit") não é usada — some para
+				// TODO MUNDO (usuário e admin), independente de preferência
+				// salva. Sobra só a de código-fonte, renomeada para "Editar".
+				if ( $key === 've-edit' ) { continue; }
 				$extraClass = $key === 'edit' ? ' rw-tab-edit' : '';
+				$text = ( $key === 'edit' ) ? 'Editar' : ( $tab['text'] ?? '' );
 				printf( '<a href="%s" class="rw-tab%s">%s</a>' . "\n",
-					htmlspecialchars( $tab['href'] ), $extraClass, htmlspecialchars( $tab['text'] ) );
+					htmlspecialchars( $tab['href'] ), $extraClass, htmlspecialchars( $text ) );
 			}
 			if ( $actions ) {
 				echo '<div class="rw-personal-dropdown rw-tab-more">' . "\n";
