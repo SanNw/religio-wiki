@@ -24,11 +24,11 @@ existe, vazia, logo depois da instalação) com o conteúdo abaixo.
 <div class="rw-home-grid">
 <div class="rw-home-box">
 == Artigo em destaque ==
-{{Página principal/Artigo em destaque}}
+{{:Página principal/Artigo em destaque}}
 </div>
 <div class="rw-home-box rw-image-of-day">
 == Imagem do dia ==
-{{Página principal/Imagem do dia}}
+{{:Página principal/Imagem do dia}}
 </div>
 </div>
 
@@ -52,30 +52,27 @@ não precisa de extensão, atualiza sozinha conforme novos artigos entram.
 ---
 
 ## Page: Página principal/Artigo em destaque
-Sub-página transcluída na principal — troque o conteúdo por semana/mês
-para variar o artigo em destaque. Exemplo inicial (troque pelo artigo real
-quando o conteúdo estiver mais maduro):
-```wikitext
-=== [[Cristianismo]] ===
-O cristianismo é uma religião monoteísta abraâmica fundamentada na vida e
-nos ensinamentos de Jesus de Nazaré. Compartilha raízes históricas com o
-[[Judaísmo]] e o [[Islã]], os outros dois ramos dos monoteísmos semíticos...
-'''[[Cristianismo|Continue lendo →]]'''
-```
+Automático — o conteúdo real desta sub-página é só `{{#artigoemdestaque:}}`
+(parser function registrada por `RwPageViews.php`, ver
+`LocalSettings-snippet.php`). Mostra o artigo do espaço principal mais lido
+NAQUELE DIA (contagem própria em `rw_pageviews`, zerada a cada virada de dia
+UTC); sem nenhuma visualização registrada ainda hoje, cai para o artigo
+publicado mais recente. Nunca mostra a Página principal nem páginas de
+projeto/configuração — a consulta já é restrita ao espaço principal. Não
+precisa editar esta sub-página manualmente.
 
 ---
 
 ## Page: Página principal/Imagem do dia
-Sub-página transcluída na principal. Troque `Nome-do-arquivo.jpg` por uma
-imagem já enviada (upload liberado, ver README) e o link do artigo de
-origem. O `thumb` nativo do MediaWiki já preserva a proporção original da
-imagem — a única coisa que a `common.css` faz é deixar o contêiner grande e
-responsivo (`.rw-image-of-day`).
-```wikitext
-[[Arquivo:Nome-do-arquivo.jpg|center|thumb|upright=2.2|Legenda descrevendo a
-imagem, tirada do artigo [[Nome do artigo]].]]
-```
+Automático — o conteúdo real desta sub-página é só `{{#imagemdodia:}}`.
+Escolhe uma imagem dentre as marcadas com `[[Categoria:Imagens do dia]]` de
+forma determinística pelo dia UTC (muda sozinha a cada 24h, mesma imagem
+pra todo mundo no mesmo dia). O `thumb` nativo do MediaWiki preserva a
+proporção original; `common.css` só deixa o contêiner grande e responsivo
+(`.rw-image-of-day`).
 
-Enquanto não houver imagem enviada, deixe um placeholder de texto simples
-nessa sub-página em vez do `[[Arquivo:...]]` — evita link vermelho de imagem
-inexistente na principal.
+O que É manual: CURAR as imagens elegíveis. Envie a imagem (Special:Upload)
+e adicione `[[Categoria:Imagens do dia]]` na página do arquivo — regra da
+categoria (ver `Category_Imagens_do_dia.wikitext`): só pinturas, paisagens e
+objetos, **nunca foto de pessoa**. Sem nenhuma imagem na categoria, a caixa
+fica vazia (sem link vermelho).

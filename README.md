@@ -144,6 +144,22 @@ seguem a documentação oficial do mediawiki.org, mas confira
 `Special:Version` depois do primeiro `docker compose up` pra confirmar que
 tudo carregou.
 
+### Ver e inserir imagens ao editar um artigo
+
+Quem edita (grupo `editor` ou `Admin`) tem duas formas de trabalhar com
+imagem, sem precisar decorar nome de arquivo:
+
+1. **Ver o que já foi enviado**: "Imagens enviadas", na caixa de
+   ferramentas da lateral (leva a `Special:ListFiles`) — lista TODAS as
+   imagens já no wiki, com miniatura e busca por nome.
+2. **Inserir no artigo**: no editor de wikitexto (`WikiEditor`), o ícone de
+   "Inserir arquivo" na barra de ferramentas abre um diálogo que busca entre
+   as imagens já enviadas OU permite enviar uma nova ali mesmo — sem sair da
+   tela de edição. Ele já monta o `[[Arquivo:...|thumb|legenda]]` certo.
+
+Os dois dependem só do que já está no `Dockerfile`/`LocalSettings-snippet.php`
+(`WikiEditor` + `$wgEnableUploads`) — não precisam de configuração extra.
+
 ## Quem pode editar (acesso por convite) + criação de conta
 
 **Criar conta é livre e funcional** — tanto pela página nativa
@@ -177,6 +193,39 @@ Passo a passo pra dar (ou tirar) acesso de edição:
 
 Para tirar o acesso de alguém, é o mesmo caminho: Special:UserRights,
 desmarcar `editor`.
+
+### Confirmação de e-mail (SMTP)
+
+Quem cria conta com e-mail recebe um link de confirmação
+(`$wgEmailAuthentication`, já ligado em `LocalSettings-snippet.php`) — mas
+**isso só envia de verdade se o SMTP estiver configurado**. Sem isso, o
+código não quebra nem mostra erro pro usuário (o `$wgSMTP` simplesmente não
+é definido), só o e-mail nunca chega — é a causa mais comum de "a
+confirmação de e-mail não funciona".
+
+Pra ligar de verdade, edite o `.env` da VPS (nunca o repositório, que é
+público — ver `.env.example`) com as credenciais de um provedor SMTP real:
+
+```
+RW_SMTP_HOST=smtp.seu-provedor.com
+RW_SMTP_PORT=587
+RW_SMTP_USER=usuario@religiowiki.com
+RW_SMTP_PASS=sua-senha-ou-app-password
+RW_SMTP_IDHOST=religiowiki.com
+RW_MAIL_FROM=no-reply@religiowiki.com
+```
+
+Depois é só `docker compose up -d` de novo (o `docker-compose.yml` já
+repassa essas variáveis pro container) — não precisa mexer em
+`LocalSettings-snippet.php`. Qualquer provedor SMTP de verdade serve
+(domínio de e-mail transacional, Amazon SES, Mailgun, SendGrid, Gmail com
+"senha de app" etc.) — não use um e-mail pessoal comum, a maioria dos
+provedores bloqueia esse tipo de uso automatizado.
+
+Pra confirmar que está funcionando: crie uma conta de teste informando
+e-mail e veja se o link de confirmação chega (Special:Preferences →
+"E-mail" mostra o status "confirmado"/"não confirmado" de qualquer conta
+logada).
 
 ## Página principal
 
@@ -522,8 +571,12 @@ servidor (sem esse bloqueio) para validar de ponta a ponta.
   criados ou importados de outro wiki.
 - Decidir a lista inicial de pessoas com acesso de `editor` (ver "Quem pode
   editar" acima).
-- Escrever/enviar o primeiro "Artigo em destaque" e "Imagem do dia" de
-  verdade (as sub-páginas em `pagina-principal.wikitext` têm só exemplo).
+- "Artigo em destaque" (mais lido do dia) e "Imagem do dia" já são
+  automáticos ({{#artigoemdestaque:}} / {{#imagemdodia:}}, ver
+  `RwPageViews.php`) — a única coisa manual que falta é CURAR imagens: envie
+  fotos/pinturas (paisagens, objetos, arte — **nunca foto de pessoa**) e
+  marque a página do arquivo com `[[Categoria:Imagens do dia]]`. Sem
+  nenhuma imagem nessa categoria, a caixa fica vazia.
 - Escolher e configurar um meio de pagamento real para a página de doação
   (ver aviso em "Doação" acima) — nenhuma cobrança funciona ainda.
 - Validar ao vivo (fora deste sandbox) o seletor de idioma, o menu

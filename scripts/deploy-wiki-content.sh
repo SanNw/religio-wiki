@@ -441,6 +441,16 @@ echo "  reconstruindo índice de busca..."
 $COMPOSE exec -T "$SERVICE" php maintenance/rebuildtextindex.php || \
   echo "  (rebuildtextindex falhou — provável backend de busca sem índice MySQL; segue sem travar)"
 
+# Recalcula site_stats (contagem de "artigos publicados" usada por
+# {{NUMBEROFARTICLES}} na Página principal) do zero, direto das páginas reais
+# — necessário depois de mudar o critério de contagem (ex.: hook
+# ArticleIsCountable que agora exclui a própria Página principal, ver
+# LocalSettings-snippet.php) ou depois de aplicar/editar páginas em lote via
+# edit.php, que não recalcula esses contadores incrementalmente sozinho.
+# Seguro rodar sempre: --update sobrescreve com o valor correto atual.
+echo "  recalculando contadores (artigos publicados)..."
+$COMPOSE exec -T "$SERVICE" php maintenance/initSiteStats.php --update
+
 echo "== 4/4: resetando skin fixado em contas já existentes =="
 # $wgDefaultSkin só vale pra quem NUNCA salvou uma preferência própria de
 # aparência. Contas criadas antes do skin ReligioWiki existir (ex.: o Admin

@@ -1,0 +1,20 @@
+Imagens elegíveis para a caixa '''"Imagem do dia"''' da [[Página principal]].
+Uma delas é escolhida automaticamente a cada 24 horas ({{#imagemdodia:}},
+ver <code>RwPageViews.php</code>) — não precisa (nem deve) editar a Página
+principal pra trocar a imagem.
+
+;Como adicionar uma imagem
+# Envie a imagem em [[Special:Upload]] (ou peça a alguém do grupo "editor").
+# Abra a página do arquivo (ex.: <code>Arquivo:Nome-do-arquivo.jpg</code>) e
+  adicione <nowiki>[[Categoria:Imagens do dia]]</nowiki> nela — pode incluir
+  uma frase curta sobre a imagem antes da categoria, ela vira a legenda.
+
+;Regra de curadoria — o que PODE entrar aqui
+* Pinturas, ilustrações e obras de arte.
+* Paisagens (natureza, templos, arquitetura sem pessoas em destaque).
+* Objetos (artefatos religiosos, manuscritos, esculturas, símbolos).
+
+;O que NÃO pode entrar aqui
+* '''Nunca''' uma fotografia de pessoa (retrato, multidão, procissão com
+  rostos identificáveis etc.) — mesmo que seja de uma figura religiosa
+  histórica. Fotos de pessoas ficam nos artigos, não na "Imagem do dia".

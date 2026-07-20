@@ -101,6 +101,19 @@ documento — só imprime o miolo do body.
   barra pessoal") — usa `mw.config.get('wgUserName')` pra decidir se
   alguém está logado; deveria funcionar em qualquer versão razoavelmente
   recente, baixo risco.
+- **`RwPageViews.php`** (Artigo em destaque / Imagem do dia automáticos) —
+  usa `MediaWikiServices::getConnectionProvider()` (API de 1.42+) e
+  `IDatabase::newSelectQueryBuilder()`; sintaticamente válido pro 1.43, mas
+  não exercitado contra um banco de verdade. Depois do primeiro
+  `update.php` (cria a tabela `rw_pageviews`), confira: (1)
+  `Special:Version` não acusa erro de classe; (2) a home mostra ALGUM
+  artigo em destaque mesmo no primeiro dia, sem view nenhuma registrada
+  ainda (cai pro `getFallbackArticle()`); (3) depois de visitar um artigo
+  e virar o dia (ou forçar `rwpv_date` no banco pra testar), o destaque
+  muda pro mais visto. Se `{{#artigoemdestaque:}}`/`{{#imagemdodia:}}`
+  aparecerem como texto cru na página em vez de processados, o
+  `ParserFirstCallInit` não registrou — checar ordem de carregamento em
+  `LocalSettings-snippet.php`.
 
 ## Mapa de arquivos
 

@@ -17,7 +17,20 @@
  *     não estrutura do skin.
  */
 
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700&family=Noto+Sans+Arabic:wght@400;600;700&family=Noto+Sans+Hebrew:wght@400;600;700&family=Noto+Sans+Greek:wght@400;600;700&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap');
+/* A fonte (Noto Sans + variantes de script) NÃO é mais carregada por
+ * @import aqui — um @import dentro de um módulo CSS bloqueia a renderização
+ * da página inteira até um round-trip a fonts.googleapis.com terminar (o
+ * navegador só descobre a URL depois de baixar e parsear ESTE arquivo via
+ * load.php, e só então dispara a segunda busca — dois requests em série
+ * antes de qualquer coisa aparecer na tela). Isso é exatamente o "CSS
+ * demorando pra carregar" quando a rede até o Google está lenta ou
+ * bloqueada. Agora é injetado como <link> assíncrono (media="print" que
+ * vira "all" no load) direto no <head> — ver hook BeforePageDisplay em
+ * LocalSettings-snippet.php ("Fonte: carregamento assíncrono"). O
+ * font-family abaixo já lista as mesmas famílias; enquanto a fonte não
+ * termina de carregar, o texto aparece na fonte de sistema (fallback),
+ * sem bloquear nada.
+ */
 
 /* ---------- tokens (idênticos ao artefato e ao Common.css) ---------- */
 :root,
@@ -371,6 +384,27 @@ body.religion-islam .firstHeading { background: #15803D; color: #fff; }
 .rw-script { font-size: 1.05em; }
 .rw-script[lang="ar"] { direction: rtl; unicode-bidi: isolate; }
 .rw-script[lang="he"] { direction: rtl; unicode-bidi: isolate; }
+
+/* ---------- links de "editar" por seção (colados pelo parser em cada
+   ==Título==) ---------- */
+/* O skin não carrega mediawiki.skinning.content (ver comentário no topo do
+   arquivo), então esses links saíam sem estilo nenhum: colchetes crus,
+   tamanho de texto normal, atrapalhando a leitura do título. Fica pequeno,
+   discreto, sem colchete visível, e só aparece de verdade no hover/foco do
+   bloco do título (ainda clicável sempre, só menos "gritante" parado). */
+.mw-editsection {
+	margin-left: 0.6em;
+	font-size: 0.6em;
+	font-weight: 400;
+	white-space: nowrap;
+	vertical-align: middle;
+	opacity: 0.55;
+}
+.mw-editsection:hover, .mw-editsection:focus-within { opacity: 1; }
+.mw-editsection-bracket { display: none; }
+.mw-editsection a { color: var(--rw-text-muted); }
+.mw-editsection a:hover { color: var(--rw-link); text-decoration: underline; }
+.mw-editsection-divider { margin: 0 0.3em; color: var(--rw-text-muted); }
 
 #catlinks, .catlinks {
 	margin-top: 2.4em;
