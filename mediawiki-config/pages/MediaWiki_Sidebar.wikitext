@@ -3,7 +3,8 @@
 ** Religio Wiki:Criar artigo|Criar novo artigo
 ** Special:Random|randompage
 ** Special:RecentChanges|recentchanges
-** Special:UserRights|Gerenciar editores
+** Special:UserRights|Gestão
+** Special:ListUsers|Lista de administradores
 ** Special:Artigos|Artigos
 
 * categorias-religiao-heading

@@ -480,23 +480,24 @@
 }
 
 /* ---------- Corrige conflito no botão hambúrguer mobile (#rw-hamburger) ----------
- * A extensão ReligiowikiCustomizer carrega uma cópia antiga/obsoleta dessa
- * mesma regra (top:10px; left:10px; z-index:160; padding:6px 10px --
- * confirmado inspecionando ext.religiowikiCustomizer.customCss ao vivo),
- * que empata em especificidade com a versão certa do skin.css
- * (top:8px; right:12px; z-index:210). Dependendo da ordem de carregamento
- * dos módulos do ResourceLoader, a versão antiga podia vencer a cascata,
- * jogando o botão pro canto errado (esquerda) e com dimensões diferentes.
- * Aumenta a especificidade aqui (html body #rw-hamburger) pra garantir que
- * a versão certa sempre vença, além de resetar explicitamente width/height/
- * flex/left pra impedir qualquer esticamento (caso alguma outra regra,
- * dessa ou de outra extensão, também tente esticar o botão). */
+ * A extensão ReligiowikiCustomizer AINDA carrega uma cópia antiga/obsoleta
+ * dessa mesma regra (top:10px; left:10px; z-index:160; position:fixed --
+ * confirmado inspecionando ext.religiowikiCustomizer.customCss ao vivo,
+ * de novo, depois de reestruturar o botão pra dentro de .rw-topbar no
+ * skin.css). #rw-hamburger sozinho empata em especificidade entre as
+ * duas, então quem carregar por último no ResourceLoader vencia — esse
+ * empate é o motivo de precisar de HTML BODY aqui na frente, de novo.
+ * ATENÇÃO: os valores abaixo têm que ficar EM SINCRONIA com a regra
+ * #rw-hamburger de skins/ReligioWiki/resources/skin.css (posição
+ * absolute relativa ao .rw-topbar, que agora é sticky) -- se mexer lá,
+ * mexe aqui também, senão volta a quebrar exatamente desse jeito. */
 html body #rw-hamburger {
 	display: none;
-	position: fixed;
-	top: 8px;
+	position: absolute;
+	top: 50%;
 	right: 12px;
 	left: auto;
+	transform: translateY(-50%);
 	width: auto;
 	height: auto;
 	max-width: none;
@@ -516,4 +517,184 @@ html body #rw-hamburger {
 }
 @media (max-width: 851px) {
 	html body #rw-hamburger { display: inline-flex; align-items: center; justify-content: center; }
+}
+
+/* Link discreto de "editar direitos" (⚙) em Special:ListUsers, adicionado
+ * via hook SpecialListusersFormatRow (ver LocalSettings.php) -- só
+ * aparece pra quem tem o direito 'userrights' (Burocratas). */
+.rw-userrights-gear {
+	text-decoration: none;
+	opacity: 0.6;
+	margin-left: 4px;
+}
+.rw-userrights-gear:hover { opacity: 1; text-decoration: none; }
+
+/* ---------- Redesign do índice "Neste artigo" (#toc) no formato moderno
+ * da Wikipédia: sem numeração decimal, setas de expandir/colapsar por
+ * SEÇÃO (accordion por ramo), caixa mais leve (sem fundo bege pesado),
+ * recuo progressivo por nível. Sobrescreve as regras mais antigas de
+ * skin.css (usa "html body" pra garantir especificidade maior e sempre
+ * vencer, independente da ordem de carregamento dos módulos -- mesma
+ * lição do bug do hambúrguer desta sessão).
+ *
+ * O checkbox/label de "ocultar tudo" (#toctogglecheckbox) já vem NATIVO
+ * no HTML gerado pelo MediaWiki (ligado via for="toctogglecheckbox") --
+ * é a mesma peça que a Wikipédia usa. Só faltava o CSS pra ativar; aqui
+ * a gente estiliza e dá conteúdo pro texto "ocultar"/"mostrar" (em vez de
+ * depender das variáveis LESS do tema padrão, que não estão carregadas
+ * neste skin). Zero JS necessário pra esse toggle geral -- funciona por
+ * :checked puro. As setas por SEÇÃO (JS, ver Common.js) são um recurso
+ * novo, sem equivalente nativo. ---------- */
+
+html body .rw-toc #toc {
+	background: var(--rw-bg-elevated);
+	border: 1px solid var(--rw-border);
+	border-radius: 4px;
+	padding: 8px 12px;
+	font-size: 0.85rem;
+	margin-bottom: 14px;
+}
+
+/* Cabeçalho: "Neste artigo" + botão ocultar/mostrar nas pontas. */
+html body .rw-toc #toc .toctitle {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	text-align: left;
+	margin: 0 0 6px;
+}
+html body .rw-toc #toc .toctitle h2,
+html body .rw-toc #toc .toctitle #mw-toc-heading {
+	font-size: 0.72rem;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	color: var(--rw-text-muted);
+	font-weight: 700;
+	margin: 0;
+	border: 0;
+	padding: 0;
+}
+
+/* Reaproveita o checkbox/label nativos do MediaWiki como toggle geral --
+ * puro CSS, sem JS. O checkbox precisa ficar tecnicamente visível (só
+ * transparente) pra continuar focável via teclado -- o style="display:
+ * none" inline no HTML é só um fallback caso este CSS não carregue. */
+html body .toctogglecheckbox {
+	display: inline !important;
+	position: absolute;
+	opacity: 0;
+	z-index: -1;
+}
+html body .rw-toc #toc .toctogglespan { font-size: 0.78rem; }
+html body .rw-toc #toc .toctogglelabel {
+	color: var(--rw-link);
+	cursor: pointer;
+	text-decoration: none;
+}
+html body .rw-toc #toc .toctogglelabel:hover { text-decoration: underline; }
+html body .rw-toc #toc .toctogglelabel::after { content: 'ocultar'; }
+html body #toc .toctogglecheckbox:checked + .toctitle .toctogglelabel::after { content: 'mostrar'; }
+html body #toc .toctogglecheckbox:focus + .toctitle .toctogglelabel {
+	text-decoration: underline;
+	outline: auto;
+}
+/* O :checked esconde a LISTA -- o cabeçalho/toggle continuam visíveis. */
+html body .toctogglecheckbox:checked ~ ul { display: none; }
+
+/* Remove a numeração decimal (1, 1.1, 1.2...) -- só o texto do título
+ * de cada seção fica visível. */
+html body .rw-toc #toc .tocnumber { display: none; }
+
+/* Recuo progressivo por nível de heading e espaçamento mais compacto
+ * entre itens (em vez do padding-left fixo genérico de antes). */
+html body .rw-toc #toc ul { list-style: none; margin: 4px 0 0; padding-left: 0; }
+html body .rw-toc #toc ul ul { padding-left: 14px; margin: 2px 0 0; }
+html body .rw-toc #toc li { margin: 0; padding: 3px 0; }
+
+/* Fonte mais leve pra sub-itens (nível 2+), como na Wikipédia. */
+html body .rw-toc #toc .toclevel-2 { font-size: 0.94em; }
+html body .rw-toc #toc .toclevel-3,
+html body .rw-toc #toc .toclevel-4,
+html body .rw-toc #toc .toclevel-5 { font-size: 0.9em; color: var(--rw-text-muted); }
+
+/* Links sem sublinhado (só no hover), cor consistente com o resto do site. */
+html body .rw-toc #toc a { text-decoration: none; color: var(--rw-link); }
+html body .rw-toc #toc a:hover { text-decoration: underline; }
+
+/* Seta de expandir/colapsar por SEÇÃO -- só nos itens que TÊM
+ * subseções (classe .rw-toc-has-children adicionada via JS, ver
+ * Common.js). Aponta pra baixo (▾) quando expandido, pra direita (▸)
+ * quando colapsado (só o ramo daquela seção esconde, não o índice
+ * inteiro). */
+html body .rw-toc #toc li.rw-toc-has-children {
+	position: relative;
+	padding-left: 14px;
+}
+html body .rw-toc #toc li.rw-toc-has-children > .rw-toc-arrow {
+	position: absolute;
+	left: 0;
+	top: 4px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 14px;
+	height: 14px;
+	cursor: pointer;
+	font-size: 0.65em;
+	color: var(--rw-text-muted);
+	transition: transform 0.15s ease;
+	user-select: none;
+}
+html body .rw-toc #toc li.rw-toc-has-children.rw-toc-item-collapsed > .rw-toc-arrow {
+	transform: rotate(-90deg);
+}
+html body .rw-toc #toc li.rw-toc-has-children.rw-toc-item-collapsed > ul {
+	display: none;
+}
+
+/* ---------- Mobile: Idiomas + Neste artigo + Aparência viram um painel
+ * FLUTUANTE no canto inferior direito, fixo durante o scroll -- por
+ * padrão só um botão (FAB, "☰") aparece, pra não atrapalhar a leitura;
+ * clicar expande o painel completo por cima do conteúdo (sanfona). Ver
+ * Common.js pro botão em si. "html body" na frente pra garantir que
+ * vence a regra equivalente (mais antiga, position:static) de skin.css,
+ * não importa a ordem de carregamento dos módulos (mesma lição do bug
+ * do hambúrguer). ---------- */
+.rw-toc-fab { display: none; }
+
+@media (max-width: 851px) {
+	html body .rw-toc {
+		position: fixed;
+		right: 12px;
+		bottom: 12px;
+		left: auto;
+		top: auto;
+		z-index: 190;
+		width: auto;
+		max-width: min(320px, calc(100vw - 24px));
+		max-height: 70vh;
+		overflow-y: auto;
+		margin: 0;
+		grid-column: auto;
+	}
+	html body .rw-toc-fab {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 48px;
+		height: 48px;
+		border-radius: 50%;
+		background: var(--rw-bg-elevated);
+		border: 1px solid var(--rw-border);
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+		cursor: pointer;
+		font-size: 1.3rem;
+		color: var(--rw-text);
+		touch-action: manipulation;
+	}
+	/* Colapsado: só o FAB aparece, tudo mais (Idiomas/TOC/Aparência) some. */
+	html body .rw-toc > *:not(.rw-toc-fab) { display: none; }
+	html body .rw-toc.rw-toc-expanded > *:not(.rw-toc-fab) { display: block; }
+	html body .rw-toc.rw-toc-expanded .rw-toc-fab { margin-bottom: 8px; }
 }

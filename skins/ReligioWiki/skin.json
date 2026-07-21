@@ -35,10 +35,16 @@
 		]
 	},
 	"ResourceModules": {
-		"skins.ReligioWiki": {
+		"skins.ReligioWiki.styles": {
 			"styles": [
 				"resources/skin.css"
 			],
+			"targets": [
+				"desktop",
+				"mobile"
+			]
+		},
+		"skins.ReligioWiki": {
 			"scripts": [
 				"resources/skin.js"
 			],

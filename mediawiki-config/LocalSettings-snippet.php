@@ -416,12 +416,14 @@ $wgHooks['SidebarBeforeOutput'][] = static function ( $sk, &$sidebar ) {
 };
 
 // ---------- Quem editou por último ----------
-// Mostra "Esta página foi editada pela última vez às [hora], em [data], por
-// [usuário]" no rodapé de cada artigo — nativo do MediaWiki, só precisa
-// desse número maior que zero. O histórico completo (todas as edições, com
-// autor e data de cada uma) já é nativo à parte, na aba "Ver histórico".
-$wgMaxCredits = 1;
-$wgShowCreditsIfMax = true;
+// Mostra só "Esta página foi editada pela última vez às [hora], em
+// [data]" no rodapé de cada artigo, SEM o nome do usuário (privacidade --
+// o histórico completo com autor de cada edição já é nativo à parte, na
+// aba "Ver histórico"). $wgMaxCredits = 0 é o que faz o CreditsAction
+// (núcleo do MediaWiki) cair no lastmod (só data) em vez do
+// lastmodifiedatby (data + nome) -- ver includes/skins/components/
+// SkinComponentFooter.php::getFooterInfoData().
+$wgMaxCredits = 0;
 
 // ---------- Idiomas do artigo (convenção de sub-página) ----------
 // A Wikipédia de verdade liga wikis SEPARADOS por idioma (pt.wikipedia.org,
