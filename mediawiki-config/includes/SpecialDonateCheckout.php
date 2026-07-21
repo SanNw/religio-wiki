@@ -126,8 +126,24 @@ class SpecialDonateCheckout extends SpecialPage {
 			echo json_encode( [ 'url' => $session->url ] );
 		} catch ( \Stripe\Exception\ApiErrorException $e ) {
 			wfDebugLog( 'religio-donate', 'Stripe error: ' . $e->getMessage() );
-			http_response_code( 502 );
-			echo json_encode( [ 'error' => 'stripe_error' ] );
+			// 400, não 5xx: o Cloudflare intercepta respostas 502/503/504 e
+			// troca o corpo por uma página de erro genérica própria, escondendo
+			// o JSON de verdade (confirmado ao vivo -- o front-end nunca via o
+			// motivo real do erro). 400 passa direto.
+			http_response_code( 400 );
+			// Erro específico e comum: o método (Pix, Boleto) ainda não foi
+			// ativado em Settings > Payment methods no Dashboard do Stripe --
+			// distingue esse caso do resto pra dar uma mensagem útil no
+			// front-end, em vez de "algo deu errado" genérico.
+			$msg = $e->getMessage();
+			// Mensagem real do Stripe quando o método não está ativado no
+			// Dashboard: "...ensure the provided type is activated in your
+			// dashboard...". Confirmado testando direto contra a API.
+			if ( stripos( $msg, 'activated in your dashboard' ) !== false ) {
+				echo json_encode( [ 'error' => 'method_not_enabled' ] );
+			} else {
+				echo json_encode( [ 'error' => 'stripe_error' ] );
+			}
 		}
 	}
 

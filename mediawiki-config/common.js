@@ -201,13 +201,16 @@
 				.then( function ( result ) {
 					if ( result.ok && result.data.url ) {
 						window.location.href = result.data.url;
-					} else {
-						throw new Error( result.data.error || 'erro_desconhecido' );
+						return;
 					}
+					throw new Error( result.data.error || 'erro_desconhecido' );
 				} )
-				.catch( function () {
-					errorMsg.textContent = 'Não foi possível iniciar o pagamento agora. ' +
-						'Tente novamente em alguns instantes ou entre em contato: contato@religiowiki.com.';
+				.catch( function ( err ) {
+					errorMsg.textContent = err.message === 'method_not_enabled' ?
+						'Este método de pagamento ainda não está disponível. Tente outro método, ' +
+						'como cartão.' :
+						'Não foi possível iniciar o pagamento agora. Tente novamente em alguns ' +
+						'instantes ou entre em contato: contato@religiowiki.com.';
 					errorMsg.style.display = '';
 					submitBtn.disabled = false;
 					submitBtn.textContent = 'Confirmar doação';
