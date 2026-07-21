@@ -658,6 +658,27 @@ $wgHooks['BeforePageDisplay'][] = static function ( $out, $skin ) {
 PHPEOF
   echo "  Prefixo 'Religio Wiki:' escondido no título das páginas institucionais (rw-hide-project-ns-prefix)."
 fi
+# Corrige um crash de JS do núcleo do MediaWiki em Special:Preferences
+# (mw.widgets.visibleCodePointLimit chamado com o campo 'Assinatura' quando
+# ele renderiza como <label> em vez de TextInputWidget, pra contas sem
+# e-mail confirmado) que travava a inicialização inteira da página (abas
+# quebradas em QUALQUER seção, não só Páginas vigiadas/Notificações).
+# Corrigido via módulo skins.ReligioWiki.prefsFix (ver skin.json +
+# skins/ReligioWiki/resources/rw-prefs-fix.js), carregado só em
+# Special:Preferences. Idempotente pelo marcador rw-prefs-fix-load.
+if ! grep -q "rw-prefs-fix-load" LocalSettings.php; then
+  cat >> LocalSettings.php << 'PHPEOF'
+
+// Religio Wiki — rw-prefs-fix-load: ver comentário no deploy-wiki-content.sh.
+$wgHooks['BeforePageDisplay'][] = static function ( $out, $skin ) {
+	if ( $out->getTitle() && $out->getTitle()->isSpecial( 'Preferences' ) ) {
+		$out->addModules( 'skins.ReligioWiki.prefsFix' );
+	}
+};
+PHPEOF
+  echo "  Crash de Special:Preferences corrigido (rw-prefs-fix-load)."
+fi
+
 echo "== 2/4: rebuild da imagem + subindo/reiniciando o container =="
 # Rebuild explícito: "up -d" sozinho NÃO reconstrói a imagem quando só o
 # Dockerfile muda (ex.: skin novo copiado em skins/ReligioWiki, extensões

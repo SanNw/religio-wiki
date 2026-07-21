@@ -550,6 +550,16 @@ body.rw-noscroll { overflow: hidden; }
 	#p-personal.rw-personal ul { flex-wrap: wrap; row-gap: 6px; }
 	/* Os menus dropdown nunca ultrapassam a largura da tela. */
 	.rw-personal-dropdown-menu { max-width: calc( 100vw - 24px ); }
+	/* Mesmo tratamento pro dropdown "Admin ▾": essa <ul> não tem a classe
+	   .rw-personal-dropdown-menu (ver comentário junto da regra fora do
+	   breakpoint), então sem isso ela herda white-space:nowrap de
+	   #p-personal.rw-personal ul e nunca quebra linha — o menu atravessava a
+	   tela inteira no mobile. */
+	#p-personal .rw-admin-personal > ul {
+		max-width: calc( 100vw - 24px );
+		white-space: normal;
+		overflow-wrap: break-word;
+	}
 	/* Abas do artigo: no desktop o "Mais ▾" é empurrado pro extremo direito
 	   (margin-left:auto) pra ficar longe do grupo Ler/Editar/Ver histórico —
 	   faz sentido numa barra larga. No mobile, como a barra quebra em duas
