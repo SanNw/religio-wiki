@@ -696,6 +696,22 @@ PHPEOF
   echo "  Deteccao/troca de idioma de interface ligada (rw-i18n-interface-lang)."
 fi
 
+# URLs limpas sem /index.php (ex.: religiowiki.com/Artigo). O Apache
+# dentro do container ja tem mod_rewrite habilitado e
+# /etc/apache2/conf-available/short-url.conf ja esta symlinkado/ativo
+# (fora do repo, configurado direto no host/imagem base) -- so faltava
+# dizer ao MediaWiki pra gerar/entender esse formato. /index.php/Artigo
+# continua funcionando (compatibilidade com links antigos). Idempotente
+# pelo marcador rw-clean-urls.
+if ! grep -q "rw-clean-urls" LocalSettings.php; then
+  cat >> LocalSettings.php << 'PHPEOF'
+
+// Religio Wiki — rw-clean-urls: ver comentario no deploy-wiki-content.sh.
+$wgArticlePath = '/$1';
+PHPEOF
+  echo "  URLs limpas ligadas, sem /index.php (rw-clean-urls)."
+fi
+
 echo "== 2/4: rebuild da imagem + subindo/reiniciando o container =="
 # Rebuild explícito: "up -d" sozinho NÃO reconstrói a imagem quando só o
 # Dockerfile muda (ex.: skin novo copiado em skins/ReligioWiki, extensões
