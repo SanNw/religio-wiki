@@ -133,3 +133,88 @@
 		mount();
 	}
 }() );
+
+/* Predefinições disponíveis sem precisar buscar primeiro (TemplateWizard).
+ * Editores novatos não sabiam que precisavam digitar algo pra ver a lista
+ * de predefinições no diálogo 'Inserir predefinição' — agora, ao abrir o
+ * diálogo com o campo vazio, já lista as predefinições existentes em ordem
+ * alfabética; digitar volta a fazer a busca normal.
+ *
+ * Nota: o patch tem que ficar em SearchForm.prototype.focus (chamado de
+ * novo TODA VEZ que o diálogo abre, via Dialog.getReadyProcess), não em
+ * SearchField.prototype.onLookupInputFocus -- esse é vinculado ao evento
+ * de foco ('.bind'/'.on') na CONSTRUÇÃO do diálogo (uma única vez, no
+ * carregamento da página), então um patch feito depois desse momento não
+ * pega mais pra essa instância já existente. */
+( function () {
+	mw.hook( 'wikiEditor.toolbarReady' ).add( function () {
+		mw.loader.using( 'ext.TemplateWizard' ).then( function () {
+			var SF = mw.TemplateWizard && mw.TemplateWizard.SearchField;
+			var SFm = mw.TemplateWizard && mw.TemplateWizard.SearchForm;
+			if ( !SF || !SFm || SFm.prototype.rwPatchedEmptyLookup ) {
+				return;
+			}
+			SFm.prototype.rwPatchedEmptyLookup = true;
+
+			// O OOUI LookupElement por padrão só considera termos com 1+
+			// caractere como consulta válida.
+			SF.prototype.isValidLookupTerm = function () {
+				return true;
+			};
+
+			var originalGetApiParams = SF.prototype.getApiParams;
+			SF.prototype.getApiParams = function ( query ) {
+				if ( query ) {
+					return originalGetApiParams.call( this, query );
+				}
+				// Campo vazio: lista as predefinições existentes (A-Z) em
+				// vez de fazer uma prefixsearch vazia (que não retorna nada).
+				return {
+					action: 'templatedata',
+					includeMissingTitles: 1,
+					lang: mw.config.get( 'wgUserLanguage' ),
+					generator: 'allpages',
+					gapnamespace: mw.config.get( 'wgNamespaceIds' ).template,
+					gapfilterredir: 'nonredirects',
+					gaplimit: this.limit
+				};
+			};
+
+			// Chamado toda vez que o diálogo abre (ver Dialog.js:
+			// showSearch/getReadyProcess) -- ponto seguro pra disparar a
+			// lista mesmo com o campo vazio, sem depender do handler de
+			// foco já vinculado na construção do diálogo.
+			//
+			// Não dá pra usar searchWidget.populateLookupMenu() aqui: essa
+			// função do OOUI tem um corte próprio pra valor vazio que não
+			// passa por isValidLookupTerm (testado ao vivo -- mesmo com
+			// isValidLookupTerm sempre true, populateLookupMenu() não faz
+			// nenhuma requisição pra termo vazio). Por isso a lista é
+			// montada manualmente aqui com as mesmas peças públicas que o
+			// próprio SearchField usa (getLookupRequest +
+			// getLookupCacheDataFromResponse + getLookupMenuOptionsFromData),
+			// só que sem aquele corte.
+			var originalFocus = SFm.prototype.focus;
+			SFm.prototype.focus = function () {
+				originalFocus.apply( this, arguments );
+				var sw = this.searchWidget;
+				if ( sw.getValue() ) {
+					return;
+				}
+				sw.getLookupRequest().done( function ( response ) {
+					// Se o editor já começou a digitar enquanto a lista
+					// carregava, não sobrescreve o que o OOUI já esteja
+					// mostrando pra consulta nova.
+					if ( sw.getValue() ) {
+						return;
+					}
+					var data = sw.getLookupCacheDataFromResponse( response );
+					var menu = sw.getLookupMenu();
+					menu.clearItems();
+					menu.addItems( sw.getLookupMenuOptionsFromData( data ) );
+					menu.toggle( true );
+				} );
+			};
+		} );
+	} );
+}() );

@@ -551,6 +551,113 @@ PHPEOF
   echo "  cache de objeto/parser ligado (rw-cache-db)."
 fi
 
+# Rodapé institucional: link 'Código de Conduta' (4o item, depois de
+# privacy/about/disclaimer que ja vem do core via Privacypage/Aboutpage/
+# Disclaimerpage no manifest.tsv). Sem isso nao ha slot padrao do MediaWiki
+# pra um 4o link de rodape. Idempotente pelo marcador rw-footer-conduct-link.
+if ! grep -q "rw-footer-conduct-link" LocalSettings.php; then
+  cat >> LocalSettings.php << 'PHPEOF'
+
+// Religio Wiki — rw-footer-conduct-link: adiciona 'Código de Conduta' como
+// 4o link do rodape (depois de privacy/about/disclaimer, que ja vem do core
+// via Privacypage/Aboutpage/Disclaimerpage). Ver mediawiki-config/pages/.
+$wgHooks['SkinAddFooterLinks'][] = static function ( $skin, $key, array &$footerItems ) {
+	if ( $key !== 'places' ) {
+		return;
+	}
+	$title = Title::newFromText( 'Religio Wiki:Código de Conduta' );
+	if ( $title ) {
+		$footerItems['codigodeconduta'] = Html::rawElement(
+			'a',
+			[ 'href' => $title->getLocalURL() ],
+			'Código de Conduta'
+		);
+	}
+};
+PHPEOF
+  echo "  link 'Código de Conduta' adicionado ao rodapé (rw-footer-conduct-link)."
+fi
+
+# Aviso de licença no rodapé: SkinComponentCopyright (MW 1.43) só monta o
+# link $1 (e só entao usa o texto de MediaWiki:Copyright) se RightsUrl,
+# RightsText ou RightsPage estiver setado -- sem isso ele desiste cedo e o
+# rodape fica sem aviso de licenca nenhum, mesmo com MediaWiki:Copyright
+# preenchido. O texto exibido de fato vem da pagina MediaWiki:Copyright
+# (que precisa ser HTML puro, nao wikitext -- essa mensagem usa
+# Message::text(), que nao processa aspas triplas nem links wikitext).
+# Idempotente pelo marcador rw-footer-copyright-link.
+if ! grep -q "rw-footer-copyright-link" LocalSettings.php; then
+  cat >> LocalSettings.php << 'PHPEOF'
+
+// Religio Wiki — rw-footer-copyright-link: desbloqueia o aviso de licença
+// no rodapé (ver mediawiki-config/pages/MediaWiki_Copyright.wikitext).
+$wgRightsUrl = 'https://creativecommons.org/licenses/by-sa/4.0/deed.pt';
+$wgRightsText = 'CC BY-SA 4.0';
+PHPEOF
+  echo "  aviso de licença desbloqueado no rodapé (rw-footer-copyright-link)."
+fi
+
+
+# 'Página aleatória' só deve mostrar artigos de verdade. Restringe
+# $wgContentNamespaces só ao NS_MAIN via SetupAfterCache (o SemanticMediaWiki
+# mescla Propriedade/102 e Conceito/108 nessa lista via merge_strategy do
+# extension.json, que só termina de rodar DEPOIS do LocalSettings.php --
+# setar a variável direto no LocalSettings.php não pega, o SMW sobrescreve
+# de novo; SetupAfterCache roda depois desse merge, então é a última
+# palavra). Também exclui a Página principal e suas subpáginas (widgets como
+# 'Artigo em destaque'/'Imagem do dia'), que moram no NS_MAIN por causa da
+# transclusão mas não são artigos. Idempotente pelo marcador
+# rw-content-namespaces-main-only / rw-random-exclude-mainpage.
+if ! grep -q "rw-content-namespaces-main-only" LocalSettings.php; then
+  cat >> LocalSettings.php << 'PHPEOF'
+
+// Religio Wiki — rw-content-namespaces-main-only: ver comentário acima do
+// bloco no deploy-wiki-content.sh.
+$wgHooks['SetupAfterCache'][] = static function () {
+	$GLOBALS['wgContentNamespaces'] = [ NS_MAIN ];
+};
+PHPEOF
+  echo "  \$wgContentNamespaces restrito a NS_MAIN (rw-content-namespaces-main-only)."
+fi
+
+if ! grep -q "rw-random-exclude-mainpage" LocalSettings.php; then
+  cat >> LocalSettings.php << 'PHPEOF'
+
+// Religio Wiki — rw-random-exclude-mainpage: exclui a Página principal e
+// suas subpáginas de 'Página aleatória'. Ver deploy-wiki-content.sh.
+$wgHooks['RandomPageQuery'][] = static function ( &$tables, &$conds, &$joinConds ) {
+	$dbr = MediaWiki\MediaWikiServices::getInstance()->getConnectionProvider()->getReplicaDatabase();
+	$mainPage = Title::newMainPage();
+	if ( $mainPage ) {
+		$dbKey = $mainPage->getDBkey();
+		$conds[] = 'page_title != ' . $dbr->addQuotes( $dbKey );
+		$conds[] = 'page_title NOT ' . $dbr->buildLike( $dbKey . '/', $dbr->anyString() );
+	}
+};
+PHPEOF
+  echo "  Página principal excluída de 'Página aleatória' (rw-random-exclude-mainpage)."
+fi
+
+# Some o prefixo 'Religio Wiki:' do título exibido (H1 e <title>) das
+# páginas institucionais do namespace Projeto, só na visualização normal
+# (não mexe com 'Editando ...', histórico etc.). O prefixo continua
+# existindo na URL e nos links. Idempotente pelo marcador
+# rw-hide-project-ns-prefix.
+if ! grep -q "rw-hide-project-ns-prefix" LocalSettings.php; then
+  cat >> LocalSettings.php << 'PHPEOF'
+
+// Religio Wiki — rw-hide-project-ns-prefix: ver deploy-wiki-content.sh.
+$wgHooks['BeforePageDisplay'][] = static function ( $out, $skin ) {
+	$title = $out->getTitle();
+	if ( $title && $title->inNamespace( NS_PROJECT ) &&
+		Action::getActionName( $out->getContext() ) === 'view'
+	) {
+		$out->setPageTitle( $title->getText() );
+	}
+};
+PHPEOF
+  echo "  Prefixo 'Religio Wiki:' escondido no título das páginas institucionais (rw-hide-project-ns-prefix)."
+fi
 echo "== 2/4: rebuild da imagem + subindo/reiniciando o container =="
 # Rebuild explícito: "up -d" sozinho NÃO reconstrói a imagem quando só o
 # Dockerfile muda (ex.: skin novo copiado em skins/ReligioWiki, extensões
