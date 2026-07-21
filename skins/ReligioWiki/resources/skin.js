@@ -876,3 +876,247 @@
 		mount();
 	}
 }() );
+
+/* ===== seletor de imagens já enviadas (Special:AllImages via API), pra inserir
+   no wikitexto sem precisar saber o nome do arquivo de cor ===== */
+( function () {
+	'use strict';
+
+	var overlay = null;
+	var currentTextarea = null;
+	var searchInput, statusEl, gridEl, detailEl, listStepEl;
+	var allImagesCache = null;
+
+	function insertAtCursor( textarea, text ) {
+		var start = textarea.selectionStart;
+		var end = textarea.selectionEnd;
+		var value = textarea.value;
+		textarea.value = value.slice( 0, start ) + text + value.slice( end );
+		var pos = start + text.length;
+		textarea.selectionStart = textarea.selectionEnd = pos;
+		textarea.focus();
+	}
+
+	function fetchAllImages() {
+		if ( allImagesCache ) {
+			return $.Deferred().resolve( allImagesCache ).promise();
+		}
+		return mw.loader.using( 'mediawiki.api' ).then( function () {
+			var api = new mw.Api();
+			return api.get( {
+				action: 'query',
+				format: 'json',
+				list: 'allimages',
+				aiprop: 'url|size',
+				ailimit: 200
+			} ).then( function ( data ) {
+				allImagesCache = ( data.query && data.query.allimages ) || [];
+				return allImagesCache;
+			} );
+		} );
+	}
+
+	function renderGrid( images ) {
+		gridEl.innerHTML = '';
+		if ( !images.length ) {
+			statusEl.textContent = 'Nenhuma imagem encontrada.';
+			return;
+		}
+		statusEl.textContent = images.length + ' imagem(ns).';
+		images.forEach( function ( img ) {
+			var item = document.createElement( 'button' );
+			item.type = 'button';
+			item.className = 'rw-imgpicker-item';
+
+			var thumb = document.createElement( 'img' );
+			thumb.src = img.url;
+			thumb.alt = img.name;
+			thumb.loading = 'lazy';
+
+			var name = document.createElement( 'span' );
+			name.textContent = img.name;
+
+			item.appendChild( thumb );
+			item.appendChild( name );
+			item.addEventListener( 'click', function () {
+				showDetail( img );
+			} );
+			gridEl.appendChild( item );
+		} );
+	}
+
+	function applyFilter() {
+		var q = searchInput.value.trim().toLowerCase();
+		if ( !allImagesCache ) {
+			return;
+		}
+		var filtered = !q ? allImagesCache : allImagesCache.filter( function ( img ) {
+			return img.name.toLowerCase().indexOf( q ) !== -1;
+		} );
+		renderGrid( filtered );
+	}
+
+	function showDetail( img ) {
+		listStepEl.style.display = 'none';
+		detailEl.style.display = 'block';
+		detailEl.innerHTML = '';
+
+		var back = document.createElement( 'button' );
+		back.type = 'button';
+		back.className = 'rw-imgpicker-back';
+		back.textContent = '← Voltar pra lista';
+		back.addEventListener( 'click', function () {
+			detailEl.style.display = 'none';
+			listStepEl.style.display = 'block';
+		} );
+		detailEl.appendChild( back );
+
+		var row = document.createElement( 'div' );
+		row.className = 'rw-imgpicker-detail';
+
+		var preview = document.createElement( 'img' );
+		preview.src = img.url;
+		preview.alt = img.name;
+		row.appendChild( preview );
+
+		var fields = document.createElement( 'div' );
+		fields.className = 'rw-imgpicker-detail-fields';
+
+		var nameP = document.createElement( 'p' );
+		nameP.className = 'rw-auth-note';
+		nameP.textContent = img.name;
+		fields.appendChild( nameP );
+
+		var captionLabel = document.createElement( 'label' );
+		captionLabel.className = 'rw-auth-field';
+		var captionSpan = document.createElement( 'span' );
+		captionSpan.textContent = 'Legenda (opcional)';
+		var captionInput = document.createElement( 'input' );
+		captionInput.type = 'text';
+		captionLabel.appendChild( captionSpan );
+		captionLabel.appendChild( captionInput );
+		fields.appendChild( captionLabel );
+
+		var insertBtn = document.createElement( 'button' );
+		insertBtn.type = 'button';
+		insertBtn.className = 'rw-auth-submit';
+		insertBtn.textContent = 'Inserir no artigo';
+		insertBtn.addEventListener( 'click', function () {
+			var caption = captionInput.value.trim();
+			var wikitext = '[[Arquivo:' + img.name + '|thumb' +
+				( caption ? '|' + caption : '' ) + ']]';
+			insertAtCursor( currentTextarea, wikitext );
+			close();
+		} );
+		fields.appendChild( insertBtn );
+
+		row.appendChild( fields );
+		detailEl.appendChild( row );
+	}
+
+	function close() {
+		overlay.classList.remove( 'open' );
+	}
+
+	function buildOverlay() {
+		var ov = document.createElement( 'div' );
+		ov.id = 'rw-imgpicker-overlay';
+
+		var modal = document.createElement( 'div' );
+		modal.className = 'rw-imgpicker-modal';
+		modal.setAttribute( 'role', 'dialog' );
+		modal.setAttribute( 'aria-modal', 'true' );
+
+		var closeBtn = document.createElement( 'button' );
+		closeBtn.type = 'button';
+		closeBtn.className = 'rw-imgpicker-close';
+		closeBtn.textContent = 'Fechar ✕';
+		closeBtn.addEventListener( 'click', close );
+		modal.appendChild( closeBtn );
+
+		var title = document.createElement( 'h3' );
+		title.className = 'rw-imgpicker-title';
+		title.textContent = 'Inserir imagem já enviada';
+		modal.appendChild( title );
+
+		listStepEl = document.createElement( 'div' );
+
+		searchInput = document.createElement( 'input' );
+		searchInput.type = 'search';
+		searchInput.className = 'rw-imgpicker-search';
+		searchInput.placeholder = 'Buscar por nome do arquivo…';
+		searchInput.addEventListener( 'input', applyFilter );
+		listStepEl.appendChild( searchInput );
+
+		statusEl = document.createElement( 'p' );
+		statusEl.className = 'rw-imgpicker-status';
+		statusEl.textContent = 'Carregando…';
+		listStepEl.appendChild( statusEl );
+
+		gridEl = document.createElement( 'div' );
+		gridEl.className = 'rw-imgpicker-grid';
+		listStepEl.appendChild( gridEl );
+
+		modal.appendChild( listStepEl );
+
+		detailEl = document.createElement( 'div' );
+		detailEl.style.display = 'none';
+		modal.appendChild( detailEl );
+
+		ov.appendChild( modal );
+
+		ov.addEventListener( 'click', function ( e ) {
+			if ( e.target === ov ) {
+				close();
+			}
+		} );
+		document.addEventListener( 'keydown', function ( e ) {
+			if ( e.key === 'Escape' && ov.classList.contains( 'open' ) ) {
+				close();
+			}
+		} );
+
+		return ov;
+	}
+
+	function openPicker( textarea ) {
+		currentTextarea = textarea;
+		if ( !overlay ) {
+			overlay = buildOverlay();
+			document.body.appendChild( overlay );
+		}
+		detailEl.style.display = 'none';
+		listStepEl.style.display = 'block';
+		searchInput.value = '';
+		overlay.classList.add( 'open' );
+		statusEl.textContent = 'Carregando…';
+		gridEl.innerHTML = '';
+		fetchAllImages().then( renderGrid, function () {
+			statusEl.textContent = 'Erro ao buscar imagens enviadas.';
+		} );
+	}
+
+	function mount() {
+		var textarea = document.getElementById( 'wpTextbox1' );
+		if ( !textarea || typeof mw === 'undefined' ) {
+			return;
+		}
+		var row = document.createElement( 'div' );
+		row.className = 'rw-imgpicker-trigger-row';
+		var btn = document.createElement( 'button' );
+		btn.type = 'button';
+		btn.className = 'rw-imgpicker-trigger';
+		btn.textContent = '🖼️ Inserir imagem já enviada';
+		btn.addEventListener( 'click', function () {
+			openPicker( textarea );
+		} );
+		row.appendChild( btn );
+		textarea.parentNode.insertBefore( row, textarea );
+	}
+
+	if ( document.readyState === 'loading' ) {
+		document.addEventListener( 'DOMContentLoaded', mount );
+	} else {
+		mount();
+	}
+}() );

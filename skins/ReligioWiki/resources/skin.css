@@ -612,6 +612,31 @@ body.rw-noscroll { overflow: hidden; }
 :root[data-theme="dark"] .rw-auth-error { color: #F87171; }
 .rw-auth-note { font-size: 0.72rem; color: var(--rw-text-muted); margin-top: 12px; line-height: 1.5; }
 
+/* ---------- seletor de imagens já enviadas no editor (montado por skin.js) ----------
+   Botão perto do textarea de edição + modal de busca/miniaturas, pra inserir
+   [[Arquivo:...|thumb|legenda]] sem precisar saber o nome exato do arquivo.
+   Reusa as mesmas classes .rw-auth-field/.rw-auth-submit/.rw-auth-note do
+   pop-up de login pro campo de legenda e botão de inserir (mesmo padrão visual). */
+.rw-imgpicker-trigger-row { margin: 6px 0 10px; }
+.rw-imgpicker-trigger { font: inherit; font-size: 0.85rem; padding: 6px 12px; border: 1px solid var(--rw-border); background: var(--rw-bg-elevated); color: var(--rw-text); cursor: pointer; border-radius: 3px; }
+.rw-imgpicker-trigger:hover { border-color: var(--rw-link); }
+#rw-imgpicker-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 300; align-items: center; justify-content: center; padding: 16px; overflow: auto; }
+#rw-imgpicker-overlay.open { display: flex; }
+.rw-imgpicker-modal { background: var(--rw-bg); color: var(--rw-text); border: 1px solid var(--rw-border); width: 100%; max-width: 640px; max-height: 90vh; overflow-y: auto; padding: 22px 24px 24px; position: relative; }
+.rw-imgpicker-close { position: absolute; top: 10px; right: 10px; font: inherit; font-size: 0.85rem; border: 1px solid var(--rw-border); background: var(--rw-bg-elevated); color: var(--rw-text); padding: 3px 9px; cursor: pointer; border-radius: 3px; }
+.rw-imgpicker-title { margin: 0 0 14px; font-size: 1.05rem; }
+.rw-imgpicker-search { width: 100%; font: inherit; padding: 8px 10px; border: 1px solid var(--rw-border); background: var(--rw-bg-elevated); color: var(--rw-text); border-radius: 3px; margin-bottom: 8px; }
+.rw-imgpicker-status { font-size: 0.78rem; color: var(--rw-text-muted); margin: 0 0 8px; }
+.rw-imgpicker-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 10px; max-height: 400px; overflow-y: auto; }
+.rw-imgpicker-item { display: flex; flex-direction: column; align-items: center; gap: 4px; font: inherit; background: var(--rw-bg-elevated); border: 1px solid var(--rw-border); border-radius: 4px; padding: 6px; cursor: pointer; color: var(--rw-text); }
+.rw-imgpicker-item:hover { border-color: var(--rw-link); }
+.rw-imgpicker-item img { width: 100%; height: 72px; object-fit: cover; border-radius: 3px; background: var(--rw-surface, rgba(0,0,0,0.06)); }
+.rw-imgpicker-item span { font-size: 0.7rem; word-break: break-all; text-align: center; line-height: 1.2; max-height: 2.4em; overflow: hidden; }
+.rw-imgpicker-back { background: none; border: none; color: var(--rw-link); cursor: pointer; font: inherit; font-size: 0.8rem; padding: 0; margin-bottom: 14px; }
+.rw-imgpicker-detail { display: flex; gap: 16px; align-items: flex-start; }
+.rw-imgpicker-detail img { width: 160px; height: 160px; object-fit: contain; background: var(--rw-surface, rgba(0,0,0,0.06)); border: 1px solid var(--rw-border); border-radius: 4px; flex-shrink: 0; }
+.rw-imgpicker-detail-fields { flex: 1; min-width: 0; }
+
 /* ---------- formulários nativos genéricos (Special:Preferences, editar, etc.) ---------- */
 /* Não recria a UI dessas páginas — só garante que herdem a paleta em vez de
    ficar com fundo branco/tema padrão do navegador destoando do resto. */
@@ -719,8 +744,25 @@ input[type="text"], input[type="password"], input[type="email"], input[type="num
 }
 /* Ícone garantido, na cor de identidade do projeto — sino pra alertas
    (menções, agradecimentos), envelope pra avisos (o resto). Não depende de
-   nenhum asset do Echo carregar certo. */
+   nenhum asset do Echo carregar certo.
+   CAUSA REAL (achada inspecionando o DOM ao vivo, não suposição): o próprio
+   CSS do Echo (#pt-notifications-alert/-notice .mw-echo-notifications-badge)
+   aplica text-indent:-9999px no <a> pra esconder o rótulo de texto dele
+   ("Alerta (0)") e mostrar só um ícone de fundo. Esse text-indent é herdado
+   pela linha do bloco inteiro — inclusive pelo NOSSO ::before, que ficava
+   gerado corretamente (content batia no DevTools) só que empurrado 9999px
+   pra fora da tela junto com o texto. O Echo só reseta text-indent:0 pro
+   ::after dele (o contador "1"), nunca pro nosso ::before. Corrige tirando
+   o ::before do fluxo normal (position:absolute, o <a> já é position:
+   relative) e resetando text-indent nele mesmo — assim ele nunca herda o
+   -9999px, e o texto original do Echo continua escondido do mesmo jeito. */
 .rw-notif-icons li a::before {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	text-indent: 0;
 	font-size: 17px;
 	color: var(--rw-text);
 	line-height: 1;
