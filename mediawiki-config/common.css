@@ -518,3 +518,13 @@ html body #rw-hamburger {
 @media (max-width: 851px) {
 	html body #rw-hamburger { display: inline-flex; align-items: center; justify-content: center; }
 }
+
+/* Link discreto de "editar direitos" (⚙) em Special:ListUsers, adicionado
+ * via hook SpecialListusersFormatRow (ver LocalSettings.php) -- só
+ * aparece pra quem tem o direito 'userrights' (Burocratas). */
+.rw-userrights-gear {
+	text-decoration: none;
+	opacity: 0.6;
+	margin-left: 4px;
+}
+.rw-userrights-gear:hover { opacity: 1; text-decoration: none; }
