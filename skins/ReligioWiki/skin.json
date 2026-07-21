@@ -51,6 +51,18 @@
 				"desktop",
 				"mobile"
 			]
+		},
+		"skins.ReligioWiki.prefsFix": {
+			"scripts": [
+				"resources/rw-prefs-fix.js"
+			],
+			"dependencies": [
+				"mediawiki.widgets.visibleLengthLimit"
+			],
+			"targets": [
+				"desktop",
+				"mobile"
+			]
 		}
 	},
 	"ResourceFileModulePaths": {

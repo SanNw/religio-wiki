@@ -97,6 +97,7 @@ a.new { color: #BA2828; }
 	padding: 8px 20px;
 	border-bottom: 1px solid var(--rw-border);
 	background: var(--rw-bg-elevated);
+	position: relative; /* ancora o #rw-hamburger (position:absolute), que agora mora dentro do topbar */
 }
 .rw-brand {
 	display: flex;
@@ -491,17 +492,21 @@ body.rw-can-edit .rw-edit-pencil { display: inline; }
 #footer ul { list-style: none; margin: 0 0 6px; padding: 0; display: flex; flex-wrap: wrap; gap: 12px; }
 
 /* ---------- responsivo / hambúrguer (montado por skin.js) ---------- */
-/* Fixo (position:fixed — não some ao rolar a página) e no canto superior
-   DIREITO, alinhado com a mesma linha/altura do logo "Religio Wiki" em
-   .rw-topbar: o topbar tem padding-top 8px antes do conteúdo do logo
-   começar, então "top" aqui usa o mesmo valor — os dois ficam no mesmo
-   nível quando a página está no topo. Tamanho de toque ~40px (perto do
-   mínimo de 44px recomendado), maior que o alvo antigo. */
+/* Mora DENTRO de .rw-topbar agora (ver ReligioWikiTemplate::execute()),
+   como último item, position:absolute + top:50%/translateY(-50%) pra
+   centralizar de verdade na altura real do topbar (acompanha a altura do
+   logo/busca/barra pessoal automaticamente, não um valor de "top" chutado
+   que dependia de tudo ficar do mesmo tamanho). Ancorado à DIREITA, mesmo
+   lado da gaveta lateral (ver #mw-panel.rw-sidebar). Continua fixo durante
+   o scroll porque .rw-topbar vira sticky no breakpoint mobile (ver
+   abaixo) — os dois se movem juntos, sempre na mesma altura. Tamanho de
+   toque ~40px (perto do mínimo de 44px recomendado). */
 #rw-hamburger {
 	display: none;
-	position: fixed;
-	top: 8px;
+	position: absolute;
+	top: 50%;
 	right: 12px;
+	transform: translateY(-50%);
 	z-index: 210; /* acima até do painel lateral (200) — continua clicável (fecha) com o menu aberto */
 	font: inherit;
 	font-size: 1.3rem;
@@ -521,17 +526,18 @@ body.rw-can-edit .rw-edit-pencil { display: inline; }
 body.rw-noscroll { overflow: hidden; }
 @media (max-width: 851px) {
 	#rw-hamburger { display: inline-flex; }
+	.rw-topbar { position: sticky; top: 0; z-index: 220; }
 	#mw-panel.rw-sidebar {
 		display: none;
 		position: fixed;
-		top: 0; left: 0; bottom: 0;
+		top: 0; right: 0; bottom: 0;
 		width: min(80vw, 300px);
 		max-width: 100%;
 		z-index: 200;
 		overflow-x: hidden;
 		overflow-y: auto;
 		background: var(--rw-bg-elevated);
-		border-right: 1px solid var(--rw-border);
+		border-left: 1px solid var(--rw-border);
 		padding: 16px;
 		box-sizing: border-box;
 		overscroll-behavior: contain;
@@ -550,6 +556,16 @@ body.rw-noscroll { overflow: hidden; }
 	#p-personal.rw-personal ul { flex-wrap: wrap; row-gap: 6px; }
 	/* Os menus dropdown nunca ultrapassam a largura da tela. */
 	.rw-personal-dropdown-menu { max-width: calc( 100vw - 24px ); }
+	/* Mesmo tratamento pro dropdown "Admin ▾": essa <ul> não tem a classe
+	   .rw-personal-dropdown-menu (ver comentário junto da regra fora do
+	   breakpoint), então sem isso ela herda white-space:nowrap de
+	   #p-personal.rw-personal ul e nunca quebra linha — o menu atravessava a
+	   tela inteira no mobile. */
+	#p-personal .rw-admin-personal > ul {
+		max-width: calc( 100vw - 24px );
+		white-space: normal;
+		overflow-wrap: break-word;
+	}
 	/* Abas do artigo: no desktop o "Mais ▾" é empurrado pro extremo direito
 	   (margin-left:auto) pra ficar longe do grupo Ler/Editar/Ver histórico —
 	   faz sentido numa barra larga. No mobile, como a barra quebra em duas
