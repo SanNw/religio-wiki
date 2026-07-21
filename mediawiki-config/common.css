@@ -663,10 +663,14 @@ html body .rw-toc #toc li.rw-toc-has-children.rw-toc-item-collapsed > ul {
 		width: auto;
 		max-width: min(320px, calc(100vw - 24px));
 		max-height: 70vh;
-		overflow-y: auto;
 		margin: 0;
 		grid-column: auto;
 	}
+	/* overflow só entra quando o painel está EXPANDIDO (precisa rolar se o
+	   conteúdo passar de 70vh) -- no estado recolhido (só o botão "☰"),
+	   overflow:auto cortava a sombra (box-shadow) do próprio botão, que
+	   "vaza" pra fora da caixa de 48x48px dele. */
+	html body .rw-toc.rw-toc-expanded { overflow-y: auto; }
 	html body .rw-toc-fab {
 		display: inline-flex;
 		align-items: center;

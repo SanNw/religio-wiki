@@ -670,6 +670,11 @@ body.rw-noscroll { overflow: hidden; }
   .rw-layout { grid-template-columns: 1fr; }
 }
 @media (max-width: 600px) {
+	/* Largo/Padrão (largura do conteúdo) não faz sentido em smartphone --
+	   não há "espaço a mais" a dar numa tela desse tamanho, diferente de
+	   tablet/notebook onde a diferença é real. Ver skin.js (classe
+	   adicionada só nesse grupo específico do painel Aparência). */
+	.rw-appearance-group-width { display: none; }
 	.firstHeading { font-size: 1.5rem; }
 	/* Título com fonte menor quebra em 2+ linhas com mais facilidade — o link
 	   de "editar" (inline, grudado na última palavra) ficava espremido contra

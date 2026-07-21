@@ -271,9 +271,9 @@
 	}
 	apply();
 
-	function buildGroup( label, attrKey, options, storageKey ) {
+	function buildGroup( label, attrKey, options, storageKey, extraClass ) {
 		var group = document.createElement( 'div' );
-		group.className = 'rw-appearance-group';
+		group.className = 'rw-appearance-group' + ( extraClass ? ' ' + extraClass : '' );
 
 		var span = document.createElement( 'span' );
 		span.className = 'rw-appearance-group-label';
@@ -326,10 +326,14 @@
 			{ id: 'standard', label: 'Padrão' },
 			{ id: 'large', label: 'Grande' }
 		], TEXT_KEY ) );
+		// Grupo "Largura" só faz sentido em telas maiores (tablet/notebook) --
+		// não tem "espaço a mais" pra dar num smartphone, então esconde via
+		// CSS (classe rw-appearance-group-width, ver Common.css) abaixo de
+		// 600px.
 		panel.appendChild( buildGroup( 'Largura', 'data-rw-width', [
 			{ id: 'standard', label: 'Padrão' },
 			{ id: 'wide', label: 'Largo' }
-		], WIDTH_KEY ) );
+		], WIDTH_KEY, 'rw-appearance-group-width' ) );
 		tocColumn.appendChild( panel );
 	}
 
