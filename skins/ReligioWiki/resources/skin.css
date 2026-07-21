@@ -89,7 +89,7 @@ a.new { color: #BA2828; }
 :root[data-theme="dark"] a.new { color: #E27878; }
 
 /* ---------- barra superior ---------- */
- {
+.rw-topbar {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
@@ -520,14 +520,14 @@ body.rw-can-edit .rw-edit-pencil { display: inline; }
 #footer a { text-decoration: underline; }
 
 /* ---------- responsivo / hambúrguer (montado por skin.js) ---------- */
-/* Mora DENTRO de  agora (ver ReligioWikiTemplate::execute()),
+/* Mora DENTRO de .rw-topbar agora (ver ReligioWikiTemplate::execute()),
    como último item, position:absolute + top:50%/translateY(-50%) pra
    centralizar de verdade na altura real do topbar (acompanha a altura do
    logo/busca/barra pessoal automaticamente, não um valor de "top" chutado
    que dependia de tudo ficar do mesmo tamanho). Ancorado à ESQUERDA, ANTES
    do logo (padrão Wikipédia) -- a gaveta lateral também abre pela esquerda
    agora (ver #mw-panel.rw-sidebar). Continua fixo durante o scroll porque
-    vira sticky no breakpoint mobile (ver abaixo) — os dois se
+   .rw-topbar vira sticky no breakpoint mobile (ver abaixo) — os dois se
    movem juntos, sempre na mesma altura. Tamanho de toque ~40px (perto do
    mínimo de 44px recomendado). */
 #rw-hamburger {
@@ -554,9 +554,75 @@ body.rw-can-edit .rw-edit-pencil { display: inline; }
 /* Trava o scroll do conteúdo por trás enquanto o menu lateral (gaveta) está
    aberto — ver skin.js, bloco "menu hambúrguer". */
 body.rw-noscroll { overflow: hidden; }
+/* ---------- Cabeçalho mobile: reescrito em CSS GRID (era flex +
+ * position:absolute no hambúrguer + padding-left compensando + exceção
+ * especial pra telas de 388px -- frágil, porque qualquer descompasso
+ * entre esses valores cria um "buraco" na tela, exatamente o bug
+ * reportado ao vivo. Com Grid, o hambúrguer é só mais um item do layout
+ * (position:static), sem compensação manual nenhuma. ---------- */
 @media (max-width: 851px) {
-  #rw-hamburger { display: inline-flex; }
-  .rw-topbar { position: sticky; top: 0; z-index: 220; }
+  .rw-topbar {
+    position: sticky;
+    top: 0;
+    z-index: 220;
+    display: grid;
+    grid-template-columns: 44px 1fr;
+    grid-template-areas:
+      "hamburger brand"
+      "search search"
+      "personal personal";
+    align-items: center;
+    column-gap: 12px;
+    row-gap: 10px;
+    padding: 12px 16px;
+  }
+  #rw-hamburger {
+    display: flex;
+    grid-area: hamburger;
+    position: static;
+    /* A regra base (fora deste breakpoint) ainda tem transform:translateY(-50%)
+       de quando o botão era position:absolute -- transform continua valendo
+       em elementos static (diferente de top/left, que aí sim são ignorados),
+       então sem isso o botão ficava deslocado pra cima igual estivesse ainda
+       flutuando. */
+    transform: none;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    margin: 0;
+  }
+  .rw-brand { grid-area: brand; min-width: 0; }
+  .rw-search { grid-area: search; width: 100%; max-width: none; flex: none; }
+  #p-personal.rw-personal {
+    grid-area: personal;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    white-space: normal;
+  }
+  #p-personal.rw-personal ul { flex-wrap: wrap; gap: 12px; white-space: normal; }
+  /* Os menus dropdown nunca ultrapassam a largura da tela. */
+  .rw-personal-dropdown-menu { max-width: calc( 100vw - 24px ); }
+  /* Mesmo tratamento pro dropdown "Admin ▾": essa <ul> não tem a classe
+     .rw-personal-dropdown-menu (ver comentário junto da regra fora do
+     breakpoint), então sem isso ela herda white-space:nowrap de
+     #p-personal.rw-personal ul e nunca quebra linha — o menu atravessava a
+     tela inteira no mobile. */
+  #p-personal .rw-admin-personal > ul {
+    max-width: calc( 100vw - 24px );
+    white-space: normal;
+    overflow-wrap: break-word;
+  }
+  /* Abas do artigo: no desktop o "Mais ▾" é empurrado pro extremo direito
+     (margin-left:auto) pra ficar longe do grupo Ler/Editar/Ver histórico —
+     faz sentido numa barra larga. No mobile, como a barra quebra em duas
+     linhas, esse "auto" cria um vão enorme e vazio antes do "Mais ▾" na
+     segunda linha (parece desalinhado). Tira o empurrão só aqui: os itens
+     ficam juntos, fluindo da esquerda, como o resto da interface mobile. */
+  .rw-tab-group { margin-left: 0; }
   #mw-panel.rw-sidebar {
     display: none;
     position: fixed;
@@ -573,10 +639,10 @@ body.rw-noscroll { overflow: hidden; }
     overscroll-behavior: contain;
   }
   /* Botão "✕" grudado no canto superior direito da própria gaveta (que
-     abre pela esquerda agora) -- o #rw-hamburger também fecha (mesma
-     função close() no skin.js), mas fica longe uma vez que a gaveta está
-     aberta e ocupa boa parte da tela. Fica escondido sozinho porque é
-     filho de #mw-panel.rw-sidebar, que só aparece com .rw-sidebar-open. */
+     abre pela esquerda) -- o #rw-hamburger também fecha (mesma função
+     close() no skin.js), mas fica longe uma vez que a gaveta está aberta
+     e ocupa boa parte da tela. Fica escondido sozinho porque é filho de
+     #mw-panel.rw-sidebar, que só aparece com .rw-sidebar-open. */
   #mw-panel.rw-sidebar #rw-sidebar-close {
     position: absolute;
     top: 10px;
@@ -602,45 +668,13 @@ body.rw-noscroll { overflow: hidden; }
   #rw-sidebar-overlay.rw-sidebar-open { display: block; }
   #mw-panel.rw-sidebar, #mw-panel.rw-sidebar * { overflow-wrap: break-word; word-break: break-word; }
   .rw-layout { grid-template-columns: 1fr; }
-  /* Reserva espaço à ESQUERDA (padrão Wikipédia) pro hambúrguer, que
-     agora mora nesse canto — sem isso, o logo/marca ficaria embaixo do
-     botão fixo. */
-  .rw-topbar { padding-left: 56px; flex-wrap: wrap; row-gap: 8px; }
-  /* Controles do topo (Doar, Admin ▾, Tema ▾, Entrar/Criar conta) quebram
-     em linha em vez de estourar/serem cortados pelo overflow-x:hidden. */
-  #p-personal.rw-personal { flex-wrap: wrap; row-gap: 6px; }
-  #p-personal.rw-personal ul { flex-wrap: wrap; row-gap: 6px; }
-  /* Os menus dropdown nunca ultrapassam a largura da tela. */
-  .rw-personal-dropdown-menu { max-width: calc( 100vw - 24px ); }
-  /* Mesmo tratamento pro dropdown "Admin ▾": essa <ul> não tem a classe
-     .rw-personal-dropdown-menu (ver comentário junto da regra fora do
-     breakpoint), então sem isso ela herda white-space:nowrap de
-     #p-personal.rw-personal ul e nunca quebra linha — o menu atravessava a
-     tela inteira no mobile. */
-  #p-personal .rw-admin-personal > ul {
-    max-width: calc( 100vw - 24px );
-    white-space: normal;
-    overflow-wrap: break-word;
-  }
-  /* Abas do artigo: no desktop o "Mais ▾" é empurrado pro extremo direito
-     (margin-left:auto) pra ficar longe do grupo Ler/Editar/Ver histórico —
-     faz sentido numa barra larga. No mobile, como a barra quebra em duas
-     linhas, esse "auto" cria um vão enorme e vazio antes do "Mais ▾" na
-     segunda linha (parece desalinhado). Tira o empurrão só aqui: os itens
-     ficam juntos, fluindo da esquerda, como o resto da interface mobile. */
-  .rw-tab-group { margin-left: 0; }
-}
-
-/* Telas bem estreitas (ex: iPhone SE): a barra pessoal quebra em mais
-   linhas e o topbar fica mais alto, então o centro vertical (50%) do
-   hambúrguer não bate mais com a altura real do logo -- ajuste fino só
-   pra essa faixa de largura. */
-@media screen and (max-width: 388px) {
-	html body #rw-hamburger {
-		top: 37%;
-	}
 }
 @media (max-width: 600px) {
+	/* Largo/Padrão (largura do conteúdo) não faz sentido em smartphone --
+	   não há "espaço a mais" a dar numa tela desse tamanho, diferente de
+	   tablet/notebook onde a diferença é real. Ver skin.js (classe
+	   adicionada só nesse grupo específico do painel Aparência). */
+	.rw-appearance-group-width { display: none; }
 	.firstHeading { font-size: 1.5rem; }
 	/* Título com fonte menor quebra em 2+ linhas com mais facilidade — o link
 	   de "editar" (inline, grudado na última palavra) ficava espremido contra

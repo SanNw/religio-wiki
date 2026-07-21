@@ -484,44 +484,28 @@
 
 /* ---------- Corrige conflito no botão hambúrguer mobile (#rw-hamburger) ----------
  * A extensão ReligiowikiCustomizer AINDA carrega uma cópia antiga/obsoleta
- * dessa mesma regra, confirmado inspecionando ext.religiowikiCustomizer.customCss
- * ao vivo. #rw-hamburger sozinho empata em especificidade entre as duas,
- * então quem carregar por último no ResourceLoader vencia — esse empate é
- * o motivo de precisar de HTML BODY aqui na frente, de novo.
- * ATENÇÃO: os valores abaixo têm que ficar EM SINCRONIA com a regra
- * #rw-hamburger de skins/ReligioWiki/resources/skin.css (posição
- * absolute relativa ao .rw-topbar, que agora é sticky, ANCORADO À
- * ESQUERDA -- antes do logo, padrão Wikipédia) -- se mexer lá, mexe aqui
- * também, senão volta a quebrar exatamente desse jeito (foi o que
- * aconteceu: mudei left/right no skin.css e esqueci desta cópia, que tem
- * especificidade maior e ganhava, deixando o botão preso do lado errado
- * e o padding-left do .rw-topbar sobrando como espaço em branco). */
-html body #rw-hamburger {
-	display: none;
-	position: absolute;
-	top: 30%;
-	left: 12px;
-	right: auto;
-	transform: translateY(-50%);
-	width: auto;
-	height: auto;
-	max-width: none;
-	flex: 0 0 auto;
-	box-sizing: content-box;
-	z-index: 210;
-	font-size: 1.3rem;
-	line-height: 1;
-	padding: 8px 12px;
-	border: 1px solid var(--rw-border);
-	background: var(--rw-bg-elevated);
-	color: var(--rw-text);
-	cursor: pointer;
-	border-radius: 3px;
-	touch-action: manipulation;
-	box-shadow: 0 1px 4px rgba(0,0,0,0.15);
-}
+ * dessa regra (position:fixed; top:10px; left:10px; z-index:160 --
+ * confirmado inspecionando ext.religiowikiCustomizer.customCss ao vivo).
+ * #rw-hamburger sozinho empata em especificidade entre as duas, então quem
+ * carregar por último no ResourceLoader vencia -- daí o HTML BODY aqui na
+ * frente. Desde que o cabeçalho mobile virou CSS GRID (skin.css), o botão
+ * é só position:static dentro do grid -- só precisa garantir que ESSA
+ * propriedade específica vença (as cores/bordas/etc já coincidem com o
+ * valor da extensão, então nem precisam ser duplicadas aqui: especificidade
+ * em CSS vale por PROPRIEDADE, não por regra inteira). */
 @media (max-width: 851px) {
-	html body #rw-hamburger { display: inline-flex; align-items: center; justify-content: center; }
+	html body #rw-hamburger {
+		display: flex;
+		position: static;
+		transform: none; /* mesma razao do skin.css: cancela o translateY(-50%) da regra base */
+		grid-area: hamburger;
+		align-items: center;
+		justify-content: center;
+		width: 44px;
+		height: 44px;
+		padding: 0;
+		margin: 0;
+	}
 }
 
 /* Link discreto de "editar direitos" (⚙) em Special:ListUsers, adicionado
@@ -679,10 +663,14 @@ html body .rw-toc #toc li.rw-toc-has-children.rw-toc-item-collapsed > ul {
 		width: auto;
 		max-width: min(320px, calc(100vw - 24px));
 		max-height: 70vh;
-		overflow-y: auto;
 		margin: 0;
 		grid-column: auto;
 	}
+	/* overflow só entra quando o painel está EXPANDIDO (precisa rolar se o
+	   conteúdo passar de 70vh) -- no estado recolhido (só o botão "☰"),
+	   overflow:auto cortava a sombra (box-shadow) do próprio botão, que
+	   "vaza" pra fora da caixa de 48x48px dele. */
+	html body .rw-toc.rw-toc-expanded { overflow-y: auto; }
 	html body .rw-toc-fab {
 		display: inline-flex;
 		align-items: center;
