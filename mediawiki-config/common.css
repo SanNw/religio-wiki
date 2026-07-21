@@ -499,7 +499,7 @@
 html body #rw-hamburger {
 	display: none;
 	position: absolute;
-	top: 70%;
+	top: 30%;
 	left: 12px;
 	right: auto;
 	transform: translateY(-50%);
