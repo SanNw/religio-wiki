@@ -580,6 +580,12 @@ body.rw-noscroll { overflow: hidden; }
     display: flex;
     grid-area: hamburger;
     position: static;
+    /* A regra base (fora deste breakpoint) ainda tem transform:translateY(-50%)
+       de quando o botão era position:absolute -- transform continua valendo
+       em elementos static (diferente de top/left, que aí sim são ignorados),
+       então sem isso o botão ficava deslocado pra cima igual estivesse ainda
+       flutuando. */
+    transform: none;
     align-items: center;
     justify-content: center;
     width: 44px;

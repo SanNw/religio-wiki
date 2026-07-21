@@ -497,6 +497,7 @@
 	html body #rw-hamburger {
 		display: flex;
 		position: static;
+		transform: none; /* mesma razao do skin.css: cancela o translateY(-50%) da regra base */
 		grid-area: hamburger;
 		align-items: center;
 		justify-content: center;
