@@ -1,0 +1,26 @@
+== Sobre Religio Wiki ==
+
+'''Religio Wiki''' es un proyecto digital colaborativo cuyo propósito es poner a disposición información tradicional, fidedigna y verificada sobre las grandes religiones del mundo —entre ellas el Hinduismo, el Budismo, el Judaísmo, el Cristianismo, el Islam, el Confucianismo, el Taoísmo y el Sintoísmo—, partiendo de sus fuentes primarias y adoptando sus perspectivas más ortodoxas, siempre con referencias bibliográficas.
+
+=== Misión ===
+
+Ante la profusión de información superficial, sincrética o distorsionada sobre religión disponible en internet, Religio Wiki busca ofrecer un punto de referencia serio: un compendio donde cada tradición se presente a partir de sus propias fuentes canónicas, autoridades reconocidas y comentaristas ortodoxos —y no a partir de lecturas externas, revisionistas o reduccionistas.
+
+=== Metodología ===
+
+* Priorizamos las '''fuentes primarias''' (textos sagrados, comentarios canónicos, autoridades tradicionales reconocidas dentro de cada religión);
+* Cada tradición se describe según su '''propia perspectiva ortodoxa''', no según comparaciones valorativas externas;
+* Toda afirmación relevante debe estar '''referenciada bibliográficamente''';
+* Buscamos rigor filológico e histórico, evitando anacronismos y simplificaciones.
+
+=== Lo que Religio Wiki no es ===
+
+Este no es un espacio de debate teológico, apologética comparada o proselitismo. Religio Wiki no jerarquiza las religiones entre sí, ni se pronuncia sobre cuál de ellas sería "verdadera" —su compromiso es describir con fidelidad lo que cada tradición enseña sobre sí misma, a partir de sus fuentes más autorizadas.
+
+=== Cómo contribuir ===
+
+Los colaboradores interesados en contribuir deben consultar el [[Religio Wiki:Código de Conduta/es|Código de conducta]] y los [[Religio Wiki:Avisos gerais/es|Avisos generales]] antes de editar. Las contribuciones sin referencia bibliográfica adecuada están sujetas a reversión.
+
+=== Contacto ===
+
+[mailto:contato@religiowiki.com contato@religiowiki.com]

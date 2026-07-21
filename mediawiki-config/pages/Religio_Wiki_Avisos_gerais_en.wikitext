@@ -1,0 +1,33 @@
+== General Notices ==
+
+=== Nature of the project ===
+
+Religio Wiki is a collective work, in constant development. As with any wiki, its content may be edited, revised, expanded, or corrected at any time, and no version should be considered definitive or final.
+
+=== This is not religious, spiritual, medical, or legal advice ===
+
+The content presented here is for '''informational and encyclopedic''' purposes. It does not constitute religious, spiritual, medical, psychological, or legal advice, nor does it replace the guidance of a religious authority, spiritual leader, or qualified professional. Personal decisions of a spiritual, devotional, or ritual nature should be made in consultation with the authorities and communities proper to each tradition.
+
+=== No institutional affiliation ===
+
+Religio Wiki is not affiliated with, sponsored by, or endorsed by any religious institution, order, sect, school, or specific lineage. The descriptions presented here seek to faithfully reflect the orthodox perspective of each tradition based on its sources, but this does not imply endorsement, official representation, or spokesperson status for any religion or organization.
+
+=== Editorial neutrality and orthodox perspective ===
+
+Religio Wiki does not rank or make value-based comparisons between religions. Each tradition is described from its own orthodox perspective and its primary sources — this is a methodological choice, not a judgment about the ultimate truth of any religion.
+
+=== Accuracy and verification ===
+
+We make reasonable efforts to ensure the accuracy of the content, but, being a collective work under continuous revision, we do not guarantee that all information is free of errors, outdated material, or gaps. Consulting the primary sources cited is always recommended.
+
+=== Copyright and licensing ===
+
+Unless otherwise indicated, all textual content is made available under the Creative Commons [https://creativecommons.org/licenses/by-sa/4.0/deed.en Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)] license. Images, tables, or other materials may be subject to different licenses, individually indicated alongside each item.
+
+=== Disclaimer of warranties ===
+
+The content is provided "as is," without warranties of any kind, express or implied. Use of the information contained herein is entirely the reader's responsibility.
+
+=== Contact ===
+
+[mailto:contato@religiowiki.com contato@religiowiki.com]

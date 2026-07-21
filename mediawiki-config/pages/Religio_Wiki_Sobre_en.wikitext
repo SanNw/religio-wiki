@@ -1,0 +1,26 @@
+== About Religio Wiki ==
+
+'''Religio Wiki''' is a collaborative digital project whose purpose is to provide traditional, reliable, and verified information about the world's major religions — among them Hinduism, Buddhism, Judaism, Christianity, Islam, Confucianism, Taoism, and Shinto — drawing from their primary sources and adopting their most orthodox perspectives, always with bibliographic references.
+
+=== Mission ===
+
+Faced with the abundance of superficial, syncretic, or distorted information about religion available on the internet, Religio Wiki seeks to offer a serious point of reference: a compendium in which each tradition is presented from its own canonical sources, recognized authorities, and orthodox commentators — rather than from external, revisionist, or reductionist readings.
+
+=== Methodology ===
+
+* We prioritize '''primary sources''' (sacred texts, canonical commentaries, traditional authorities recognized within each religion);
+* Each tradition is described according to its '''own orthodox perspective''', not according to external value-laden comparisons;
+* Every relevant claim must be '''bibliographically referenced''';
+* We seek philological and historical rigor, avoiding anachronisms and oversimplifications.
+
+=== What Religio Wiki is not ===
+
+This is not a space for theological debate, comparative apologetics, or proselytism. Religio Wiki does not rank religions against one another, nor does it pronounce on which one would be "true" — its commitment is to faithfully describe what each tradition teaches about itself, based on its most authoritative sources.
+
+=== How to contribute ===
+
+Contributors interested in helping should consult the [[Religio Wiki:Código de Conduta/en|Code of Conduct]] and the [[Religio Wiki:Avisos gerais/en|General Notices]] before editing. Contributions without adequate bibliographic references are subject to reversion.
+
+=== Contact ===
+
+[mailto:contato@religiowiki.com contato@religiowiki.com]

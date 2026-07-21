@@ -1,0 +1,39 @@
+== Code of Conduct ==
+
+''"There is no right higher than truth."''
+
+=== Fundamental principle ===
+
+Religio Wiki exists to present each religious tradition faithfully according to its own sources and its orthodox perspective. Every contributor commits, when editing, to serve this principle — the pursuit and faithful exposition of each tradition's truth — above personal preferences, doctrinal disputes, or external agendas.
+
+=== Expected conduct ===
+
+* '''Good faith:''' assume good intentions from other contributors and seek consensus before conflict.
+* '''Respect:''' treat all religious traditions and their practitioners with seriousness and respect, even in the face of personal disagreement.
+* '''Bibliographic rigor:''' every relevant contribution must cite primary sources or recognized commentators within the tradition being described.
+* '''Fidelity to the orthodox perspective:''' describe each tradition in the terms by which it understands itself, avoiding external, syncretic, or unreferenced revisionist readings.
+* '''No proselytism:''' this is not a space to convert, refute, or rank religions against one another.
+
+=== Prohibited conduct ===
+
+* Hate speech, discrimination, or attacks against any religion, tradition, or group of practitioners;
+* Vandalism, unjustified removal of referenced content, or insertion of unsourced content;
+* Deliberate misinformation or intentional distortion of sources;
+* Personal attacks, harassment, or hostile conduct toward other contributors;
+* Using the wiki as a stage for theological controversy, comparative apologetics, or doctrinal disputes.
+
+=== Resolving disagreements ===
+
+Editorial disagreements should be resolved, in this order:
+
+# By consulting the most authoritative primary source within the tradition in question;
+# By discussing civilly on the article's talk page;
+# By seeking mediation from an administrator, if no consensus is reached.
+
+=== Consequences ===
+
+Violations of this code may result, depending on severity and recurrence, in: a warning, reversion of the edit, temporary block, or permanent ban from the platform.
+
+=== How to report ===
+
+Violations can be reported to an administrator or via [mailto:contato@religiowiki.com contato@religiowiki.com].

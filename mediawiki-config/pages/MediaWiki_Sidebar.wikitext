@@ -1,16 +1,16 @@
 * navigation
 ** Página principal|mainpage-description
-** Religio Wiki:Criar artigo|Criar novo artigo
+** Religio Wiki:Criar artigo|rw-sidebar-newarticle
 ** Special:Random|randompage
 ** Special:RecentChanges|recentchanges
-** Special:UserRights|Gestão
-** Special:ListUsers|Lista de administradores
-** Special:Artigos|Artigos
+** Special:UserRights|rw-sidebar-management
+** Special:ListUsers|rw-sidebar-adminlist
+** Special:Artigos|rw-sidebar-articles
 
 * categorias-religiao-heading
-** Category:I. Xamanismos Hiperbóreos|I. Xamanismos Hiperbóreos
-** Category:II. Mitologias Arianas|II. Mitologias Arianas
-** Category:III. Monoteísmos Semíticos|III. Monoteísmos Semíticos
+** Category:I. Xamanismos Hiperbóreos|rw-sidebar-cat1
+** Category:II. Mitologias Arianas|rw-sidebar-cat2
+** Category:III. Monoteísmos Semíticos|rw-sidebar-cat3
 
 * SEARCH
 * TOOLBOX

@@ -21,12 +21,20 @@ class ReligioWikiTemplate extends BaseTemplate {
 		// principal (a home não deve mostrar o índice "Neste artigo" nem os
 		// catlinks "Categorias: ..." no rodapé).
 		$isArticle = $title && $title->inNamespace( NS_MAIN ) && !$title->isMainPage() && $skin->getRelevantTitle()->exists();
-		// Aparência/Idioma (dentro de #rw-toc-column) também fazem sentido nas
-		// páginas institucionais (namespace Projeto, ex.: Política de
-		// privacidade, Código de Conduta) -- só "Neste artigo" (índice) que
-		// fica vazio ali se a página não tiver cabeçalhos suficientes, igual
-		// já acontece em artigos curtos.
-		$showTocColumn = $isArticle || ( $title && $title->inNamespace( NS_PROJECT ) && $title->exists() );
+		// Aparência (com ajuste de tamanho de fonte -- importante pra quem tem
+		// dificuldade de leitura) e Idioma fazem sentido em QUALQUER página que
+		// um leitor normal vê, incluindo a própria página principal. "Neste
+		// artigo" (índice) simplesmente fica vazio ali se a página não tiver
+		// cabeçalhos suficientes, igual já acontece em artigos curtos -- não
+		// precisa de uma condição própria. Fica de fora só o que NÃO é
+		// conteúdo que um leitor comum acessaria: Predefinição (Template,
+		// técnico/só-editor), MediaWiki (mensagens de sistema) e páginas
+		// especiais (Special:, que não são "página" no sentido de conteúdo).
+		$showTocColumn = $title && $title->exists()
+			&& !$title->inNamespace( NS_SPECIAL )
+			&& !$title->inNamespace( NS_MEDIAWIKI )
+			&& !$title->inNamespace( NS_TEMPLATE )
+			&& !$title->inNamespace( NS_TEMPLATE_TALK );
 		$isMainPage = $title && $title->isMainPage();
 		// "Admin" = quem tem o direito editinterface (grupos Administradores /
 		// Administradores da interface). Usado pra esconder itens só de admin
@@ -34,7 +42,13 @@ class ReligioWikiTemplate extends BaseTemplate {
 		$isAdmin = $skin->getAuthority()->isAllowed( 'editinterface' );
 		// Itens da lateral (MediaWiki:Sidebar) que só admin deve ver — casados
 		// pelo rótulo exato definido no wikitext da sidebar.
-		$adminOnlySidebar = [ 'Criar novo artigo', 'Mudanças recentes', 'Gestão', 'Lista de administradores', 'Artigos' ];
+		// Comparação pelo 'id' (derivado da CHAVE crua do MediaWiki:Sidebar,
+		// ex.: "n-rw-sidebar-management"), não pelo 'text' (resolvido/
+		// traduzido pelo Skin::addToSidebarPlain -- mudaria por idioma via
+		// EN/ES e o filtro pararia de esconder esses itens de quem não é
+		// admin). Ver Skin.php::addToSidebarPlain(): 'id' vem de
+		// strtr($line[1], ' ', '-'), sempre a chave original, nunca traduzida.
+		$adminOnlySidebar = [ 'n-rw-sidebar-newarticle', 'n-recentchanges', 'n-rw-sidebar-management', 'n-rw-sidebar-adminlist', 'n-rw-sidebar-articles' ];
 		// Link "Doar" renderizado direto aqui (e não via hook PersonalUrls, que
 		// deixou de ser chamado no MediaWiki 1.43 — buildPersonalUrls() não o
 		// dispara, então o botão nunca aparecia). Aponta para Religio Wiki:Doar.
@@ -50,6 +64,9 @@ class ReligioWikiTemplate extends BaseTemplate {
 	// no-op + um warning "Undefined array key" a cada página.)
 ?>
 <div class="rw-topbar">
+	<!-- Hambúrguer ANTES do logo (padrão Wikipédia) -- ver skin.css pro
+	     posicionamento (position:absolute, ancorado à esquerda agora). -->
+	<button type="button" id="rw-hamburger" aria-label="Abrir menu de navegação">☰</button>
 	<a href="<?php echo htmlspecialchars( Title::newMainPage()->getLocalURL() ) ?>" class="rw-brand">
 		<span class="mark">R</span> <?php echo htmlspecialchars( $this->data['sitename'] ) ?>
 	</a>
@@ -66,7 +83,6 @@ class ReligioWikiTemplate extends BaseTemplate {
 <?php } ?>
 		</ul>
 	</div>
-	<button type="button" id="rw-hamburger" aria-label="Abrir menu de navegação">☰</button>
 </div>
 
 <div id="mw-page-base"></div>
@@ -74,6 +90,11 @@ class ReligioWikiTemplate extends BaseTemplate {
 
 <div class="rw-layout">
 	<div id="mw-panel" class="rw-sidebar">
+		<!-- Botão de fechar grudado na borda direita da gaveta (que agora abre
+		     pela esquerda) -- o próprio #rw-hamburger já fecha também (vira
+		     ✕), mas fica longe da gaveta uma vez que ela está aberta; ver
+		     skin.js (mesma função close()) e skin.css. -->
+		<button type="button" id="rw-sidebar-close" aria-label="Fechar menu de navegação">✕</button>
 <?php foreach ( $this->getSidebar( [ 'search' => false ] ) as $boxName => $box ) { ?>
 		<?php if ( is_array( $box ) ) { ?>
 		<div class="portal" id="<?php echo Sanitizer::escapeIdForAttribute( "p-{$boxName}" ) ?>">
@@ -84,7 +105,7 @@ class ReligioWikiTemplate extends BaseTemplate {
 				<?php if ( is_array( $box['content'] ) ) { ?>
 				<ul>
 					<?php foreach ( $box['content'] as $key => $link ) {
-							if ( !$isAdmin && is_array( $link ) && in_array( $link['text'] ?? '', $adminOnlySidebar, true ) ) { continue; } // só admin: Criar novo artigo / Mudanças recentes / Gestão / Lista de administradores
+							if ( !$isAdmin && is_array( $link ) && in_array( $link['id'] ?? '', $adminOnlySidebar, true ) ) { continue; } // só admin: Criar novo artigo / Mudanças recentes / Gestão / Lista de administradores / Artigos
 						echo $this->makeListItem( $key, $link );
 					} ?>
 				</ul>

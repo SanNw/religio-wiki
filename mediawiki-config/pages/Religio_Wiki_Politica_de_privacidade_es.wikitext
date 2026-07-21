@@ -1,0 +1,46 @@
+== Política de privacidad ==
+
+Esta política describe qué datos se recopilan mediante el uso de '''Religio Wiki''' (religiowiki.com), para qué fines se utilizan y qué derechos tiene usted sobre ellos.
+
+=== 1. Qué datos recopilamos ===
+
+* '''Datos de navegación:''' dirección IP, tipo de navegador, páginas visitadas, fecha y hora de acceso, recopilados automáticamente por motivos de seguridad y estadísticas de uso.
+* '''Datos de cuenta:''' si crea una cuenta de usuario, recopilamos su nombre de usuario, dirección de correo electrónico (si se proporciona) y el historial de ediciones públicas asociado a la cuenta.
+* '''Cookies:''' utilizamos cookies esenciales para el funcionamiento del sitio (como el mantenimiento de sesión y las preferencias de visualización). No utilizamos cookies con fines de publicidad dirigida.
+
+=== 2. Cómo usamos los datos ===
+
+Los datos recopilados se utilizan exclusivamente para:
+
+* Mantener el funcionamiento técnico y la seguridad del sitio;
+* Prevenir vandalismo, spam y abuso;
+* Generar estadísticas de uso agregadas y anónimas;
+* Posibilitar la autenticación y las preferencias de los usuarios registrados.
+
+No vendemos, alquilamos ni compartimos sus datos personales con terceros con fines comerciales.
+
+=== 3. Compartición con terceros ===
+
+Los datos pueden compartirse únicamente cuando lo exija la ley, una orden judicial, o para proteger los derechos, la seguridad y la integridad de Religio Wiki, sus colaboradores y sus usuarios.
+
+=== 4. Retención de datos ===
+
+Las ediciones y contribuciones públicas permanecen en el historial del wiki por tiempo indefinido, como parte del registro de autoría exigido por la licencia [https://creativecommons.org/licenses/by-sa/4.0/deed.es Creative Commons CC BY-SA 4.0] bajo la cual se distribuye el contenido. Los datos técnicos de acceso (como los registros de IP) se conservan solo durante el tiempo necesario para la seguridad del sitio.
+
+=== 5. Sus derechos ===
+
+Usted puede, en cualquier momento:
+
+* Solicitar información sobre los datos personales que mantenemos asociados a su cuenta;
+* Solicitar la corrección de datos de registro incorrectos;
+* Solicitar el cierre de su cuenta (teniendo en cuenta que las contribuciones públicas permanecen en el historial, conforme al punto 4).
+
+=== 6. Cambios en esta política ===
+
+Esta política puede actualizarse periódicamente. Los cambios relevantes se comunicarán mediante un aviso en esta misma página.
+
+=== 7. Contacto ===
+
+Las dudas sobre esta política pueden enviarse a [mailto:contato@religiowiki.com contato@religiowiki.com].
+
+''Última actualización: 21 de julio de 2026''

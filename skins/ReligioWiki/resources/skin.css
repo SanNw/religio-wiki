@@ -324,7 +324,13 @@ html[data-rw-width="wide"] .rw-layout { max-width: 1500px; }
 	padding-top: 14px;
 }
 #mw-panel.rw-sidebar .portal .body ul { list-style: none; margin: 0; padding: 0; font-size: 0.85rem; }
-#mw-panel.rw-sidebar .portal li { padding: 1px 0; }
+#mw-panel.rw-sidebar .portal li { padding: 0; }
+/* Alvo de toque: os links da sidebar (Página principal, Página aleatória
+   etc.) tinham só a altura da linha de texto (~19px) sem nenhuma área de
+   toque extra, abaixo do mínimo de 24x24px recomendado (achado do
+   Lighthouse). Padding no próprio <a>, com margem negativa igual pra não
+   deslocar o layout visual, aumenta a área clicável sem mudar a aparência. */
+#mw-panel.rw-sidebar .portal li a { display: block; padding: 4px 2px; margin: -4px -2px; }
 #mw-panel.rw-sidebar .portal a.current, #mw-panel.rw-sidebar .portal a.selected { font-weight: 700; color: var(--rw-text); }
 
 /* Portlets viram collapse/accordion (montado por skin.js), fechados por padrão. */
@@ -507,22 +513,28 @@ body.rw-can-edit .rw-edit-pencil { display: inline; }
 	color: var(--rw-text-muted);
 }
 #footer ul { list-style: none; margin: 0 0 6px; padding: 0; display: flex; flex-wrap: wrap; gap: 12px; }
+/* Sublinhado nos links do rodapé -- a cor de link (--rw-link) tem contraste
+   baixo contra o texto ao redor (--rw-text-muted, ambos tons escuros de
+   marrom), então o sublinhado garante que o link seja distinguível sem
+   depender só da cor (achado de acessibilidade do Lighthouse). */
+#footer a { text-decoration: underline; }
 
 /* ---------- responsivo / hambúrguer (montado por skin.js) ---------- */
 /* Mora DENTRO de .rw-topbar agora (ver ReligioWikiTemplate::execute()),
    como último item, position:absolute + top:50%/translateY(-50%) pra
    centralizar de verdade na altura real do topbar (acompanha a altura do
    logo/busca/barra pessoal automaticamente, não um valor de "top" chutado
-   que dependia de tudo ficar do mesmo tamanho). Ancorado à DIREITA, mesmo
-   lado da gaveta lateral (ver #mw-panel.rw-sidebar). Continua fixo durante
-   o scroll porque .rw-topbar vira sticky no breakpoint mobile (ver
-   abaixo) — os dois se movem juntos, sempre na mesma altura. Tamanho de
-   toque ~40px (perto do mínimo de 44px recomendado). */
+   que dependia de tudo ficar do mesmo tamanho). Ancorado à ESQUERDA, ANTES
+   do logo (padrão Wikipédia) -- a gaveta lateral também abre pela esquerda
+   agora (ver #mw-panel.rw-sidebar). Continua fixo durante o scroll porque
+   .rw-topbar vira sticky no breakpoint mobile (ver abaixo) — os dois se
+   movem juntos, sempre na mesma altura. Tamanho de toque ~40px (perto do
+   mínimo de 44px recomendado). */
 #rw-hamburger {
 	display: none;
 	position: absolute;
 	top: 50%;
-	right: 12px;
+	left: 12px;
 	transform: translateY(-50%);
 	z-index: 210; /* acima até do painel lateral (200) — continua clicável (fecha) com o menu aberto */
 	font: inherit;
@@ -538,6 +550,7 @@ body.rw-can-edit .rw-edit-pencil { display: inline; }
 	box-shadow: 0 1px 4px rgba(0,0,0,0.15);
 }
 #rw-sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 150; }
+#rw-sidebar-close { display: none; } /* só aparece dentro do breakpoint mobile -- ver @media abaixo */
 /* Trava o scroll do conteúdo por trás enquanto o menu lateral (gaveta) está
    aberto — ver skin.js, bloco "menu hambúrguer". */
 body.rw-noscroll { overflow: hidden; }
@@ -547,26 +560,52 @@ body.rw-noscroll { overflow: hidden; }
 	#mw-panel.rw-sidebar {
 		display: none;
 		position: fixed;
-		top: 0; right: 0; bottom: 0;
+		top: 0; left: 0; bottom: 0;
 		width: min(80vw, 300px);
 		max-width: 100%;
 		z-index: 200;
 		overflow-x: hidden;
 		overflow-y: auto;
 		background: var(--rw-bg-elevated);
-		border-left: 1px solid var(--rw-border);
+		border-right: 1px solid var(--rw-border);
 		padding: 16px;
 		box-sizing: border-box;
 		overscroll-behavior: contain;
 	}
-	#mw-panel.rw-sidebar.rw-sidebar-open { display: block; }
+	/* Botão "✕" grudado no canto superior direito da própria gaveta (que
+	   abre pela esquerda agora) -- o #rw-hamburger também fecha (mesma
+	   função close() no skin.js), mas fica longe uma vez que a gaveta está
+	   aberta e ocupa boa parte da tela. Fica escondido sozinho porque é
+	   filho de #mw-panel.rw-sidebar, que só aparece com .rw-sidebar-open. */
+	#mw-panel.rw-sidebar #rw-sidebar-close {
+		position: absolute;
+		top: 10px;
+		right: 10px;
+		width: 32px;
+		height: 32px;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: 50%;
+		font-size: 1.1rem;
+		line-height: 1;
+		border: 1px solid var(--rw-border);
+		background: var(--rw-bg);
+		color: var(--rw-text);
+		cursor: pointer;
+		padding: 0;
+	}
+	/* z-index igual ao .rw-topbar (220, sticky) -- sem isso a parte de
+	   cima da gaveta ficava escondida atrás da barra fixa ao abrir
+	   (a gaveta vinha depois no DOM, mas com z-index 200 < 220 perdia). */
+	#mw-panel.rw-sidebar.rw-sidebar-open { display: block; z-index: 220; }
 	#rw-sidebar-overlay.rw-sidebar-open { display: block; }
 	#mw-panel.rw-sidebar, #mw-panel.rw-sidebar * { overflow-wrap: break-word; word-break: break-word; }
 	.rw-layout { grid-template-columns: 1fr; }
-	/* Reserva espaço à DIREITA (não mais à esquerda) pro hambúrguer, que
-	   agora mora nesse canto — sem isso, "Doar"/"Entrar"/"Tema ▾" no fim da
-	   barra pessoal ficariam embaixo do botão fixo. */
-	.rw-topbar { padding-right: 56px; flex-wrap: wrap; row-gap: 8px; }
+	/* Reserva espaço à ESQUERDA (padrão Wikipédia) pro hambúrguer, que
+	   agora mora nesse canto — sem isso, o logo/marca ficaria embaixo do
+	   botão fixo. */
+	.rw-topbar { padding-left: 56px; flex-wrap: wrap; row-gap: 8px; }
 	/* Controles do topo (Doar, Admin ▾, Tema ▾, Entrar/Criar conta) quebram
 	   em linha em vez de estourar/serem cortados pelo overflow-x:hidden. */
 	#p-personal.rw-personal { flex-wrap: wrap; row-gap: 6px; }
@@ -590,6 +629,16 @@ body.rw-noscroll { overflow: hidden; }
 	   segunda linha (parece desalinhado). Tira o empurrão só aqui: os itens
 	   ficam juntos, fluindo da esquerda, como o resto da interface mobile. */
 	.rw-tab-group { margin-left: 0; }
+}
+
+/* Telas bem estreitas (ex: iPhone SE): a barra pessoal quebra em mais
+   linhas e o topbar fica mais alto, então o centro vertical (50%) do
+   hambúrguer não bate mais com a altura real do logo -- ajuste fino só
+   pra essa faixa de largura. */
+@media screen and (max-width: 388px) {
+	html body #rw-hamburger {
+		top: 37%;
+	}
 }
 @media (max-width: 600px) {
 	.firstHeading { font-size: 1.5rem; }

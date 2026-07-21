@@ -412,8 +412,11 @@
 		flex-direction: column;
 		align-items: flex-start;
 	}
+	/* Esconde o contador de artigos ("N artigos publicados") no mobile --
+	   pedido do usuário, ocupa espaço vertical sem agregar muito no
+	   celular. Continua visível normalmente no desktop. */
 	.rw-home-stat {
-		text-align: left;
+		display: none;
 	}
 	.rw-donate-amounts {
 		grid-template-columns: repeat(2, 1fr);
@@ -481,22 +484,24 @@
 
 /* ---------- Corrige conflito no botão hambúrguer mobile (#rw-hamburger) ----------
  * A extensão ReligiowikiCustomizer AINDA carrega uma cópia antiga/obsoleta
- * dessa mesma regra (top:10px; left:10px; z-index:160; position:fixed --
- * confirmado inspecionando ext.religiowikiCustomizer.customCss ao vivo,
- * de novo, depois de reestruturar o botão pra dentro de .rw-topbar no
- * skin.css). #rw-hamburger sozinho empata em especificidade entre as
- * duas, então quem carregar por último no ResourceLoader vencia — esse
- * empate é o motivo de precisar de HTML BODY aqui na frente, de novo.
+ * dessa mesma regra, confirmado inspecionando ext.religiowikiCustomizer.customCss
+ * ao vivo. #rw-hamburger sozinho empata em especificidade entre as duas,
+ * então quem carregar por último no ResourceLoader vencia — esse empate é
+ * o motivo de precisar de HTML BODY aqui na frente, de novo.
  * ATENÇÃO: os valores abaixo têm que ficar EM SINCRONIA com a regra
  * #rw-hamburger de skins/ReligioWiki/resources/skin.css (posição
- * absolute relativa ao .rw-topbar, que agora é sticky) -- se mexer lá,
- * mexe aqui também, senão volta a quebrar exatamente desse jeito. */
+ * absolute relativa ao .rw-topbar, que agora é sticky, ANCORADO À
+ * ESQUERDA -- antes do logo, padrão Wikipédia) -- se mexer lá, mexe aqui
+ * também, senão volta a quebrar exatamente desse jeito (foi o que
+ * aconteceu: mudei left/right no skin.css e esqueci desta cópia, que tem
+ * especificidade maior e ganhava, deixando o botão preso do lado errado
+ * e o padding-left do .rw-topbar sobrando como espaço em branco). */
 html body #rw-hamburger {
 	display: none;
 	position: absolute;
 	top: 50%;
-	right: 12px;
-	left: auto;
+	left: 12px;
+	right: auto;
 	transform: translateY(-50%);
 	width: auto;
 	height: auto;

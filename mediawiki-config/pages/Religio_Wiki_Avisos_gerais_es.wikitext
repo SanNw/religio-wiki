@@ -1,0 +1,33 @@
+== Avisos generales ==
+
+=== Naturaleza del proyecto ===
+
+Religio Wiki es una obra colectiva, en constante desarrollo. Como en cualquier wiki, su contenido puede ser editado, revisado, ampliado o corregido en cualquier momento, y ninguna versión debe considerarse definitiva o terminada.
+
+=== No constituye asesoramiento religioso, espiritual, médico o jurídico ===
+
+El contenido aquí presentado tiene finalidad '''informativa y enciclopédica'''. No constituye asesoramiento religioso, espiritual, médico, psicológico o jurídico, ni sustituye la orientación de una autoridad religiosa, líder espiritual o profesional cualificado. Las decisiones personales de naturaleza espiritual, devocional o ritual deben tomarse en consulta con las autoridades y comunidades propias de cada tradición.
+
+=== Ausencia de vínculo institucional ===
+
+Religio Wiki no está afiliada, patrocinada ni respaldada por ninguna institución religiosa, orden, secta, escuela o linaje específico. Las descripciones aquí presentadas buscan reflejar fielmente la perspectiva ortodoxa de cada tradición a partir de sus fuentes, pero esto no implica respaldo, representación oficial o portavocía de ninguna religión u organización.
+
+=== Neutralidad editorial y perspectiva ortodoxa ===
+
+Religio Wiki no jerarquiza ni compara valorativamente las religiones entre sí. Cada tradición se describe desde su propia perspectiva ortodoxa y sus fuentes primarias —lo cual es una elección metodológica, no un juicio sobre la verdad última de ninguna religión.
+
+=== Precisión y verificación ===
+
+Empleamos esfuerzos razonables para garantizar la exactitud del contenido, pero, al tratarse de una obra colectiva en revisión continua, no garantizamos que toda la información esté libre de errores, desactualizaciones o lagunas. Se recomienda siempre consultar las fuentes primarias citadas.
+
+=== Derechos de autor y licenciamiento ===
+
+Salvo indicación en contrario, todo el contenido textual está disponible bajo la licencia [https://creativecommons.org/licenses/by-sa/4.0/deed.es Atribución-CompartirIgual 4.0 Internacional (CC BY-SA 4.0)] de Creative Commons. Las imágenes, tablas u otros materiales pueden estar sujetos a licencias diferentes, indicadas individualmente junto a cada elemento.
+
+=== Exención de garantías ===
+
+El contenido se proporciona "tal cual", sin garantías de ningún tipo, expresas o implícitas. El uso de la información aquí contenida es responsabilidad exclusiva del lector.
+
+=== Contacto ===
+
+[mailto:contato@religiowiki.com contato@religiowiki.com]
