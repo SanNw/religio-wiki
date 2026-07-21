@@ -1289,3 +1289,97 @@
 		mount();
 	}
 }() );
+
+/* ===== seletor de IDIOMA DA INTERFACE (PT/EN/ES) — dropdown "Idioma ▾" no
+   mesmo padrão visual do dropdown "Tema ▾". Diferente do painel "Idiomas"
+   dentro de #rw-toc-column (esse é conteúdo do ARTIGO, por subpágina
+   Artigo/en); este aqui troca só menus/botões/mensagens do sistema, via
+   ?setlang=xx (UniversalLanguageSelector -- $wgULSLanguageDetection e
+   $wgULSAnonCanChangeLanguage ligados em LocalSettings.php). O ULS só
+   aplica a troca de verdade depois de carregar o módulo
+   ext.uls.setlang na página com esse parâmetro (por isso funciona só
+   com JS de verdade rodando, não só o parâmetro na URL sozinho). ===== */
+( function () {
+	'use strict';
+
+	var LANGS = [
+		{ code: 'pt-br', label: 'Português' },
+		{ code: 'en', label: 'English' },
+		{ code: 'es', label: 'Español' }
+	];
+
+	function currentLangCode() {
+		var code = ( typeof mw !== 'undefined' && mw.config ) ? mw.config.get( 'wgUserLanguage' ) : 'pt-br';
+		return code || 'pt-br';
+	}
+
+	function switchTo( code ) {
+		var url = new URL( window.location.href );
+		url.searchParams.set( 'setlang', code );
+		window.location.href = url.toString();
+	}
+
+	function buildSwitcher() {
+		var current = currentLangCode();
+		var currentEntry = LANGS.filter( function ( l ) { return l.code === current; } )[ 0 ] || LANGS[ 0 ];
+
+		var wrapper = document.createElement( 'div' );
+		wrapper.className = 'rw-personal-dropdown rw-interface-lang-dropdown';
+
+		var toggle = document.createElement( 'button' );
+		toggle.type = 'button';
+		toggle.className = 'rw-personal-dropdown-toggle';
+		toggle.setAttribute( 'aria-expanded', 'false' );
+		toggle.innerHTML = mw.html.escape( currentEntry.label ) + ' <span class="rw-collapse-chevron">▾</span>';
+		wrapper.appendChild( toggle );
+
+		var menu = document.createElement( 'div' );
+		menu.className = 'rw-personal-dropdown-menu rw-theme-menu';
+		LANGS.forEach( function ( l ) {
+			var btn = document.createElement( 'button' );
+			btn.type = 'button';
+			btn.className = 'rw-theme-opt';
+			btn.textContent = l.label;
+			btn.setAttribute( 'aria-pressed', String( l.code === current ) );
+			btn.addEventListener( 'click', function () {
+				switchTo( l.code );
+			} );
+			menu.appendChild( btn );
+		} );
+		wrapper.appendChild( menu );
+
+		toggle.addEventListener( 'click', function () {
+			var isOpen = wrapper.classList.toggle( 'open' );
+			toggle.setAttribute( 'aria-expanded', String( isOpen ) );
+		} );
+		document.addEventListener( 'click', function ( e ) {
+			if ( !wrapper.contains( e.target ) ) {
+				wrapper.classList.remove( 'open' );
+				toggle.setAttribute( 'aria-expanded', 'false' );
+			}
+		} );
+
+		return wrapper;
+	}
+
+	function mount() {
+		var personalTools = document.getElementById( 'p-personal' );
+		var target = personalTools || document.body;
+		if ( target.querySelector( '.rw-interface-lang-dropdown' ) ) {
+			return; // idempotência
+		}
+		var themeDd = target.querySelector( '.rw-theme-dropdown' );
+		var el = buildSwitcher();
+		if ( themeDd ) {
+			target.insertBefore( el, themeDd );
+		} else {
+			target.appendChild( el );
+		}
+	}
+
+	if ( document.readyState === 'loading' ) {
+		document.addEventListener( 'DOMContentLoaded', mount );
+	} else {
+		mount();
+	}
+}() );

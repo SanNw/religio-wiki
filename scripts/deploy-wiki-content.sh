@@ -679,6 +679,23 @@ PHPEOF
   echo "  Crash de Special:Preferences corrigido (rw-prefs-fix-load)."
 fi
 
+# i18n de interface (EN/ES): liga deteccao automatica de idioma
+# (Accept-Language) pra anonimos e permite trocar via ?setlang=xx
+# (UniversalLanguageSelector, ja instalada). So afeta textos de
+# interface -- conteudo dos artigos continua so em portugues. Seguro
+# aqui porque a pagina em si nao e cacheada por inteiro (Cache-Control:
+# private nas respostas do wiki). Idempotente pelo marcador
+# rw-i18n-interface-lang.
+if ! grep -q "rw-i18n-interface-lang" LocalSettings.php; then
+  cat >> LocalSettings.php << 'PHPEOF'
+
+// Religio Wiki — rw-i18n-interface-lang: ver comentario no deploy-wiki-content.sh.
+$wgULSLanguageDetection = true;
+$wgULSAnonCanChangeLanguage = true;
+PHPEOF
+  echo "  Deteccao/troca de idioma de interface ligada (rw-i18n-interface-lang)."
+fi
+
 echo "== 2/4: rebuild da imagem + subindo/reiniciando o container =="
 # Rebuild explícito: "up -d" sozinho NÃO reconstrói a imagem quando só o
 # Dockerfile muda (ex.: skin novo copiado em skins/ReligioWiki, extensões
