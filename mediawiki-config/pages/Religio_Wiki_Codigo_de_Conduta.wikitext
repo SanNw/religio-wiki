@@ -1,0 +1,39 @@
+== Código de Conduta ==
+
+''"Não há direito superior ao da verdade."''
+
+=== Princípio fundamental ===
+
+A Religio Wiki existe para apresentar cada tradição religiosa com fidelidade às suas próprias fontes e à sua perspectiva ortodoxa. Todo colaborador compromete-se, ao editar, a servir a esse princípio — a busca e a exposição fiel da verdade de cada tradição — acima de preferências pessoais, disputas doutrinárias ou agendas externas.
+
+=== Conduta esperada ===
+
+* '''Boa-fé:''' presuma boa intenção nos demais colaboradores e busque o consenso antes do conflito.
+* '''Respeito:''' trate todas as tradições religiosas e seus praticantes com seriedade e respeito, mesmo diante de discordância pessoal.
+* '''Rigor bibliográfico:''' toda contribuição relevante deve citar fontes primárias ou comentadores reconhecidos dentro da própria tradição descrita.
+* '''Fidelidade à perspectiva ortodoxa:''' descreva cada tradição segundo os termos em que ela se compreende a si mesma, evitando leituras externas, sincréticas ou revisionistas não referenciadas.
+* '''Ausência de proselitismo:''' este não é um espaço para converter, refutar ou hierarquizar religiões entre si.
+
+=== Conduta proibida ===
+
+* Discurso de ódio, discriminação ou ataques a qualquer religião, tradição ou grupo de praticantes;
+* Vandalismo, remoção não justificada de conteúdo referenciado, ou inserção de conteúdo sem fonte;
+* Desinformação deliberada ou distorção intencional de fontes;
+* Ataques pessoais, assédio ou conduta hostil contra outros colaboradores;
+* Uso da wiki como palco de polêmica teológica, apologética comparada ou disputa doutrinária.
+
+=== Resolução de divergências ===
+
+Divergências editoriais devem ser resolvidas, nesta ordem:
+
+# Recorrendo à fonte primária mais autorizada dentro da própria tradição em questão;
+# Discutindo civilmente na página de discussão do artigo;
+# Recorrendo à mediação de um administrador, caso não haja consenso.
+
+=== Consequências ===
+
+Violações a este código podem resultar, conforme a gravidade e reincidência, em: advertência, reversão da edição, bloqueio temporário ou banimento permanente da plataforma.
+
+=== Como reportar ===
+
+Violações podem ser reportadas a um administrador ou por meio de [mailto:contato@religiowiki.com contato@religiowiki.com].

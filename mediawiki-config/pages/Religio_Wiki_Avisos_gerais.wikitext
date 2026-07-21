@@ -1,0 +1,33 @@
+== Avisos gerais ==
+
+=== Natureza do projeto ===
+
+A Religio Wiki é uma obra coletiva, em constante desenvolvimento. Como em qualquer wiki, seu conteúdo pode ser editado, revisado, ampliado ou corrigido a qualquer momento, e nenhuma versão deve ser considerada definitiva ou finalizada.
+
+=== Não é aconselhamento religioso, espiritual, médico ou jurídico ===
+
+O conteúdo aqui apresentado tem finalidade '''informativa e enciclopédica'''. Não constitui aconselhamento religioso, espiritual, médico, psicológico ou jurídico, nem substitui a orientação de uma autoridade religiosa, líder espiritual ou profissional qualificado. Decisões pessoais de natureza espiritual, devocional ou ritual devem ser tomadas em consulta com as autoridades e comunidades próprias de cada tradição.
+
+=== Ausência de vínculo institucional ===
+
+A Religio Wiki não é afiliada, patrocinada ou endossada por nenhuma instituição religiosa, ordem, seita, escola ou linhagem específica. As descrições aqui apresentadas buscam refletir fielmente a perspectiva ortodoxa de cada tradição a partir de suas fontes, mas isso não implica endosso, representação oficial ou porta-voz de qualquer religião ou organização.
+
+=== Neutralidade editorial e perspectiva ortodoxa ===
+
+A Religio Wiki não hierarquiza nem compara valorativamente as religiões entre si. Cada tradição é descrita a partir de sua própria perspectiva ortodoxa e de suas fontes primárias — o que é uma escolha metodológica, não um juízo sobre a verdade última de qualquer religião.
+
+=== Precisão e verificação ===
+
+Empregamos esforços razoáveis para garantir a exatidão do conteúdo, mas, por se tratar de obra coletiva e em contínua revisão, não garantimos que todas as informações estejam livres de erros, desatualizações ou lacunas. Recomenda-se sempre a consulta às fontes primárias citadas.
+
+=== Direitos autorais e licenciamento ===
+
+Salvo indicação em contrário, todo o conteúdo textual é disponibilizado sob a licença [https://creativecommons.org/licenses/by-sa/4.0/deed.pt Atribuição-CompartilhaIgual 4.0 Internacional (CC BY-SA 4.0)] da Creative Commons. Imagens, tabelas ou outros materiais podem estar sujeitos a licenças diferentes, indicadas individualmente junto a cada item.
+
+=== Isenção de garantias ===
+
+O conteúdo é fornecido "como está", sem garantias de qualquer tipo, expressas ou implícitas. O uso das informações aqui contidas é de inteira responsabilidade do leitor.
+
+=== Contato ===
+
+[mailto:contato@religiowiki.com contato@religiowiki.com]
