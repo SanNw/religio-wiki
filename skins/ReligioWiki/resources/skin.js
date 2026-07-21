@@ -886,6 +886,7 @@
 	var currentTextarea = null;
 	var searchInput, statusEl, gridEl, detailEl, listStepEl;
 	var allImagesCache = null;
+	var canDeleteCache = null;
 
 	function insertAtCursor( textarea, text ) {
 		var start = textarea.selectionStart;
@@ -895,6 +896,25 @@
 		var pos = start + text.length;
 		textarea.selectionStart = textarea.selectionEnd = pos;
 		textarea.focus();
+	}
+
+	function formatDate( timestamp ) {
+		var d = new Date( timestamp );
+		if ( isNaN( d.getTime() ) ) {
+			return '';
+		}
+		var pad = function ( n ) { return n < 10 ? '0' + n : String( n ); };
+		return pad( d.getDate() ) + '/' + pad( d.getMonth() + 1 ) + '/' + d.getFullYear();
+	}
+
+	function ensureCanDelete() {
+		if ( canDeleteCache !== null ) {
+			return $.Deferred().resolve( canDeleteCache ).promise();
+		}
+		return mw.user.getRights().then( function ( rights ) {
+			canDeleteCache = rights.indexOf( 'delete' ) !== -1;
+			return canDeleteCache;
+		} );
 	}
 
 	function fetchAllImages() {
@@ -907,11 +927,30 @@
 				action: 'query',
 				format: 'json',
 				list: 'allimages',
-				aiprop: 'url|size',
+				aiprop: 'url|size|timestamp|user',
+				aisort: 'timestamp',
+				aidir: 'descending',
 				ailimit: 200
 			} ).then( function ( data ) {
 				allImagesCache = ( data.query && data.query.allimages ) || [];
 				return allImagesCache;
+			} );
+		} );
+	}
+
+	function fetchFileUsage( name ) {
+		return mw.loader.using( 'mediawiki.api' ).then( function () {
+			var api = new mw.Api();
+			return api.get( {
+				action: 'query',
+				format: 'json',
+				titles: 'Arquivo:' + name,
+				prop: 'fileusage',
+				fulimit: 50
+			} ).then( function ( data ) {
+				var pages = ( data.query && data.query.pages ) || {};
+				var page = pages[ Object.keys( pages )[ 0 ] ];
+				return ( page && page.fileusage ) || [];
 			} );
 		} );
 	}
@@ -936,8 +975,13 @@
 			var name = document.createElement( 'span' );
 			name.textContent = img.name;
 
+			var date = document.createElement( 'small' );
+			date.className = 'rw-imgpicker-date';
+			date.textContent = formatDate( img.timestamp );
+
 			item.appendChild( thumb );
 			item.appendChild( name );
+			item.appendChild( date );
 			item.addEventListener( 'click', function () {
 				showDetail( img );
 			} );
@@ -987,6 +1031,26 @@
 		nameP.textContent = img.name;
 		fields.appendChild( nameP );
 
+		var metaP = document.createElement( 'p' );
+		metaP.className = 'rw-auth-note';
+		metaP.textContent = 'Enviada em ' + formatDate( img.timestamp ) +
+			( img.user ? ' por ' + img.user : '' );
+		fields.appendChild( metaP );
+
+		var usageP = document.createElement( 'p' );
+		usageP.className = 'rw-auth-note';
+		usageP.textContent = 'Verificando uso em artigos…';
+		fields.appendChild( usageP );
+		fetchFileUsage( img.name ).done( function ( usage ) {
+			if ( !usage.length ) {
+				usageP.textContent = 'Não é usada em nenhum artigo.';
+				return;
+			}
+			var titles = usage.slice( 0, 5 ).map( function ( p ) { return p.title; } ).join( ', ' );
+			usageP.textContent = 'Usada em ' + usage.length + ' artigo(s): ' + titles +
+				( usage.length > 5 ? '…' : '' );
+		} );
+
 		var captionLabel = document.createElement( 'label' );
 		captionLabel.className = 'rw-auth-field';
 		var captionSpan = document.createElement( 'span' );
@@ -1010,8 +1074,86 @@
 		} );
 		fields.appendChild( insertBtn );
 
+		var deleteZone = document.createElement( 'div' );
+		fields.appendChild( deleteZone );
+		ensureCanDelete().done( function ( canDelete ) {
+			if ( canDelete ) {
+				renderDeleteZone( deleteZone, img );
+			}
+		} );
+
 		row.appendChild( fields );
 		detailEl.appendChild( row );
+	}
+
+	function renderDeleteZone( zone, img ) {
+		zone.innerHTML = '';
+		var deleteBtn = document.createElement( 'button' );
+		deleteBtn.type = 'button';
+		deleteBtn.className = 'rw-imgpicker-delete';
+		deleteBtn.textContent = '🗑️ Apagar arquivo';
+		deleteBtn.addEventListener( 'click', function () {
+			renderDeleteConfirm( zone, img );
+		} );
+		zone.appendChild( deleteBtn );
+	}
+
+	function renderDeleteConfirm( zone, img ) {
+		zone.innerHTML = '';
+
+		var warn = document.createElement( 'p' );
+		warn.className = 'rw-auth-error';
+		warn.textContent = 'Apagar "' + img.name + '"? Fica no registro de eliminações e pode ser restaurada depois, mas some do artigo onde for usada.';
+		zone.appendChild( warn );
+
+		var reasonLabel = document.createElement( 'label' );
+		reasonLabel.className = 'rw-auth-field';
+		var reasonSpan = document.createElement( 'span' );
+		reasonSpan.textContent = 'Motivo (opcional)';
+		var reasonInput = document.createElement( 'input' );
+		reasonInput.type = 'text';
+		reasonLabel.appendChild( reasonSpan );
+		reasonLabel.appendChild( reasonInput );
+		zone.appendChild( reasonLabel );
+
+		var confirmBtn = document.createElement( 'button' );
+		confirmBtn.type = 'button';
+		confirmBtn.className = 'rw-imgpicker-delete-confirm';
+		confirmBtn.textContent = 'Confirmar exclusão';
+
+		var cancelBtn = document.createElement( 'button' );
+		cancelBtn.type = 'button';
+		cancelBtn.className = 'rw-imgpicker-back';
+		cancelBtn.textContent = 'Cancelar';
+		cancelBtn.addEventListener( 'click', function () {
+			renderDeleteZone( zone, img );
+		} );
+
+		confirmBtn.addEventListener( 'click', function () {
+			confirmBtn.disabled = true;
+			confirmBtn.textContent = 'Apagando…';
+			mw.loader.using( 'mediawiki.api' ).then( function () {
+				var api = new mw.Api();
+				return api.postWithToken( 'csrf', {
+					action: 'delete',
+					title: 'Arquivo:' + img.name,
+					reason: reasonInput.value.trim()
+				} );
+			} ).done( function () {
+				allImagesCache = allImagesCache.filter( function ( i ) { return i.name !== img.name; } );
+				detailEl.style.display = 'none';
+				listStepEl.style.display = 'block';
+				applyFilter();
+				statusEl.textContent = 'Imagem apagada. ' + statusEl.textContent;
+			} ).fail( function ( code, err ) {
+				warn.textContent = 'Erro ao apagar: ' + ( ( err && err.error && err.error.info ) || code );
+				confirmBtn.disabled = false;
+				confirmBtn.textContent = 'Confirmar exclusão';
+			} );
+		} );
+
+		zone.appendChild( confirmBtn );
+		zone.appendChild( cancelBtn );
 	}
 
 	function close() {
@@ -1101,17 +1243,40 @@
 		if ( !textarea || typeof mw === 'undefined' ) {
 			return;
 		}
-		var row = document.createElement( 'div' );
-		row.className = 'rw-imgpicker-trigger-row';
-		var btn = document.createElement( 'button' );
-		btn.type = 'button';
-		btn.className = 'rw-imgpicker-trigger';
-		btn.textContent = '🖼️ Inserir imagem já enviada';
-		btn.addEventListener( 'click', function () {
-			openPicker( textarea );
-		} );
-		row.appendChild( btn );
-		textarea.parentNode.insertBefore( row, textarea );
+
+		function insertTrigger() {
+			// Evita duplicar se o hook do WikiEditor e o setTimeout de segurança
+			// (abaixo) dispararem os dois.
+			if ( document.querySelector( '.rw-imgpicker-trigger-row' ) ) {
+				return;
+			}
+			var row = document.createElement( 'div' );
+			row.className = 'rw-imgpicker-trigger-row';
+			var btn = document.createElement( 'button' );
+			btn.type = 'button';
+			btn.className = 'rw-imgpicker-trigger';
+			btn.textContent = '🖼️ Inserir imagem já enviada';
+			btn.addEventListener( 'click', function () {
+				openPicker( textarea );
+			} );
+			row.appendChild( btn );
+			// O WikiEditor envolve o <textarea> numa estrutura nova (.wikiEditor-ui)
+			// de forma assíncrona, depois do nosso DOMContentLoaded. Inserir antes
+			// do <textarea> cedo demais deixava o botão preso na posição antiga,
+			// sobrepondo visualmente a barra de ferramentas real do WikiEditor.
+			// Por isso espera o hook wikiEditor.toolbarReady (que dispara mesmo
+			// se o listener for adicionado depois, via mw.hook) e insere relativo
+			// ao wrapper .wikiEditor-ui já pronto.
+			var target = textarea.closest( '.wikiEditor-ui' ) || textarea;
+			target.parentNode.insertBefore( row, target );
+		}
+
+		if ( mw.hook ) {
+			mw.hook( 'wikiEditor.toolbarReady' ).add( insertTrigger );
+		}
+		// Nem toda página de edição tem WikiEditor ativo; garante o botão de
+		// qualquer jeito depois de um tempo se o hook nunca disparar.
+		setTimeout( insertTrigger, 1500 );
 	}
 
 	if ( document.readyState === 'loading' ) {
