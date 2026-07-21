@@ -441,3 +441,79 @@
 	padding: 0;
 	width: auto !important;
 }
+
+/* ---------- Sanfona (accordion) nos grupos da barra de ferramentas
+   da ReligiowikiCustomizer (#rwc-editor-toolbar > .rwc-editor-group:
+   "Formatação"/"Componentes"/"Ajuda") ----------
+   O JS (ver Common.js) move os botões de cada grupo pra um wrapper
+   .rwc-editor-group-buttons e alterna aria-expanded no grupo pra
+   recolher/expandir, economizando espaço (sobretudo no mobile). */
+.rwc-editor-group-label {
+	cursor: pointer;
+	user-select: none;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+}
+.rwc-editor-group-label::after {
+	content: "▾";
+	font-size: 0.7em;
+	line-height: 1;
+	transition: transform 0.15s ease;
+}
+.rwc-editor-group[aria-expanded="false"] > .rwc-editor-group-label::after {
+	transform: rotate(-90deg);
+}
+.rwc-editor-group-buttons {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	max-height: 1000px;
+	overflow: hidden;
+	transition: max-height 0.2s ease, opacity 0.15s ease, margin 0.2s ease;
+	margin-top: 6px;
+}
+.rwc-editor-group[aria-expanded="false"] > .rwc-editor-group-buttons {
+	max-height: 0;
+	opacity: 0;
+	margin-top: 0;
+}
+
+/* ---------- Corrige conflito no botão hambúrguer mobile (#rw-hamburger) ----------
+ * A extensão ReligiowikiCustomizer carrega uma cópia antiga/obsoleta dessa
+ * mesma regra (top:10px; left:10px; z-index:160; padding:6px 10px --
+ * confirmado inspecionando ext.religiowikiCustomizer.customCss ao vivo),
+ * que empata em especificidade com a versão certa do skin.css
+ * (top:8px; right:12px; z-index:210). Dependendo da ordem de carregamento
+ * dos módulos do ResourceLoader, a versão antiga podia vencer a cascata,
+ * jogando o botão pro canto errado (esquerda) e com dimensões diferentes.
+ * Aumenta a especificidade aqui (html body #rw-hamburger) pra garantir que
+ * a versão certa sempre vença, além de resetar explicitamente width/height/
+ * flex/left pra impedir qualquer esticamento (caso alguma outra regra,
+ * dessa ou de outra extensão, também tente esticar o botão). */
+html body #rw-hamburger {
+	display: none;
+	position: fixed;
+	top: 8px;
+	right: 12px;
+	left: auto;
+	width: auto;
+	height: auto;
+	max-width: none;
+	flex: 0 0 auto;
+	box-sizing: content-box;
+	z-index: 210;
+	font-size: 1.3rem;
+	line-height: 1;
+	padding: 8px 12px;
+	border: 1px solid var(--rw-border);
+	background: var(--rw-bg-elevated);
+	color: var(--rw-text);
+	cursor: pointer;
+	border-radius: 3px;
+	touch-action: manipulation;
+	box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+}
+@media (max-width: 851px) {
+	html body #rw-hamburger { display: inline-flex; align-items: center; justify-content: center; }
+}

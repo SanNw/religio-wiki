@@ -21,6 +21,12 @@ class ReligioWikiTemplate extends BaseTemplate {
 		// principal (a home não deve mostrar o índice "Neste artigo" nem os
 		// catlinks "Categorias: ..." no rodapé).
 		$isArticle = $title && $title->inNamespace( NS_MAIN ) && !$title->isMainPage() && $skin->getRelevantTitle()->exists();
+		// Aparência/Idioma (dentro de #rw-toc-column) também fazem sentido nas
+		// páginas institucionais (namespace Projeto, ex.: Política de
+		// privacidade, Código de Conduta) -- só "Neste artigo" (índice) que
+		// fica vazio ali se a página não tiver cabeçalhos suficientes, igual
+		// já acontece em artigos curtos.
+		$showTocColumn = $isArticle || ( $title && $title->inNamespace( NS_PROJECT ) && $title->exists() );
 		$isMainPage = $title && $title->isMainPage();
 		// "Admin" = quem tem o direito editinterface (grupos Administradores /
 		// Administradores da interface). Usado pra esconder itens só de admin
@@ -60,6 +66,7 @@ class ReligioWikiTemplate extends BaseTemplate {
 <?php } ?>
 		</ul>
 	</div>
+	<button type="button" id="rw-hamburger" aria-label="Abrir menu de navegação">☰</button>
 </div>
 
 <div id="mw-page-base"></div>
@@ -159,12 +166,11 @@ class ReligioWikiTemplate extends BaseTemplate {
 		</div>
 	</main>
 
-	<?php if ( $isArticle ) { ?>
+	<?php if ( $showTocColumn ) { ?>
 	<div class="rw-toc" id="rw-toc-column"></div>
 	<?php } ?>
 </div>
 
-<button type="button" id="rw-hamburger" aria-label="Abrir menu de navegação">☰</button>
 
 <div id="footer">
 <?php foreach ( $this->getFooterLinks() as $category => $links ) { ?>

@@ -597,6 +597,121 @@ PHPEOF
   echo "  aviso de licença desbloqueado no rodapé (rw-footer-copyright-link)."
 fi
 
+
+# 'Página aleatória' só deve mostrar artigos de verdade. Restringe
+# $wgContentNamespaces só ao NS_MAIN via SetupAfterCache (o SemanticMediaWiki
+# mescla Propriedade/102 e Conceito/108 nessa lista via merge_strategy do
+# extension.json, que só termina de rodar DEPOIS do LocalSettings.php --
+# setar a variável direto no LocalSettings.php não pega, o SMW sobrescreve
+# de novo; SetupAfterCache roda depois desse merge, então é a última
+# palavra). Também exclui a Página principal e suas subpáginas (widgets como
+# 'Artigo em destaque'/'Imagem do dia'), que moram no NS_MAIN por causa da
+# transclusão mas não são artigos. Idempotente pelo marcador
+# rw-content-namespaces-main-only / rw-random-exclude-mainpage.
+if ! grep -q "rw-content-namespaces-main-only" LocalSettings.php; then
+  cat >> LocalSettings.php << 'PHPEOF'
+
+// Religio Wiki — rw-content-namespaces-main-only: ver comentário acima do
+// bloco no deploy-wiki-content.sh.
+$wgHooks['SetupAfterCache'][] = static function () {
+	$GLOBALS['wgContentNamespaces'] = [ NS_MAIN ];
+};
+PHPEOF
+  echo "  \$wgContentNamespaces restrito a NS_MAIN (rw-content-namespaces-main-only)."
+fi
+
+if ! grep -q "rw-random-exclude-mainpage" LocalSettings.php; then
+  cat >> LocalSettings.php << 'PHPEOF'
+
+// Religio Wiki — rw-random-exclude-mainpage: exclui a Página principal e
+// suas subpáginas de 'Página aleatória'. Ver deploy-wiki-content.sh.
+$wgHooks['RandomPageQuery'][] = static function ( &$tables, &$conds, &$joinConds ) {
+	$dbr = MediaWiki\MediaWikiServices::getInstance()->getConnectionProvider()->getReplicaDatabase();
+	$mainPage = Title::newMainPage();
+	if ( $mainPage ) {
+		$dbKey = $mainPage->getDBkey();
+		$conds[] = 'page_title != ' . $dbr->addQuotes( $dbKey );
+		$conds[] = 'page_title NOT ' . $dbr->buildLike( $dbKey . '/', $dbr->anyString() );
+	}
+};
+PHPEOF
+  echo "  Página principal excluída de 'Página aleatória' (rw-random-exclude-mainpage)."
+fi
+
+# Some o prefixo 'Religio Wiki:' do título exibido (H1 e <title>) das
+# páginas institucionais do namespace Projeto, só na visualização normal
+# (não mexe com 'Editando ...', histórico etc.). O prefixo continua
+# existindo na URL e nos links. Idempotente pelo marcador
+# rw-hide-project-ns-prefix.
+if ! grep -q "rw-hide-project-ns-prefix" LocalSettings.php; then
+  cat >> LocalSettings.php << 'PHPEOF'
+
+// Religio Wiki — rw-hide-project-ns-prefix: ver deploy-wiki-content.sh.
+$wgHooks['BeforePageDisplay'][] = static function ( $out, $skin ) {
+	$title = $out->getTitle();
+	if ( $title && $title->inNamespace( NS_PROJECT ) &&
+		Action::getActionName( $out->getContext() ) === 'view'
+	) {
+		$out->setPageTitle( $title->getText() );
+	}
+};
+PHPEOF
+  echo "  Prefixo 'Religio Wiki:' escondido no título das páginas institucionais (rw-hide-project-ns-prefix)."
+fi
+# Corrige um crash de JS do núcleo do MediaWiki em Special:Preferences
+# (mw.widgets.visibleCodePointLimit chamado com o campo 'Assinatura' quando
+# ele renderiza como <label> em vez de TextInputWidget, pra contas sem
+# e-mail confirmado) que travava a inicialização inteira da página (abas
+# quebradas em QUALQUER seção, não só Páginas vigiadas/Notificações).
+# Corrigido via módulo skins.ReligioWiki.prefsFix (ver skin.json +
+# skins/ReligioWiki/resources/rw-prefs-fix.js), carregado só em
+# Special:Preferences. Idempotente pelo marcador rw-prefs-fix-load.
+if ! grep -q "rw-prefs-fix-load" LocalSettings.php; then
+  cat >> LocalSettings.php << 'PHPEOF'
+
+// Religio Wiki — rw-prefs-fix-load: ver comentário no deploy-wiki-content.sh.
+$wgHooks['BeforePageDisplay'][] = static function ( $out, $skin ) {
+	if ( $out->getTitle() && $out->getTitle()->isSpecial( 'Preferences' ) ) {
+		$out->addModules( 'skins.ReligioWiki.prefsFix' );
+	}
+};
+PHPEOF
+  echo "  Crash de Special:Preferences corrigido (rw-prefs-fix-load)."
+fi
+
+# i18n de interface (EN/ES): liga deteccao automatica de idioma
+# (Accept-Language) pra anonimos e permite trocar via ?setlang=xx
+# (UniversalLanguageSelector, ja instalada). So afeta textos de
+# interface -- conteudo dos artigos continua so em portugues. Seguro
+# aqui porque a pagina em si nao e cacheada por inteiro (Cache-Control:
+# private nas respostas do wiki). Idempotente pelo marcador
+# rw-i18n-interface-lang.
+if ! grep -q "rw-i18n-interface-lang" LocalSettings.php; then
+  cat >> LocalSettings.php << 'PHPEOF'
+
+// Religio Wiki — rw-i18n-interface-lang: ver comentario no deploy-wiki-content.sh.
+$wgULSLanguageDetection = true;
+$wgULSAnonCanChangeLanguage = true;
+PHPEOF
+  echo "  Deteccao/troca de idioma de interface ligada (rw-i18n-interface-lang)."
+fi
+
+# URLs limpas sem /index.php (ex.: religiowiki.com/Artigo). O Apache
+# dentro do container ja tem mod_rewrite habilitado e
+# /etc/apache2/conf-available/short-url.conf ja esta symlinkado/ativo
+# (fora do repo, configurado direto no host/imagem base) -- so faltava
+# dizer ao MediaWiki pra gerar/entender esse formato. /index.php/Artigo
+# continua funcionando (compatibilidade com links antigos). Idempotente
+# pelo marcador rw-clean-urls.
+if ! grep -q "rw-clean-urls" LocalSettings.php; then
+  cat >> LocalSettings.php << 'PHPEOF'
+
+// Religio Wiki — rw-clean-urls: ver comentario no deploy-wiki-content.sh.
+$wgArticlePath = '/$1';
+PHPEOF
+  echo "  URLs limpas ligadas, sem /index.php (rw-clean-urls)."
+fi
+
 echo "== 2/4: rebuild da imagem + subindo/reiniciando o container =="
 # Rebuild explícito: "up -d" sozinho NÃO reconstrói a imagem quando só o
 # Dockerfile muda (ex.: skin novo copiado em skins/ReligioWiki, extensões
