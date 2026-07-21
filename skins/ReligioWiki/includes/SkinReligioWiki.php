@@ -23,7 +23,19 @@ class SkinReligioWiki extends SkinTemplate {
 	 */
 	public function initPage( OutputPage $out ) {
 		parent::initPage( $out );
-		$out->addModuleStyles( [ 'skins.ReligioWiki' ] );
+		// CSS num módulo SEPARADO (skins.ReligioWiki.styles, só "styles", sem
+		// "scripts") carregado via addModuleStyles() -- isso sim vira um
+		// <link rel="stylesheet"> de verdade no <head>, bloqueante/síncrono.
+		// Antes, com styles+scripts no MESMO módulo "skins.ReligioWiki" e
+		// addModuleStyles()+addModules() chamados pra ele, o ResourceLoader
+		// tratava o módulo inteiro como "precisa de JS" e MOVIA o CSS junto
+		// pro carregamento assíncrono via mw.loader (RLPAGEMODULES) -- a
+		// página inteira renderizava SEM estilo nenhum até o JS rodar
+		// ("flash of unstyled content", reportado como "CSS demora pra
+		// carregar"). O JS (skin.js, com toda a lógica de hambúrguer/tema/
+		// Aparência/etc.) continua no módulo "skins.ReligioWiki" original,
+		// carregado async como sempre -- só o CSS que precisava virar síncrono.
+		$out->addModuleStyles( [ 'skins.ReligioWiki.styles' ] );
 		$out->addModules( [ 'skins.ReligioWiki' ] );
 	}
 }

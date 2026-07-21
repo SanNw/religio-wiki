@@ -712,6 +712,19 @@ PHPEOF
   echo "  URLs limpas ligadas, sem /index.php (rw-clean-urls)."
 fi
 
+# Metodo de contagem de artigos: o padrao do MediaWiki ('link') so conta
+# paginas com pelo menos 1 link interno [[...]] -- conteudo aqui e curado
+# manualmente, entao conta qualquer pagina nao-redirecionamento do
+# namespace principal. Idempotente pelo marcador rw-article-count-any.
+if ! grep -q "rw-article-count-any" LocalSettings.php; then
+  cat >> LocalSettings.php << 'PHPEOF'
+
+// Religio Wiki — rw-article-count-any: ver comentario no deploy-wiki-content.sh.
+$wgArticleCountMethod = 'any';
+PHPEOF
+  echo "  Metodo de contagem de artigos ajustado pra 'any' (rw-article-count-any)."
+fi
+
 echo "== 2/4: rebuild da imagem + subindo/reiniciando o container =="
 # Rebuild explícito: "up -d" sozinho NÃO reconstrói a imagem quando só o
 # Dockerfile muda (ex.: skin novo copiado em skins/ReligioWiki, extensões

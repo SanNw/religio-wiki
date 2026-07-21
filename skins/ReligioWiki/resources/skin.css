@@ -289,9 +289,22 @@ a.new { color: #BA2828; }
 }
 
 /* ---------- layout principal: sidebar | conteúdo | TOC ---------- */
+/* BUGs corrigidos (relatados pelo usuário, confirmados ao vivo):
+   1) Coluna do Aparência/TOC (3ª) era "1fr" por padrão -- crescia sem
+      limite em telas largas, ficando mais larga que o conteúdo, e ainda
+      apertava/quebrava os links do "Neste artigo" de forma esquisita
+      quando o espaço restante era pequeno (largura inconsistente).
+   2) O modo "Largo" trocava as colunas de um jeito que ESTREITAVA o
+      conteúdo (de 780px pra ~704px, já que o layout tinha max-width:1180px
+      no total) e ALARGAVA a coluna do Aparência/TOC (de ~154px pra 230px)
+      -- o oposto do esperado.
+   Conserto: coluna do Aparência/TOC fica numa largura FIXA e confortável
+   (230px) em AMBOS os modos -- nunca mais aperta o texto nem cresce sem
+   limite. Conteúdo é sempre a coluna flexível (1fr); "Largo" só aumenta o
+   max-width do layout inteiro, dando mais espaço de verdade pro conteúdo. */
 .rw-layout {
 	display: grid;
-	grid-template-columns: 190px minmax(0, 780px) 1fr;
+	grid-template-columns: 190px minmax(0, 1fr) 230px;
 	gap: 0 28px;
 	max-width: 1180px;
 	margin: 0 auto;
@@ -299,7 +312,7 @@ a.new { color: #BA2828; }
 	min-width: 0;
 	align-items: start;
 }
-html[data-rw-width="wide"] .rw-layout { grid-template-columns: 190px minmax(0, 1fr) 230px; }
+html[data-rw-width="wide"] .rw-layout { max-width: 1500px; }
 
 #mw-panel.rw-sidebar .portal { margin-bottom: 10px; }
 #mw-panel.rw-sidebar .portal h3 {
@@ -444,13 +457,17 @@ body.religion-islam .firstHeading { background: #15803D; color: #fff; }
 	margin: 0 0 6px;
 }
 .rw-toc #toc ul { list-style: none; margin: 0; padding-left: 1.1em; }
-/* Títulos longos no índice quebram dentro da caixa em vez de vazar. */
+.rw-toc #toc li { margin-bottom: 4px; }
+/* Títulos longos no índice quebram NAS PALAVRAS (não no meio de uma
+   palavra) dentro da caixa, em vez de vazar -- word-break:break-word
+   sozinho quebrava até palavras curtas de forma esquisita numa coluna
+   estreita; overflow-wrap:break-word só força a quebra quando a palavra
+   sozinha não cabe, preferindo sempre quebrar entre palavras primeiro. */
 .rw-toc, .rw-toc #toc, .rw-toc #toc a, .rw-toc-box {
 	min-width: 0;
 	overflow-wrap: break-word;
-	word-break: break-word;
 }
-.rw-toc #toc a { display: inline-block; max-width: 100%; }
+.rw-toc #toc a { display: inline-block; max-width: 100%; line-height: 1.35; }
 
 .rw-appearance-panel { margin-top: 14px; border: 1px solid var(--rw-border); background: var(--rw-bg-elevated); padding: 10px 14px; font-size: 0.82rem; }
 .rw-appearance-panel h2 { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--rw-text-muted); margin: 0 0 8px; }

@@ -480,23 +480,24 @@
 }
 
 /* ---------- Corrige conflito no botão hambúrguer mobile (#rw-hamburger) ----------
- * A extensão ReligiowikiCustomizer carrega uma cópia antiga/obsoleta dessa
- * mesma regra (top:10px; left:10px; z-index:160; padding:6px 10px --
- * confirmado inspecionando ext.religiowikiCustomizer.customCss ao vivo),
- * que empata em especificidade com a versão certa do skin.css
- * (top:8px; right:12px; z-index:210). Dependendo da ordem de carregamento
- * dos módulos do ResourceLoader, a versão antiga podia vencer a cascata,
- * jogando o botão pro canto errado (esquerda) e com dimensões diferentes.
- * Aumenta a especificidade aqui (html body #rw-hamburger) pra garantir que
- * a versão certa sempre vença, além de resetar explicitamente width/height/
- * flex/left pra impedir qualquer esticamento (caso alguma outra regra,
- * dessa ou de outra extensão, também tente esticar o botão). */
+ * A extensão ReligiowikiCustomizer AINDA carrega uma cópia antiga/obsoleta
+ * dessa mesma regra (top:10px; left:10px; z-index:160; position:fixed --
+ * confirmado inspecionando ext.religiowikiCustomizer.customCss ao vivo,
+ * de novo, depois de reestruturar o botão pra dentro de .rw-topbar no
+ * skin.css). #rw-hamburger sozinho empata em especificidade entre as
+ * duas, então quem carregar por último no ResourceLoader vencia — esse
+ * empate é o motivo de precisar de HTML BODY aqui na frente, de novo.
+ * ATENÇÃO: os valores abaixo têm que ficar EM SINCRONIA com a regra
+ * #rw-hamburger de skins/ReligioWiki/resources/skin.css (posição
+ * absolute relativa ao .rw-topbar, que agora é sticky) -- se mexer lá,
+ * mexe aqui também, senão volta a quebrar exatamente desse jeito. */
 html body #rw-hamburger {
 	display: none;
-	position: fixed;
-	top: 8px;
+	position: absolute;
+	top: 50%;
 	right: 12px;
 	left: auto;
+	transform: translateY(-50%);
 	width: auto;
 	height: auto;
 	max-width: none;
