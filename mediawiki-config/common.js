@@ -276,3 +276,169 @@
 	// Cobre o caso do toolbar ser inserido depois (associado ao WikiEditor).
 	mw.hook( 'wikiEditor.toolbarReady' ).add( setupAccordion );
 }() );
+
+/* Adiciona setas de expandir/colapsar por SEÇÃO ao índice nativo do
+ * MediaWiki (#toc, já realocado pra dentro de .rw-toc por skin.js),
+ * completando o redesign visual feito em Common.css (que remove a
+ * numeração decimal e reestiliza a caixa/cabeçalho -- o toggle GERAL de
+ * ocultar/mostrar reaproveita o checkbox nativo do MediaWiki, puro CSS,
+ * sem precisar de JS nenhum).
+ *
+ * Escrito de propósito sem depender de nada específico do skin.js desta
+ * skin (só do #toc nativo, padrão em qualquer instalação do MediaWiki) --
+ * pra poder ser portado sem ajuste pra dentro da extensão
+ * ReligiowikiCustomizer no futuro (fase 2, editor CSS/JS), sem reescrever
+ * a lógica.
+ *
+ * Persistência via localStorage: cada seção colapsada é lembrada por
+ * PÁGINA (a chave inclui o nome da página + o href da seção), então
+ * artigos diferentes não interferem uns nos outros. */
+( function () {
+	'use strict';
+
+	var SECTION_KEY_PREFIX = 'rw-toc-section-collapsed:';
+
+	function pageKey() {
+		return ( typeof mw !== 'undefined' && mw.config ) ?
+			mw.config.get( 'wgPageName' ) :
+			window.location.pathname;
+	}
+
+	function setupSectionArrows() {
+		var toc = document.getElementById( 'toc' );
+		if ( !toc || toc.dataset.rwTocArrowsDone ) {
+			return;
+		}
+		var topList = toc.querySelector( 'ul' );
+		if ( !topList ) {
+			return;
+		}
+		toc.dataset.rwTocArrowsDone = '1';
+
+		var key = pageKey();
+		var items = toc.querySelectorAll( 'li' );
+
+		Array.prototype.forEach.call( items, function ( li ) {
+			// Só o <ul> filho DIRETO conta como "tem subseções" -- não
+			// os <ul> de netos, que já pertencem ao item filho.
+			var childList = null;
+			for ( var i = 0; i < li.children.length; i++ ) {
+				if ( li.children[ i ].tagName === 'UL' ) {
+					childList = li.children[ i ];
+					break;
+				}
+			}
+			if ( !childList ) {
+				return;
+			}
+			li.classList.add( 'rw-toc-has-children' );
+
+			var arrow = document.createElement( 'span' );
+			arrow.className = 'rw-toc-arrow';
+			arrow.textContent = '▾';
+			arrow.setAttribute( 'role', 'button' );
+			arrow.setAttribute( 'tabindex', '0' );
+			arrow.setAttribute( 'aria-label', 'Expandir ou recolher esta seção do índice' );
+
+			li.insertBefore( arrow, li.firstChild );
+
+			var firstLink = li.querySelector( 'a' );
+			var sectionKey = SECTION_KEY_PREFIX + key + ':' + ( firstLink ? firstLink.getAttribute( 'href' ) : String( Array.prototype.indexOf.call( items, li ) ) );
+
+			function toggleSection() {
+				var collapsed = li.classList.toggle( 'rw-toc-item-collapsed' );
+				try {
+					localStorage.setItem( sectionKey, collapsed ? '1' : '0' );
+				} catch ( e ) { /* localStorage indisponível (modo privado etc.) -- ignora, só não persiste */ }
+			}
+
+			arrow.addEventListener( 'click', function ( e ) {
+				e.preventDefault();
+				e.stopPropagation();
+				toggleSection();
+			} );
+			arrow.addEventListener( 'keydown', function ( e ) {
+				if ( e.key === 'Enter' || e.key === ' ' ) {
+					e.preventDefault();
+					toggleSection();
+				}
+			} );
+
+			var savedSection = null;
+			try {
+				savedSection = localStorage.getItem( sectionKey );
+			} catch ( e ) { /* ignora */ }
+			if ( savedSection === '1' ) {
+				li.classList.add( 'rw-toc-item-collapsed' );
+			}
+		} );
+	}
+
+	if ( document.readyState === 'loading' ) {
+		document.addEventListener( 'DOMContentLoaded', setupSectionArrows );
+	} else {
+		setupSectionArrows();
+	}
+	// O #toc pode ser movido/inserido de forma assíncrona (skin.js realoca
+	// o #toc nativo pra dentro de .rw-toc) -- reforça a checagem um pouco
+	// depois, sem custo (a função já é idempotente via data-attribute).
+	setTimeout( setupSectionArrows, 300 );
+	setTimeout( setupSectionArrows, 1000 );
+}() );
+
+/* Mobile: Idiomas + Neste artigo + Aparência (dentro de #rw-toc-column)
+ * viram um painel flutuante no canto inferior direito -- só um botão
+ * (FAB, "☰") aparece por padrão, expandindo o painel completo ao clicar
+ * (sanfona), sem atrapalhar a leitura do artigo. O CSS (Common.css) só
+ * ativa esse comportamento dentro do breakpoint mobile; em telas
+ * maiores o FAB fica escondido e a coluna volta ao normal (grid, tudo
+ * sempre visível). */
+( function () {
+	'use strict';
+
+	var STORAGE_KEY = 'rw-toc-mobile-expanded';
+
+	function setup() {
+		var tocColumn = document.getElementById( 'rw-toc-column' );
+		if ( !tocColumn || tocColumn.dataset.rwFabDone || !tocColumn.children.length ) {
+			return;
+		}
+		tocColumn.dataset.rwFabDone = '1';
+
+		var fab = document.createElement( 'button' );
+		fab.type = 'button';
+		fab.className = 'rw-toc-fab';
+		fab.setAttribute( 'aria-label', 'Mostrar ou ocultar índice, idiomas e aparência' );
+		fab.textContent = '☰';
+		fab.setAttribute( 'aria-expanded', 'false' );
+
+		fab.addEventListener( 'click', function () {
+			var expanded = tocColumn.classList.toggle( 'rw-toc-expanded' );
+			fab.setAttribute( 'aria-expanded', String( expanded ) );
+			try {
+				localStorage.setItem( STORAGE_KEY, expanded ? '1' : '0' );
+			} catch ( e ) { /* ignora */ }
+		} );
+
+		tocColumn.insertBefore( fab, tocColumn.firstChild );
+
+		var saved = null;
+		try {
+			saved = localStorage.getItem( STORAGE_KEY );
+		} catch ( e ) { /* ignora */ }
+		if ( saved === '1' ) {
+			tocColumn.classList.add( 'rw-toc-expanded' );
+			fab.setAttribute( 'aria-expanded', 'true' );
+		}
+	}
+
+	if ( document.readyState === 'loading' ) {
+		document.addEventListener( 'DOMContentLoaded', setup );
+	} else {
+		setup();
+	}
+	// #rw-toc-column só ganha conteúdo depois que skin.js monta os
+	// painéis (Aparência/Idiomas) -- reforça um pouco depois.
+	setTimeout( setup, 300 );
+	setTimeout( setup, 1000 );
+}() );
