@@ -15,12 +15,28 @@
  * Common.js porque é conteúdo de UMA página, não do site inteiro.
  */
 
-/* ===== Widget da página de doação (Religio Wiki:Doar) ===== */
+/* ===== Widget da página de doação (Religio Wiki:Doar) =====
+ * Monta a UI de valor/frequência/método e, ao confirmar, chama
+ * Special:DonateCheckout (ver mediawiki-config/includes/SpecialDonateCheckout.php)
+ * que cria uma Stripe Checkout Session de verdade -- o navegador é
+ * redirecionado pra página de pagamento hospedada pelo próprio Stripe
+ * (cartão nunca passa pelo nosso servidor).
+ *
+ * Pix/Boleto são pagamento de ação única -- não têm "débito automático" no
+ * Stripe -- então somem da lista de métodos quando a frequência é
+ * Mensal/Anual (só cartão continua disponível nesse caso).
+ */
 ( function () {
 	'use strict';
 
 	var PRESETS = [ 15, 20, 30, 70, 140, 200, 300 ];
-	var METHODS = [ 'Pix', 'Cartão de débito', 'Cartão de crédito', 'Boleto', 'PayPal', 'Google Pay' ];
+	// key = chave ASCII enviada pro backend; label = texto do botão;
+	// oneTimeOnly = some da lista quando a frequência não é "unico".
+	var METHODS = [
+		{ key: 'pix', label: 'Pix', oneTimeOnly: true },
+		{ key: 'boleto', label: 'Boleto', oneTimeOnly: true },
+		{ key: 'card', label: 'Cartão de crédito/débito', oneTimeOnly: false }
+	];
 
 	function mount() {
 		var host = document.getElementById( 'rw-donate-widget' );
@@ -28,9 +44,22 @@
 			return;
 		}
 
-		var state = { frequency: 'unico', amount: 30, method: 'Pix' };
+		var state = { frequency: 'unico', amount: 30, method: 'pix' };
 
 		host.innerHTML = '';
+
+		// Mensagem de retorno do Stripe (?doacao=sucesso|cancelado na URL,
+		// ver success_url/cancel_url no SpecialDonateCheckout.php).
+		var params = new URLSearchParams( window.location.search );
+		var doacaoStatus = params.get( 'doacao' );
+		if ( doacaoStatus === 'sucesso' || doacaoStatus === 'cancelado' ) {
+			var banner = document.createElement( 'p' );
+			banner.className = 'rw-donate-banner rw-donate-banner-' + doacaoStatus;
+			banner.textContent = doacaoStatus === 'sucesso' ?
+				'Obrigado! Sua doação foi confirmada. 💛' :
+				'Pagamento cancelado -- nenhum valor foi cobrado.';
+			host.appendChild( banner );
+		}
 
 		var h2 = document.createElement( 'h2' );
 		h2.textContent = 'Fazer uma doação';
@@ -54,6 +83,7 @@
 				Object.keys( freqButtons ).forEach( function ( k ) {
 					freqButtons[ k ].setAttribute( 'aria-pressed', String( k === f[ 0 ] ) );
 				} );
+				updateMethodVisibility();
 			} );
 			freqButtons[ f[ 0 ] ] = btn;
 			tabs.appendChild( btn );
@@ -103,27 +133,92 @@
 		var methods = document.createElement( 'div' );
 		methods.className = 'rw-donate-methods';
 		var methodButtons = {};
-		METHODS.forEach( function ( name ) {
+		METHODS.forEach( function ( m ) {
 			var btn = document.createElement( 'button' );
 			btn.type = 'button';
-			btn.textContent = name;
-			btn.setAttribute( 'aria-pressed', String( name === state.method ) );
+			btn.textContent = m.label;
+			btn.setAttribute( 'aria-pressed', String( m.key === state.method ) );
 			btn.addEventListener( 'click', function () {
-				state.method = name;
+				state.method = m.key;
 				Object.keys( methodButtons ).forEach( function ( k ) {
-					methodButtons[ k ].setAttribute( 'aria-pressed', String( k === name ) );
+					methodButtons[ k ].setAttribute( 'aria-pressed', String( k === m.key ) );
 				} );
 			} );
-			methodButtons[ name ] = btn;
+			methodButtons[ m.key ] = btn;
 			methods.appendChild( btn );
 		} );
 		host.appendChild( methods );
 
+		// Some Pix/Boleto quando a frequência não é "unico" (não têm cobrança
+		// recorrente no Stripe); troca automaticamente pra "card" se o método
+		// selecionado no momento deixar de estar disponível.
+		function updateMethodVisibility() {
+			var recurring = state.frequency !== 'unico';
+			METHODS.forEach( function ( m ) {
+				methodButtons[ m.key ].style.display = ( recurring && m.oneTimeOnly ) ? 'none' : '';
+			} );
+			if ( recurring && state.method !== 'card' ) {
+				state.method = 'card';
+				Object.keys( methodButtons ).forEach( function ( k ) {
+					methodButtons[ k ].setAttribute( 'aria-pressed', String( k === 'card' ) );
+				} );
+			}
+		}
+		updateMethodVisibility();
+
+		var errorMsg = document.createElement( 'p' );
+		errorMsg.className = 'rw-donate-error';
+		errorMsg.style.display = 'none';
+		host.appendChild( errorMsg );
+
+		var submitBtn = document.createElement( 'button' );
+		submitBtn.type = 'button';
+		submitBtn.className = 'rw-donate-submit';
+		submitBtn.textContent = 'Confirmar doação';
+		submitBtn.addEventListener( 'click', function () {
+			if ( !state.amount || state.amount < 1 ) {
+				errorMsg.textContent = 'Escolha um valor válido antes de continuar.';
+				errorMsg.style.display = '';
+				return;
+			}
+			errorMsg.style.display = 'none';
+			submitBtn.disabled = true;
+			submitBtn.textContent = 'Processando…';
+			fetch( mw.util.getUrl( 'Special:DonateCheckout' ), {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify( {
+					amount: state.amount,
+					frequency: state.frequency,
+					method: state.method
+				} )
+			} )
+				.then( function ( res ) {
+					return res.json().then( function ( data ) {
+						return { ok: res.ok, data: data };
+					} );
+				} )
+				.then( function ( result ) {
+					if ( result.ok && result.data.url ) {
+						window.location.href = result.data.url;
+					} else {
+						throw new Error( result.data.error || 'erro_desconhecido' );
+					}
+				} )
+				.catch( function () {
+					errorMsg.textContent = 'Não foi possível iniciar o pagamento agora. ' +
+						'Tente novamente em alguns instantes ou entre em contato: contato@religiowiki.com.';
+					errorMsg.style.display = '';
+					submitBtn.disabled = false;
+					submitBtn.textContent = 'Confirmar doação';
+				} );
+		} );
+		host.appendChild( submitBtn );
+
 		var note = document.createElement( 'p' );
 		note.className = 'rw-donate-note';
-		note.textContent = 'Esta é uma prévia da interface de doação — a cobrança de verdade ' +
-			'depende de conectar um meio de pagamento real (Pix, gateway de cartão/boleto, ' +
-			'PayPal etc.) a esta página, o que ainda não foi feito.';
+		note.textContent = 'Pagamento processado pelo Stripe -- seus dados de cartão nunca passam ' +
+			'pelos nossos servidores.';
 		host.appendChild( note );
 	}
 

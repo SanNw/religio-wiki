@@ -720,3 +720,13 @@ if ( getenv( 'RW_SMTP_HOST' ) ) {
 		'password' => (string)getenv( 'RW_SMTP_PASS' ),
 	];
 }
+
+
+// rw-donate-checkout: Special:DonateCheckout recebe o valor/frequência/
+// método escolhidos no widget de Religio Wiki:Doar (ver MediaWiki:Common.js)
+// e cria uma Stripe Checkout Session -- pagamento de verdade, hospedado
+// pelo próprio Stripe (nenhum dado de cartão passa por aqui). Chave secreta
+// só existe como variável de ambiente (RW_STRIPE_SECRET_KEY, ver
+// docker-compose.yml / .env), nunca em código.
+require_once __DIR__ . '/mediawiki-config/includes/SpecialDonateCheckout.php';
+$wgSpecialPages['DonateCheckout'] = SpecialDonateCheckout::class;

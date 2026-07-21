@@ -1,5 +1,6 @@
 {
 	"require": {
+		"stripe/stripe-php": "^17.0",
 		"mediawiki/semantic-media-wiki": "7.1.0",
 		"mediawiki/page-forms": "6.0.9",
 		"mediawiki/cargo": "3.9.3",

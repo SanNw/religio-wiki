@@ -107,3 +107,10 @@ RUN set -eux; \
 # Vector clássico + Common.css/Common.js como forma de reconciliar visual —
 # ver skins/ReligioWiki/docs/SKIN_STATUS.md.
 COPY skins/ReligioWiki /var/www/html/skins/ReligioWiki
+
+# mediawiki-config/includes/ -- classes PHP customizadas do próprio wiki
+# (ex.: SpecialDonateCheckout.php), registradas via require_once no
+# LocalSettings.php. Diferente de Common.css/Common.js/pages/ (que viram
+# conteúdo NO BANCO via maintenance/edit.php), classe PHP precisa existir
+# como arquivo de verdade na imagem.
+COPY mediawiki-config/includes /var/www/html/mediawiki-config/includes

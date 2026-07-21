@@ -28,6 +28,11 @@ services:
       RW_SMTP_PASS: ${RW_SMTP_PASS:-}
       RW_SMTP_IDHOST: ${RW_SMTP_IDHOST:-religiowiki.com}
       RW_MAIL_FROM: ${RW_MAIL_FROM:-no-reply@religiowiki.com}
+      # Doação (Stripe) -- chave SECRETA nunca fica no código/commit, só no
+      # .env da VPS. Enquanto vazia, Special:DonateCheckout recusa qualquer
+      # pedido (ver SpecialDonateCheckout.php).
+      RW_STRIPE_SECRET_KEY: ${RW_STRIPE_SECRET_KEY:-}
+      RW_STRIPE_PUBLISHABLE_KEY: ${RW_STRIPE_PUBLISHABLE_KEY:-}
     volumes:
       - ./LocalSettings.php:/var/www/html/LocalSettings.php
       - wiki_images:/var/www/html/images
