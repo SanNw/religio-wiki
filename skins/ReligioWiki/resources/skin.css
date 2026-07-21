@@ -554,118 +554,81 @@ body.rw-can-edit .rw-edit-pencil { display: inline; }
 /* Trava o scroll do conteúdo por trás enquanto o menu lateral (gaveta) está
    aberto — ver skin.js, bloco "menu hambúrguer". */
 body.rw-noscroll { overflow: hidden; }
-@media (max-width:851px){
-
-    /* ---------- Barra superior ---------- */
-    .rw-topbar{
-        position:sticky;
-        top:0;
-        z-index:220;
-        display:grid;
-        grid-template-columns:44px 1fr;
-        grid-template-areas:
-            "hamburger brand"
-            "search search"
-            "personal personal";
-        align-items:center;
-        column-gap:12px;
-        row-gap:10px;
-        padding:12px 16px;
-        background:var(--rw-bg-elevated);
-        border-bottom:1px solid var(--rw-border);
-    }
-
-    /* ---------- Hambúrguer ---------- */
-
-    #rw-hamburger{
-        display:flex;
-        grid-area:hamburger;
-        position:static;
-        transform:none;
-        width:44px;
-        height:44px;
-        justify-content:center;
-        align-items:center;
-        padding:0;
-        margin:0;
-        box-shadow:none;
-    }
-
-    /* ---------- Marca ---------- */
-
-    .rw-brand{
-        grid-area:brand;
-        min-width:0;
-        font-size:1.05rem;
-    }
-
-    /* ---------- Busca ---------- */
-
-    .rw-search{
-        grid-area:search;
-        width:100%;
-        max-width:none;
-        flex:none;
-    }
-
-    .rw-search input{
-        width:100%;
-    }
-
-    /* ---------- Área pessoal ---------- */
-
-    #p-personal.rw-personal{
-        grid-area:personal;
-        display:flex;
-        flex-wrap:wrap;
-        align-items:center;
-        gap:12px;
-        white-space:normal;
-    }
-
-    #p-personal.rw-personal ul{
-        display:flex;
-        flex-wrap:wrap;
-        gap:12px;
-        white-space:normal;
-    }
-
-    /* ---------- Dropdowns ---------- */
-
-    .rw-personal-dropdown-menu,
-    #p-personal .rw-admin-personal > ul{
-        max-width:calc(100vw - 32px);
-        white-space:normal;
-    }
-
-    /* ---------- Layout ---------- */
-
-    .rw-layout{
-        grid-template-columns:1fr;
-    }
-
-    /* ---------- Sidebar ---------- */
-
-    #mw-panel.rw-sidebar{
-        display:none;
-        position:fixed;
-        inset:0 auto 0 0;
-        width:min(300px,80vw);
-        background:var(--rw-bg-elevated);
-        border-right:1px solid var(--rw-border);
-        overflow:auto;
-        z-index:210;
-        padding:16px;
-
-    }
-    #mw-panel.rw-sidebar.rw-sidebar-open{
-        display:block;
-    }
-
-    #rw-sidebar-overlay.rw-sidebar-open{
-        display:block;
-    }
-
+@media (max-width: 851px) {
+  #rw-hamburger { display: inline-flex; }
+  .rw-topbar { position: sticky; top: 0; z-index: 220; }
+  #mw-panel.rw-sidebar {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    width: min(80vw, 300px);
+    max-width: 100%;
+    z-index: 200;
+    overflow-x: hidden;
+    overflow-y: auto;
+    background: var(--rw-bg-elevated);
+    border-right: 1px solid var(--rw-border);
+    padding: 16px;
+    box-sizing: border-box;
+    overscroll-behavior: contain;
+  }
+  /* Botão "✕" grudado no canto superior direito da própria gaveta (que
+     abre pela esquerda agora) -- o #rw-hamburger também fecha (mesma
+     função close() no skin.js), mas fica longe uma vez que a gaveta está
+     aberta e ocupa boa parte da tela. Fica escondido sozinho porque é
+     filho de #mw-panel.rw-sidebar, que só aparece com .rw-sidebar-open. */
+  #mw-panel.rw-sidebar #rw-sidebar-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 1.1rem;
+    line-height: 1;
+    border: 1px solid var(--rw-border);
+    background: var(--rw-bg);
+    color: var(--rw-text);
+    cursor: pointer;
+    padding: 0;
+  }
+  /* z-index igual ao .rw-topbar (220, sticky) -- sem isso a parte de
+     cima da gaveta ficava escondida atrás da barra fixa ao abrir
+     (a gaveta vinha depois no DOM, mas com z-index 200 < 220 perdia). */
+  #mw-panel.rw-sidebar.rw-sidebar-open { display: block; z-index: 220; }
+  #rw-sidebar-overlay.rw-sidebar-open { display: block; }
+  #mw-panel.rw-sidebar, #mw-panel.rw-sidebar * { overflow-wrap: break-word; word-break: break-word; }
+  .rw-layout { grid-template-columns: 1fr; }
+  /* Reserva espaço à ESQUERDA (padrão Wikipédia) pro hambúrguer, que
+     agora mora nesse canto — sem isso, o logo/marca ficaria embaixo do
+     botão fixo. */
+  .rw-topbar { padding-left: 56px; flex-wrap: wrap; row-gap: 8px; }
+  /* Controles do topo (Doar, Admin ▾, Tema ▾, Entrar/Criar conta) quebram
+     em linha em vez de estourar/serem cortados pelo overflow-x:hidden. */
+  #p-personal.rw-personal { flex-wrap: wrap; row-gap: 6px; }
+  #p-personal.rw-personal ul { flex-wrap: wrap; row-gap: 6px; }
+  /* Os menus dropdown nunca ultrapassam a largura da tela. */
+  .rw-personal-dropdown-menu { max-width: calc( 100vw - 24px ); }
+  /* Mesmo tratamento pro dropdown "Admin ▾": essa <ul> não tem a classe
+     .rw-personal-dropdown-menu (ver comentário junto da regra fora do
+     breakpoint), então sem isso ela herda white-space:nowrap de
+     #p-personal.rw-personal ul e nunca quebra linha — o menu atravessava a
+     tela inteira no mobile. */
+  #p-personal .rw-admin-personal > ul {
+    max-width: calc( 100vw - 24px );
+    white-space: normal;
+    overflow-wrap: break-word;
+  }
+  /* Abas do artigo: no desktop o "Mais ▾" é empurrado pro extremo direito
+     (margin-left:auto) pra ficar longe do grupo Ler/Editar/Ver histórico —
+     faz sentido numa barra larga. No mobile, como a barra quebra em duas
+     linhas, esse "auto" cria um vão enorme e vazio antes do "Mais ▾" na
+     segunda linha (parece desalinhado). Tira o empurrão só aqui: os itens
+     ficam juntos, fluindo da esquerda, como o resto da interface mobile. */
+  .rw-tab-group { margin-left: 0; }
 }
 
 /* Telas bem estreitas (ex: iPhone SE): a barra pessoal quebra em mais
