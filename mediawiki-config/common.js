@@ -218,3 +218,61 @@
 		} );
 	} );
 }() );
+
+/* Sanfona (accordion) nos grupos "Formatação"/"Componentes"/"Ajuda" da
+ * barra de ferramentas da ReligiowikiCustomizer (#rwc-editor-toolbar) --
+ * clique no rótulo do grupo recolhe/expande os botões, pra não ocupar
+ * tanto espaço na tela do editor (sobretudo no mobile). Progressive
+ * enhancement puro: a extensão continua funcionando normalmente se isso
+ * não rodar (ex.: markup mudar numa versão futura). */
+( function () {
+	function setupAccordion() {
+		var toolbar = document.getElementById( 'rwc-editor-toolbar' );
+		if ( !toolbar || toolbar.rwAccordionDone ) {
+			return;
+		}
+		toolbar.rwAccordionDone = true;
+		var isMobile = window.matchMedia( '(max-width: 851px)' ).matches;
+		Array.prototype.forEach.call( toolbar.querySelectorAll( '.rwc-editor-group' ), function ( group ) {
+			var label = group.querySelector( '.rwc-editor-group-label' );
+			if ( !label ) {
+				return;
+			}
+			// Junta todo o resto do grupo (os botões) num wrapper próprio,
+			// pra poder recolher só eles -- o rótulo continua sempre visível.
+			var buttons = Array.prototype.filter.call( group.children, function ( el ) {
+				return el !== label;
+			} );
+			var wrapper = document.createElement( 'div' );
+			wrapper.className = 'rwc-editor-group-buttons';
+			buttons.forEach( function ( btn ) {
+				wrapper.appendChild( btn );
+			} );
+			group.appendChild( wrapper );
+
+			label.setAttribute( 'role', 'button' );
+			label.setAttribute( 'tabindex', '0' );
+			group.setAttribute( 'aria-expanded', isMobile ? 'false' : 'true' );
+
+			function toggle() {
+				var expanded = group.getAttribute( 'aria-expanded' ) === 'true';
+				group.setAttribute( 'aria-expanded', expanded ? 'false' : 'true' );
+			}
+			label.addEventListener( 'click', toggle );
+			label.addEventListener( 'keydown', function ( e ) {
+				if ( e.key === 'Enter' || e.key === ' ' ) {
+					e.preventDefault();
+					toggle();
+				}
+			} );
+		} );
+	}
+
+	if ( document.readyState === 'loading' ) {
+		document.addEventListener( 'DOMContentLoaded', setupAccordion );
+	} else {
+		setupAccordion();
+	}
+	// Cobre o caso do toolbar ser inserido depois (associado ao WikiEditor).
+	mw.hook( 'wikiEditor.toolbarReady' ).add( setupAccordion );
+}() );
