@@ -361,7 +361,11 @@
 	}
 
 	function mount() {
-		if ( typeof mw === 'undefined' || !mw.config || mw.config.get( 'wgNamespaceNumber' ) !== 0 ) {
+		// Namespace principal (artigos) ou Projeto (páginas institucionais,
+		// ex.: Política de privacidade) -- ver ReligioWikiTemplate::execute()
+		// (showTocColumn) pra onde o container #rw-toc-column é decidido.
+		var ns = typeof mw !== 'undefined' && mw.config ? mw.config.get( 'wgNamespaceNumber' ) : null;
+		if ( ns !== 0 && ns !== 4 ) {
 			return;
 		}
 		var tocColumn = document.getElementById( 'rw-toc-column' );
