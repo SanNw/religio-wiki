@@ -551,6 +551,52 @@ PHPEOF
   echo "  cache de objeto/parser ligado (rw-cache-db)."
 fi
 
+# Rodapé institucional: link 'Código de Conduta' (4o item, depois de
+# privacy/about/disclaimer que ja vem do core via Privacypage/Aboutpage/
+# Disclaimerpage no manifest.tsv). Sem isso nao ha slot padrao do MediaWiki
+# pra um 4o link de rodape. Idempotente pelo marcador rw-footer-conduct-link.
+if ! grep -q "rw-footer-conduct-link" LocalSettings.php; then
+  cat >> LocalSettings.php << 'PHPEOF'
+
+// Religio Wiki — rw-footer-conduct-link: adiciona 'Código de Conduta' como
+// 4o link do rodape (depois de privacy/about/disclaimer, que ja vem do core
+// via Privacypage/Aboutpage/Disclaimerpage). Ver mediawiki-config/pages/.
+$wgHooks['SkinAddFooterLinks'][] = static function ( $skin, $key, array &$footerItems ) {
+	if ( $key !== 'places' ) {
+		return;
+	}
+	$title = Title::newFromText( 'Religio Wiki:Código de Conduta' );
+	if ( $title ) {
+		$footerItems['codigodeconduta'] = Html::rawElement(
+			'a',
+			[ 'href' => $title->getLocalURL() ],
+			'Código de Conduta'
+		);
+	}
+};
+PHPEOF
+  echo "  link 'Código de Conduta' adicionado ao rodapé (rw-footer-conduct-link)."
+fi
+
+# Aviso de licença no rodapé: SkinComponentCopyright (MW 1.43) só monta o
+# link $1 (e só entao usa o texto de MediaWiki:Copyright) se RightsUrl,
+# RightsText ou RightsPage estiver setado -- sem isso ele desiste cedo e o
+# rodape fica sem aviso de licenca nenhum, mesmo com MediaWiki:Copyright
+# preenchido. O texto exibido de fato vem da pagina MediaWiki:Copyright
+# (que precisa ser HTML puro, nao wikitext -- essa mensagem usa
+# Message::text(), que nao processa aspas triplas nem links wikitext).
+# Idempotente pelo marcador rw-footer-copyright-link.
+if ! grep -q "rw-footer-copyright-link" LocalSettings.php; then
+  cat >> LocalSettings.php << 'PHPEOF'
+
+// Religio Wiki — rw-footer-copyright-link: desbloqueia o aviso de licença
+// no rodapé (ver mediawiki-config/pages/MediaWiki_Copyright.wikitext).
+$wgRightsUrl = 'https://creativecommons.org/licenses/by-sa/4.0/deed.pt';
+$wgRightsText = 'CC BY-SA 4.0';
+PHPEOF
+  echo "  aviso de licença desbloqueado no rodapé (rw-footer-copyright-link)."
+fi
+
 echo "== 2/4: rebuild da imagem + subindo/reiniciando o container =="
 # Rebuild explícito: "up -d" sozinho NÃO reconstrói a imagem quando só o
 # Dockerfile muda (ex.: skin novo copiado em skins/ReligioWiki, extensões
