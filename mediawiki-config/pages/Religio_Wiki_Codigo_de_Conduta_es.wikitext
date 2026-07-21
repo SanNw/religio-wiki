@@ -1,0 +1,39 @@
+== Código de conducta ==
+
+''"No hay derecho superior al de la verdad."''
+
+=== Principio fundamental ===
+
+Religio Wiki existe para presentar cada tradición religiosa con fidelidad a sus propias fuentes y a su perspectiva ortodoxa. Todo colaborador se compromete, al editar, a servir a este principio —la búsqueda y exposición fiel de la verdad de cada tradición— por encima de preferencias personales, disputas doctrinales o agendas externas.
+
+=== Conducta esperada ===
+
+* '''Buena fe:''' presuma buena intención en los demás colaboradores y busque el consenso antes que el conflicto.
+* '''Respeto:''' trate todas las tradiciones religiosas y a sus practicantes con seriedad y respeto, incluso ante el desacuerdo personal.
+* '''Rigor bibliográfico:''' toda contribución relevante debe citar fuentes primarias o comentaristas reconocidos dentro de la propia tradición descrita.
+* '''Fidelidad a la perspectiva ortodoxa:''' describa cada tradición en los términos en que ella se comprende a sí misma, evitando lecturas externas, sincréticas o revisionistas no referenciadas.
+* '''Ausencia de proselitismo:''' este no es un espacio para convertir, refutar o jerarquizar religiones entre sí.
+
+=== Conducta prohibida ===
+
+* Discurso de odio, discriminación o ataques contra cualquier religión, tradición o grupo de practicantes;
+* Vandalismo, eliminación injustificada de contenido referenciado, o inserción de contenido sin fuente;
+* Desinformación deliberada o distorsión intencional de fuentes;
+* Ataques personales, acoso o conducta hostil contra otros colaboradores;
+* Usar la wiki como escenario de polémica teológica, apologética comparada o disputa doctrinal.
+
+=== Resolución de divergencias ===
+
+Las divergencias editoriales deben resolverse, en este orden:
+
+# Recurriendo a la fuente primaria más autorizada dentro de la propia tradición en cuestión;
+# Discutiendo de forma civilizada en la página de discusión del artículo;
+# Recurriendo a la mediación de un administrador, si no hay consenso.
+
+=== Consecuencias ===
+
+Las violaciones a este código pueden resultar, según la gravedad y la reincidencia, en: advertencia, reversión de la edición, bloqueo temporal o expulsión permanente de la plataforma.
+
+=== Cómo reportar ===
+
+Las violaciones pueden reportarse a un administrador o mediante [mailto:contato@religiowiki.com contato@religiowiki.com].

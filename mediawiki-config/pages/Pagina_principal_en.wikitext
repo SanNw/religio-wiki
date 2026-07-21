@@ -1,0 +1,36 @@
+<div class="rw-home-hero">
+<div>
+
+= Welcome to Religio Wiki =
+''the authentic encyclopedia of religions''
+
+</div>
+<div class="rw-home-stat">
+<span class="rw-home-stat-number">{{NUMBEROFARTICLES}}</span>
+<span class="rw-home-stat-label">published articles</span>
+</div>
+</div>
+
+<div class="rw-home-grid">
+<div class="rw-home-box">
+== Featured article ==
+{{:Página principal/Artigo em destaque}}
+</div>
+<div class="rw-home-box rw-image-of-day">
+== Picture of the day ==
+{{:Página principal/Imagem do dia}}
+</div>
+</div>
+
+<div class="rw-home-about">
+== About Religio Wiki ==
+Religio Wiki is a collaborative digital project whose purpose is to
+provide traditional, reliable, and verified information about the world's
+major religions — among them Hinduism, Buddhism, Judaism, Christianity,
+Islam, Confucianism, Taoism, and Shinto — drawing from their primary
+sources and adopting their most orthodox perspectives, always with
+bibliographic references.
+</div>
+
+[[Categoria:Página principal]]
+__NOTOC__

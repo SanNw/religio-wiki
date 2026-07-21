@@ -31,7 +31,7 @@ WORKDIR /var/www/html/extensions
 RUN set -eux; \
 	for ext in Cite ParserFunctions WikiEditor VisualEditor TemplateData TemplateWizard Scribunto PluggableAuth OpenIDConnect; do \
 		rm -rf "${ext}"; \
-		git clone --depth 1 --branch "${MW_BRANCH}" \
+		git clone --depth 1 --recurse-submodules --shallow-submodules --branch "${MW_BRANCH}" \
 			"https://github.com/wikimedia/mediawiki-extensions-${ext}.git" "${ext}"; \
 		rm -rf "${ext}/.git"; \
 	done
@@ -64,7 +64,7 @@ RUN set -eux; \
 RUN set -eux; \
 	for ext in ExternalData HeaderTabs TemplateStyles CodeMirror; do \
 		rm -rf "${ext}"; \
-		git clone --depth 1 --branch "${MW_BRANCH}" \
+		git clone --depth 1 --recurse-submodules --shallow-submodules --branch "${MW_BRANCH}" \
 			"https://github.com/wikimedia/mediawiki-extensions-${ext}.git" "${ext}"; \
 		rm -rf "${ext}/.git"; \
 	done
@@ -82,7 +82,7 @@ RUN set -eux; \
 		CheckUser SecurePoll Renameuser Nuke DeleteBatch \
 		Linter DiscussionTools AdvancedSearch; do \
 		rm -rf "${ext}"; \
-		git clone --depth 1 --branch "${MW_BRANCH}" \
+		git clone --depth 1 --recurse-submodules --shallow-submodules --branch "${MW_BRANCH}" \
 			"https://github.com/wikimedia/mediawiki-extensions-${ext}.git" "${ext}"; \
 		rm -rf "${ext}/.git"; \
 	done

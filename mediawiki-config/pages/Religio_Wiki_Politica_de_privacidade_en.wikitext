@@ -1,0 +1,46 @@
+== Privacy Policy ==
+
+This policy describes what data is collected through the use of '''Religio Wiki''' (religiowiki.com), for what purposes it is used, and what rights you have over it.
+
+=== 1. What data we collect ===
+
+* '''Browsing data:''' IP address, browser type, pages visited, date and time of access, collected automatically for security and usage statistics purposes.
+* '''Account data:''' if you create a user account, we collect your username, email address (if provided), and the public edit history associated with the account.
+* '''Cookies:''' we use cookies essential to the site's operation (such as session maintenance and display preferences). We do not use cookies for targeted advertising purposes.
+
+=== 2. How we use the data ===
+
+The data collected is used exclusively to:
+
+* Maintain the technical operation and security of the site;
+* Prevent vandalism, spam, and abuse;
+* Generate aggregated and anonymous usage statistics;
+* Enable authentication and preferences for registered users.
+
+We do not sell, rent, or share your personal data with third parties for commercial purposes.
+
+=== 3. Sharing with third parties ===
+
+Data may be shared only when required by law, court order, or to protect the rights, safety, and integrity of Religio Wiki, its contributors, and its users.
+
+=== 4. Data retention ===
+
+Public edits and contributions remain in the wiki's history indefinitely, as part of the authorship record required by the [https://creativecommons.org/licenses/by-sa/4.0/deed.en Creative Commons CC BY-SA 4.0] license under which the content is distributed. Technical access data (such as IP logs) is retained only for as long as necessary for site security.
+
+=== 5. Your rights ===
+
+You may, at any time:
+
+* Request information about the personal data we hold associated with your account;
+* Request correction of incorrect registration data;
+* Request closure of your account (noting that public contributions remain in the history, per item 4).
+
+=== 6. Changes to this policy ===
+
+This policy may be updated periodically. Significant changes will be communicated via a notice on this page.
+
+=== 7. Contact ===
+
+Questions about this policy can be sent to [mailto:contato@religiowiki.com contato@religiowiki.com].
+
+''Last updated: July 21, 2026''

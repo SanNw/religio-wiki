@@ -502,6 +502,10 @@
 		var panel = document.getElementById( 'mw-panel' );
 		var btn = document.getElementById( 'rw-hamburger' );
 		var overlay = document.getElementById( 'rw-sidebar-overlay' );
+		// Botão "✕" grudado na borda da própria gaveta -- ver
+		// ReligioWikiTemplate::execute() / skin.css. Fecha a gaveta do mesmo
+		// jeito que o overlay ou a tecla Esc (mesma função close() abaixo).
+		var closeBtn = document.getElementById( 'rw-sidebar-close' );
 		if ( !panel || !btn || !overlay ) {
 			return;
 		}
@@ -528,6 +532,9 @@
 			setOpen( !panel.classList.contains( 'rw-sidebar-open' ) );
 		}
 		btn.addEventListener( 'click', toggle );
+		if ( closeBtn ) {
+			closeBtn.addEventListener( 'click', close );
+		}
 		overlay.addEventListener( 'click', close );
 		document.addEventListener( 'keydown', function ( e ) {
 			if ( e.key === 'Escape' ) {
