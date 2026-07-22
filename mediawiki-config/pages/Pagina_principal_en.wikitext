@@ -6,7 +6,7 @@
 
 </div>
 <div class="rw-home-stat">
-<span class="rw-home-stat-number">{{NUMBEROFARTICLES}}</span>
+<span class="rw-home-stat-number"><artigosreais/></span>
 <span class="rw-home-stat-label">published articles</span>
 </div>
 </div>
@@ -32,5 +32,4 @@ sources and adopting their most orthodox perspectives, always with
 bibliographic references.
 </div>
 
-[[Categoria:Página principal]]
 __NOTOC__

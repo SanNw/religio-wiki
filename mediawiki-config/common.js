@@ -15,12 +15,34 @@
  * Common.js porque é conteúdo de UMA página, não do site inteiro.
  */
 
-/* ===== Widget da página de doação (Religio Wiki:Doar) ===== */
+/* ===== Widget da página de doação (Religio Wiki:Doar) =====
+ * Monta a UI de valor/frequência/método. Ao confirmar:
+ * - Cartão/Boleto: chama Special:DonateCheckout (Stripe) -- o navegador é
+ *   redirecionado pra página de pagamento hospedada pelo próprio Stripe.
+ * - Pix: chama Special:DonatePix (Mercado Pago) -- NÃO redireciona; mostra
+ *   o QR code + código "copia e cola" na própria página e consulta
+ *   Special:DonatePix/status periodicamente até confirmar o pagamento
+ *   (Pix não estava ativado na conta Stripe atual, por isso usa um
+ *   processador diferente só pra esse método).
+ *
+ * Pix/Boleto são pagamento de ação única -- não têm "débito automático" --
+ * então somem da lista de métodos quando a frequência é Mensal/Anual (só
+ * cartão continua disponível nesse caso).
+ */
 ( function () {
 	'use strict';
 
 	var PRESETS = [ 15, 20, 30, 70, 140, 200, 300 ];
-	var METHODS = [ 'Pix', 'Cartão de débito', 'Cartão de crédito', 'Boleto', 'PayPal', 'Google Pay' ];
+	// key = chave ASCII enviada pro backend; label = texto do botão;
+	// oneTimeOnly = some da lista quando a frequência não é "unico".
+	var METHODS = [
+		{ key: 'pix', label: 'Pix', oneTimeOnly: true },
+		{ key: 'boleto', label: 'Boleto', oneTimeOnly: true },
+		{ key: 'card', label: 'Cartão de crédito/débito', oneTimeOnly: false }
+	];
+
+	var PIX_POLL_INTERVAL_MS = 4000;
+	var PIX_POLL_TIMEOUT_MS = 15 * 60 * 1000; // 15 min -- combina com o prazo padrão do QR
 
 	function mount() {
 		var host = document.getElementById( 'rw-donate-widget' );
@@ -28,9 +50,24 @@
 			return;
 		}
 
-		var state = { frequency: 'unico', amount: 30, method: 'Pix' };
+		var state = { frequency: 'unico', amount: 30, method: 'pix' };
+		var pollTimer = null;
+		var pollDeadline = 0;
 
 		host.innerHTML = '';
+
+		// Mensagem de retorno do Stripe (?doacao=sucesso|cancelado na URL,
+		// ver success_url/cancel_url no SpecialDonateCheckout.php).
+		var params = new URLSearchParams( window.location.search );
+		var doacaoStatus = params.get( 'doacao' );
+		if ( doacaoStatus === 'sucesso' || doacaoStatus === 'cancelado' ) {
+			var banner = document.createElement( 'p' );
+			banner.className = 'rw-donate-banner rw-donate-banner-' + doacaoStatus;
+			banner.textContent = doacaoStatus === 'sucesso' ?
+				'Obrigado! Sua doação foi confirmada. 💛' :
+				'Pagamento cancelado -- nenhum valor foi cobrado.';
+			host.appendChild( banner );
+		}
 
 		var h2 = document.createElement( 'h2' );
 		h2.textContent = 'Fazer uma doação';
@@ -40,6 +77,9 @@
 		currency.className = 'rw-donate-currency';
 		currency.textContent = 'Montante do donativo (BRL)';
 		host.appendChild( currency );
+
+		var formArea = document.createElement( 'div' );
+		host.appendChild( formArea );
 
 		var tabs = document.createElement( 'div' );
 		tabs.className = 'rw-donate-tabs';
@@ -54,11 +94,12 @@
 				Object.keys( freqButtons ).forEach( function ( k ) {
 					freqButtons[ k ].setAttribute( 'aria-pressed', String( k === f[ 0 ] ) );
 				} );
+				updateMethodVisibility();
 			} );
 			freqButtons[ f[ 0 ] ] = btn;
 			tabs.appendChild( btn );
 		} );
-		host.appendChild( tabs );
+		formArea.appendChild( tabs );
 
 		var amounts = document.createElement( 'div' );
 		amounts.className = 'rw-donate-amounts';
@@ -78,7 +119,7 @@
 			amountButtons[ value ] = btn;
 			amounts.appendChild( btn );
 		} );
-		host.appendChild( amounts );
+		formArea.appendChild( amounts );
 
 		var customRow = document.createElement( 'div' );
 		customRow.className = 'rw-donate-custom';
@@ -98,32 +139,266 @@
 		} );
 		customRow.appendChild( customLabel );
 		customRow.appendChild( customInput );
-		host.appendChild( customRow );
+		formArea.appendChild( customRow );
 
 		var methods = document.createElement( 'div' );
 		methods.className = 'rw-donate-methods';
 		var methodButtons = {};
-		METHODS.forEach( function ( name ) {
+		METHODS.forEach( function ( m ) {
 			var btn = document.createElement( 'button' );
 			btn.type = 'button';
-			btn.textContent = name;
-			btn.setAttribute( 'aria-pressed', String( name === state.method ) );
+			btn.textContent = m.label;
+			btn.setAttribute( 'aria-pressed', String( m.key === state.method ) );
 			btn.addEventListener( 'click', function () {
-				state.method = name;
+				state.method = m.key;
 				Object.keys( methodButtons ).forEach( function ( k ) {
-					methodButtons[ k ].setAttribute( 'aria-pressed', String( k === name ) );
+					methodButtons[ k ].setAttribute( 'aria-pressed', String( k === m.key ) );
 				} );
+				updateEmailVisibility();
 			} );
-			methodButtons[ name ] = btn;
+			methodButtons[ m.key ] = btn;
 			methods.appendChild( btn );
 		} );
-		host.appendChild( methods );
+		formArea.appendChild( methods );
+
+		// E-mail só aparece pro Pix (Mercado Pago exige e-mail do pagador pra
+		// gerar o QR code; Cartão/Boleto não precisam de nada extra aqui --
+		// Stripe Checkout já coleta o que precisa na própria página dele).
+		var emailRow = document.createElement( 'div' );
+		emailRow.className = 'rw-donate-email-row';
+		var emailLabel = document.createElement( 'label' );
+		emailLabel.textContent = 'Seu e-mail (recibo do Pix)';
+		var emailInput = document.createElement( 'input' );
+		emailInput.type = 'email';
+		emailInput.placeholder = 'nome@exemplo.com';
+		emailRow.appendChild( emailLabel );
+		emailRow.appendChild( emailInput );
+		formArea.appendChild( emailRow );
+
+		function updateEmailVisibility() {
+			emailRow.style.display = state.method === 'pix' ? '' : 'none';
+		}
+
+		// Some Pix/Boleto quando a frequência não é "unico" (não têm cobrança
+		// recorrente); troca automaticamente pra "card" se o método
+		// selecionado no momento deixar de estar disponível.
+		function updateMethodVisibility() {
+			var recurring = state.frequency !== 'unico';
+			METHODS.forEach( function ( m ) {
+				methodButtons[ m.key ].style.display = ( recurring && m.oneTimeOnly ) ? 'none' : '';
+			} );
+			if ( recurring && state.method !== 'card' ) {
+				state.method = 'card';
+				Object.keys( methodButtons ).forEach( function ( k ) {
+					methodButtons[ k ].setAttribute( 'aria-pressed', String( k === 'card' ) );
+				} );
+			}
+			updateEmailVisibility();
+		}
+		updateMethodVisibility();
+
+		var errorMsg = document.createElement( 'p' );
+		errorMsg.className = 'rw-donate-error';
+		errorMsg.style.display = 'none';
+		formArea.appendChild( errorMsg );
+
+		var submitBtn = document.createElement( 'button' );
+		submitBtn.type = 'button';
+		submitBtn.className = 'rw-donate-submit';
+		submitBtn.textContent = 'Confirmar doação';
+		formArea.appendChild( submitBtn );
+
+		// Área do QR code Pix -- só aparece depois de gerar o pagamento;
+		// substitui o formulário (não faz sentido mudar valor/método com um
+		// QR já emitido) até confirmar ou o doador cancelar.
+		var pixArea = document.createElement( 'div' );
+		pixArea.className = 'rw-donate-pix-area';
+		pixArea.style.display = 'none';
+		host.appendChild( pixArea );
+
+		function stopPolling() {
+			if ( pollTimer ) {
+				clearTimeout( pollTimer );
+				pollTimer = null;
+			}
+		}
+
+		function showPixQr( orderId, qrCode, qrCodeBase64 ) {
+			formArea.style.display = 'none';
+			pixArea.style.display = '';
+			pixArea.innerHTML = '';
+
+			var title = document.createElement( 'p' );
+			title.className = 'rw-donate-pix-title';
+			title.textContent = 'Escaneie o QR code com o app do seu banco, ou copie o código Pix:';
+			pixArea.appendChild( title );
+
+			if ( qrCodeBase64 ) {
+				var img = document.createElement( 'img' );
+				img.className = 'rw-donate-pix-qr';
+				img.src = 'data:image/png;base64,' + qrCodeBase64;
+				img.alt = 'QR code Pix';
+				pixArea.appendChild( img );
+			}
+
+			var codeRow = document.createElement( 'div' );
+			codeRow.className = 'rw-donate-pix-code-row';
+			var codeInput = document.createElement( 'input' );
+			codeInput.type = 'text';
+			codeInput.readOnly = true;
+			codeInput.value = qrCode;
+			var copyBtn = document.createElement( 'button' );
+			copyBtn.type = 'button';
+			copyBtn.textContent = 'Copiar';
+			copyBtn.addEventListener( 'click', function () {
+				codeInput.select();
+				if ( navigator.clipboard && navigator.clipboard.writeText ) {
+					navigator.clipboard.writeText( qrCode );
+				} else {
+					document.execCommand( 'copy' );
+				}
+				copyBtn.textContent = 'Copiado!';
+				setTimeout( function () { copyBtn.textContent = 'Copiar'; }, 2000 );
+			} );
+			codeRow.appendChild( codeInput );
+			codeRow.appendChild( copyBtn );
+			pixArea.appendChild( codeRow );
+
+			var statusMsg = document.createElement( 'p' );
+			statusMsg.className = 'rw-donate-pix-status';
+			statusMsg.textContent = 'Aguardando confirmação do pagamento…';
+			pixArea.appendChild( statusMsg );
+
+			var cancelBtn = document.createElement( 'button' );
+			cancelBtn.type = 'button';
+			cancelBtn.className = 'rw-donate-pix-cancel';
+			cancelBtn.textContent = 'Cancelar e escolher outro valor/método';
+			cancelBtn.addEventListener( 'click', function () {
+				stopPolling();
+				pixArea.style.display = 'none';
+				formArea.style.display = '';
+				submitBtn.disabled = false;
+				submitBtn.textContent = 'Confirmar doação';
+			} );
+			pixArea.appendChild( cancelBtn );
+
+			pollDeadline = Date.now() + PIX_POLL_TIMEOUT_MS;
+			poll( orderId, statusMsg );
+		}
+
+		function poll( orderId, statusMsg ) {
+			if ( Date.now() > pollDeadline ) {
+				statusMsg.textContent = 'O QR code expirou. Cancele e gere um novo.';
+				return;
+			}
+			fetch( mw.util.getUrl( 'Special:DonatePix/status' ), {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify( { order_id: orderId } )
+			} )
+				.then( function ( res ) { return res.json(); } )
+				.then( function ( data ) {
+					if ( data.status === 'processed' ) {
+						stopPolling();
+						pixArea.innerHTML = '';
+						var ok = document.createElement( 'p' );
+						ok.className = 'rw-donate-banner rw-donate-banner-sucesso';
+						ok.textContent = 'Obrigado! Seu Pix foi confirmado. 💛';
+						pixArea.appendChild( ok );
+						return;
+					}
+					if ( data.status === 'expired' || data.status === 'cancelled' ) {
+						statusMsg.textContent = 'Este QR code expirou ou foi cancelado. ' +
+							'Cancele e gere um novo.';
+						return;
+					}
+					pollTimer = setTimeout( function () { poll( orderId, statusMsg ); }, PIX_POLL_INTERVAL_MS );
+				} )
+				.catch( function () {
+					pollTimer = setTimeout( function () { poll( orderId, statusMsg ); }, PIX_POLL_INTERVAL_MS );
+				} );
+		}
+
+		submitBtn.addEventListener( 'click', function () {
+			if ( !state.amount || state.amount < 1 ) {
+				errorMsg.textContent = 'Escolha um valor válido antes de continuar.';
+				errorMsg.style.display = '';
+				return;
+			}
+			if ( state.method === 'pix' && !emailInput.value ) {
+				errorMsg.textContent = 'Informe seu e-mail pra gerar o Pix.';
+				errorMsg.style.display = '';
+				return;
+			}
+			errorMsg.style.display = 'none';
+			submitBtn.disabled = true;
+			submitBtn.textContent = 'Processando…';
+
+			if ( state.method === 'pix' ) {
+				fetch( mw.util.getUrl( 'Special:DonatePix' ), {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify( { amount: state.amount, email: emailInput.value } )
+				} )
+					.then( function ( res ) {
+						return res.json().then( function ( data ) { return { ok: res.ok, data: data }; } );
+					} )
+					.then( function ( result ) {
+						if ( result.ok && result.data.qr_code ) {
+							showPixQr( result.data.order_id, result.data.qr_code, result.data.qr_code_base64 );
+							return;
+						}
+						throw new Error( result.data.error || 'erro_desconhecido' );
+					} )
+					.catch( function ( err ) {
+						errorMsg.textContent = err.message === 'mercadopago_not_configured' ?
+							'Pix ainda não está disponível. Tente cartão ou boleto.' :
+							'Não foi possível gerar o Pix agora. Tente novamente em alguns ' +
+							'instantes ou entre em contato: contato@religiowiki.com.';
+						errorMsg.style.display = '';
+						submitBtn.disabled = false;
+						submitBtn.textContent = 'Confirmar doação';
+					} );
+				return;
+			}
+
+			fetch( mw.util.getUrl( 'Special:DonateCheckout' ), {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify( {
+					amount: state.amount,
+					frequency: state.frequency,
+					method: state.method
+				} )
+			} )
+				.then( function ( res ) {
+					return res.json().then( function ( data ) {
+						return { ok: res.ok, data: data };
+					} );
+				} )
+				.then( function ( result ) {
+					if ( result.ok && result.data.url ) {
+						window.location.href = result.data.url;
+						return;
+					}
+					throw new Error( result.data.error || 'erro_desconhecido' );
+				} )
+				.catch( function ( err ) {
+					errorMsg.textContent = err.message === 'method_not_enabled' ?
+						'Este método de pagamento ainda não está disponível. Tente outro método, ' +
+						'como cartão.' :
+						'Não foi possível iniciar o pagamento agora. Tente novamente em alguns ' +
+						'instantes ou entre em contato: contato@religiowiki.com.';
+					errorMsg.style.display = '';
+					submitBtn.disabled = false;
+					submitBtn.textContent = 'Confirmar doação';
+				} );
+		} );
 
 		var note = document.createElement( 'p' );
 		note.className = 'rw-donate-note';
-		note.textContent = 'Esta é uma prévia da interface de doação — a cobrança de verdade ' +
-			'depende de conectar um meio de pagamento real (Pix, gateway de cartão/boleto, ' +
-			'PayPal etc.) a esta página, o que ainda não foi feito.';
+		note.textContent = 'Cartão e boleto processados pelo Stripe; Pix processado pelo Mercado ' +
+			'Pago -- seus dados de cartão nunca passam pelos nossos servidores.';
 		host.appendChild( note );
 	}
 

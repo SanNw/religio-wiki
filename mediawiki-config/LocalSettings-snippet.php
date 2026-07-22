@@ -720,3 +720,61 @@ if ( getenv( 'RW_SMTP_HOST' ) ) {
 		'password' => (string)getenv( 'RW_SMTP_PASS' ),
 	];
 }
+
+
+// rw-donate-checkout: Special:DonateCheckout recebe o valor/frequência/
+// método escolhidos no widget de Religio Wiki:Doar (ver MediaWiki:Common.js)
+// e cria uma Stripe Checkout Session -- pagamento de verdade, hospedado
+// pelo próprio Stripe (nenhum dado de cartão passa por aqui). Chave secreta
+// só existe como variável de ambiente (RW_STRIPE_SECRET_KEY, ver
+// docker-compose.yml / .env), nunca em código.
+require_once __DIR__ . '/mediawiki-config/includes/SpecialDonateCheckout.php';
+$wgSpecialPages['DonateCheckout'] = SpecialDonateCheckout::class;
+
+// rw-donate-pix: Special:DonatePix cria e consulta pagamentos Pix via
+// Mercado Pago (Boleto/Cartão continuam via Stripe -- ver
+// SpecialDonateCheckout.php -- porque o Pix não estava ativado na conta
+// Stripe atual). Chave só existe como variável de ambiente
+// (RW_MERCADOPAGO_ACCESS_TOKEN), nunca em código.
+require_once __DIR__ . '/mediawiki-config/includes/SpecialDonatePix.php';
+$wgSpecialPages['DonatePix'] = SpecialDonatePix::class;
+
+
+// rw-real-article-count: {{#artigosreais:}} conta só artigos DE VERDADE no
+// namespace principal -- {{NUMBEROFARTICLES}} nativo (via
+// $wgArticleCountMethod='any', ver rw-article-count-any) conta QUALQUER
+// página não-redirecionamento nesse namespace, incluindo subpáginas de
+// infraestrutura que moram lá por causa de transclusão (Página
+// principal/Artigo em destaque, /Imagem do dia) e as traduções (/en, /es,
+// etc.) -- nenhuma dessas é um "artigo publicado" de verdade. Mesmo
+// filtro usado em rw-random-exclude-mainpage: exclui a própria página
+// principal e qualquer página com "/" no título (subpágina) do namespace
+// principal.
+// setHook() (tag <artigosreais/>), não setFunctionHook() ({{#artigosreais:}})
+// -- parser functions exigem uma "magic word" registrada via arquivo de
+// i18n de extensão de verdade (MessagesXx.php/extension.json), que não
+// existe pra um hook solto aqui no LocalSettings ("invalid magic word",
+// confirmado testando ao vivo). Tag hook não tem esse requisito, só
+// precisa do nome mesmo.
+$wgHooks['ParserFirstCallInit'][] = static function ( Parser $parser ) {
+	$parser->setHook( 'artigosreais', static function () {
+		$dbr = MediaWiki\MediaWikiServices::getInstance()->getConnectionProvider()->getReplicaDatabase();
+		$mainPage = Title::newMainPage();
+		$conds = [
+			'page_namespace' => NS_MAIN,
+			'page_is_redirect' => 0,
+		];
+		if ( $mainPage ) {
+			$dbKey = $mainPage->getDBkey();
+			$conds[] = 'page_title != ' . $dbr->addQuotes( $dbKey );
+		}
+		$conds[] = 'page_title NOT ' . $dbr->buildLike( $dbr->anyString(), '/', $dbr->anyString() );
+		$count = $dbr->newSelectQueryBuilder()
+			->select( 'COUNT(*)' )
+			->from( 'page' )
+			->where( $conds )
+			->caller( __METHOD__ )
+			->fetchField();
+		return (string)$count;
+	} );
+};
