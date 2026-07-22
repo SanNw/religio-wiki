@@ -6,7 +6,7 @@
 
 </div>
 <div class="rw-home-stat">
-<span class="rw-home-stat-number">{{NUMBEROFARTICLES}}</span>
+<span class="rw-home-stat-number"><artigosreais/></span>
 <span class="rw-home-stat-label">published articles</span>
 </div>
 </div>
