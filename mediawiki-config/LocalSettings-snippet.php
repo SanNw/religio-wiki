@@ -730,3 +730,11 @@ if ( getenv( 'RW_SMTP_HOST' ) ) {
 // docker-compose.yml / .env), nunca em código.
 require_once __DIR__ . '/mediawiki-config/includes/SpecialDonateCheckout.php';
 $wgSpecialPages['DonateCheckout'] = SpecialDonateCheckout::class;
+
+// rw-donate-pix: Special:DonatePix cria e consulta pagamentos Pix via
+// Mercado Pago (Boleto/Cartão continuam via Stripe -- ver
+// SpecialDonateCheckout.php -- porque o Pix não estava ativado na conta
+// Stripe atual). Chave só existe como variável de ambiente
+// (RW_MERCADOPAGO_ACCESS_TOKEN), nunca em código.
+require_once __DIR__ . '/mediawiki-config/includes/SpecialDonatePix.php';
+$wgSpecialPages['DonatePix'] = SpecialDonatePix::class;
