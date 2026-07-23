@@ -813,3 +813,51 @@ $wgHooks['ParserFirstCallInit'][] = static function ( Parser $parser ) {
 		return (string)$count;
 	} );
 };
+
+
+// rw-auto-redirect-synonyms: toda vez que um artigo é salvo (criado ou
+// editado), procura pelo padrão "'''Título''' (ou Sinônimo)" -- ou
+// "também conhecido/chamado como/de" -- logo no início do texto (convenção
+// já usada nos artigos, ex.: "'''Jesus Cristo''' (ou Jesus de Nazaré)") e
+// cria o(s) redirecionamento(s) pro(s) sinônimo(s) detectado(s) AUTOMATICAMENTE,
+// sem precisar de nenhum passo manual. Só cria se o título ainda não existir
+// (nunca sobrescreve conteúdo/redirecionamento já existente). Roda só em
+// artigos de verdade: namespace principal, não a home, não subpágina
+// (traduções/widgets), não um redirecionamento em si (evita reagir à
+// criação dos próprios redirecionamentos que ele mesmo gera).
+$wgHooks['PageSaveComplete'][] = static function ( $wikiPage, $user, $summary, $flags, $revisionRecord, $editResult ) {
+	$title = $wikiPage->getTitle();
+	if ( !$title->inNamespace( NS_MAIN ) || $title->isMainPage() || $title->isSubpage() || $wikiPage->isRedirect() ) {
+		return;
+	}
+	$content = $wikiPage->getContent();
+	if ( !$content instanceof WikitextContent ) {
+		return;
+	}
+	$text = $content->getText();
+	$pattern = '/^\s*\'{3}[^\']+\'{3}\s*\((?:ou|também conhecido como|também conhecida como|também chamado de|também chamada de)\s+([^)]+)\)/iu';
+	if ( !preg_match( $pattern, $text, $m ) ) {
+		return;
+	}
+	$namesRaw = preg_split( '/,\s*| e (?=\p{Lu})/u', $m[1] );
+	$wikiPageFactory = MediaWiki\MediaWikiServices::getInstance()->getWikiPageFactory();
+	foreach ( $namesRaw as $rawName ) {
+		$name = trim( preg_replace( '/\'{2,}|\[\[|\]\]/', '', $rawName ) );
+		if ( $name === '' || mb_strlen( $name ) > 80 ) {
+			continue;
+		}
+		$altTitle = Title::newFromText( $name, NS_MAIN );
+		if ( !$altTitle || $altTitle->equals( $title ) || $altTitle->exists() ) {
+			continue;
+		}
+		$altPage = $wikiPageFactory->newFromTitle( $altTitle );
+		$redirectContent = new WikitextContent( '#REDIRECT [[' . $title->getPrefixedText() . ']]' );
+		$updater = $altPage->newPageUpdater( $user );
+		$updater->setContent( MediaWiki\Revision\SlotRecord::MAIN, $redirectContent );
+		$updater->saveRevision(
+			CommentStoreComment::newUnsavedComment(
+				'rw-auto-redirect: sinônimo detectado automaticamente em ' . $title->getPrefixedText()
+			)
+		);
+	}
+};
