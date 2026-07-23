@@ -692,6 +692,28 @@ $wgGroupPermissions['sysop']['deletebatch'] = true;
 wfLoadExtension( 'AdvancedSearch' );
 $wgAdvancedSearchDeepcategoryEnabled = false;
 
+// ---------- LinkTitles (linka automaticamente títulos de outros artigos) ----------
+// Ao salvar um artigo (namespace principal), procura ocorrências do TÍTULO de
+// outras páginas existentes no texto e transforma a primeira ocorrência em
+// link interno -- sem o editor precisar lembrar de linkar manualmente. Os
+// padrões da extensão já são conservadores o bastante pra este wiki sem
+// precisar sobrescrever nada: só processa NS_MAIN
+// ($wgLinkTitlesSourceNamespaces = [] -> default é só o namespace principal),
+// só a 1ª ocorrência por página-alvo ($wgLinkTitlesFirstOnly = true), e modo
+// "smart" que ignora maiúsculas/minúsculas de sobra
+// ($wgLinkTitlesSmartMode = true).
+// Testado ao vivo: "Jesus Cristo" no texto virou "[[Jesus]] Cristo" em vez de
+// "[[Jesus Cristo]]" inteiro -- a extensão trata redirecionamentos (como
+// "Jesus", criado pelo hook rw-auto-redirect-synonyms) como alvo de link
+// válido igual a um artigo de verdade, e não tem opção nativa pra excluir
+// redirecionamentos da lista de candidatos (só blacklist manual por título).
+// O link final ainda funciona certo (cai no artigo certo via redirect), só
+// fica visualmente fragmentado. Mitigado listando os redirecionamentos de
+// sinônimo conhecidos no blacklist abaixo -- NOVOS sinônimos criados pelo
+// hook automático no futuro não entram aqui sozinhos, é um limite conhecido.
+wfLoadExtension( 'LinkTitles' );
+$wgLinkTitlesBlackList = [ 'Jesus', 'Jesus de Nazaré', 'Islã', 'Maomé' ];
+
 // ---------- E-mail e confirmação de conta ----------
 // A criação de conta já é aberta (ver bloco de acesso no topo). Aqui liga a
 // CONFIRMAÇÃO de e-mail: quem cria conta e informa e-mail recebe um link de
