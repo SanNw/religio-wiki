@@ -828,6 +828,27 @@ input[type="text"], input[type="password"], input[type="email"], input[type="num
 .oo-ui-image-progressive:not(.tool) {
 	background-color: var(--rw-link) !important;
 }
+/* rw-toolbar-icon-no-brown: o :not(.tool) acima só exclui o PRÓPRIO elemento
+   com classe "tool" -- não os descendentes de .oo-ui-tool (a classe "tool"
+   fica num ancestral do ícone, não no <span> em si). Resultado ao vivo:
+   dentro de qualquer toolbar OOUI (WikiEditor clássico, VisualEditor), ao
+   ATIVAR uma ferramenta (ex.: abrir o dropdown "+" do VE, ou qualquer botão
+   marcado progressive enquanto pressionado), o ícone/indicador ganhava um
+   fundo marrom SÓLIDO preenchendo a altura inteira do botão (~48px), não só
+   o desenho do ícone -- visual de "o botão inteiro vira um retângulo
+   marrom", reportado como bug. Reseta pra transparente especificamente
+   dentro de toolbars; ícones de DIÁLOGO (TemplateWizard, upload etc., fora
+   de .oo-ui-toolbar) continuam recoloridos normalmente pela regra acima.
+   Também cobre .tool (wrapper de botão do WikiEditor CLÁSSICO, ex.: o
+   toggle "Mostrar previsão" -- ext-WikiEditor-realtimepreview-button --
+   mesmo botão do bug antigo "marrom/ilegível" já corrigido uma vez pro
+   fundo/texto, mas o ÍCONE dele continuava sendo pego por esta regra
+   porque :not(.tool) nunca funcionou pra ele: a classe "tool" fica no
+   ancestral do ícone, nunca no próprio <span> do ícone). */
+.oo-ui-toolbar .oo-ui-image-progressive,
+.tool .oo-ui-image-progressive {
+	background-color: transparent !important;
+}
 /* Diálogos OOUI em geral (cabeçalho do TemplateWizard/upload) na identidade. */
 .oo-ui-processDialog-location .oo-ui-labelElement-label,
 .oo-ui-window-head .oo-ui-labelElement-label {

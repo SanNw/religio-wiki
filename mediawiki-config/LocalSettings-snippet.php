@@ -157,12 +157,20 @@ wfLoadExtension( 'Linter' );
 // tópico, assinar tópicos). Depende de VisualEditor + Linter, carregados acima.
 wfLoadExtension( 'DiscussionTools' );
 
-// A aba "Editar" do VisualEditor não é usada na Religio Wiki (a edição fica no
-// editor de código-fonte, que funciona sempre); o VE fica carregado só como
-// dependência do DiscussionTools. Este hook remove a aba do VE da navegação e
-// deixa o único botão de edição como "Editar" (em vez de "Editar código-fonte").
+// A aba "Editar" do VisualEditor não é usada na Religio Wiki por padrão (a
+// edição fica no editor de código-fonte, que funciona sempre); o VE fica
+// carregado principalmente como dependência do DiscussionTools. Este hook
+// remove a aba do VE da navegação, MAS só para quem tem a preferência
+// "visualeditor-enable" desligada (o padrão do site, via
+// $wgDefaultUserOptions acima) — quem ligar a preferência pessoalmente
+// (Special:Preferências → Edição, ou setada direto por um admin) volta a ver
+// a aba normalmente. rw-ve-optin: decisão de 2026-07-23, usuário quis manter
+// o VE ligado só na própria conta, sem mudar o padrão pros outros editores.
 $wgHooks['SkinTemplateNavigation::Universal'][] = static function ( $sktemplate, &$links ) {
-	unset( $links['views']['ve-edit'] );
+	$userOptionsLookup = MediaWiki\MediaWikiServices::getInstance()->getUserOptionsLookup();
+	if ( !$userOptionsLookup->getBoolOption( $sktemplate->getUser(), 'visualeditor-enable' ) ) {
+		unset( $links['views']['ve-edit'] );
+	}
 	if ( isset( $links['views']['edit']['text'] ) ) {
 		$links['views']['edit']['text'] = 'Editar';
 	}
@@ -174,9 +182,14 @@ $wgHooks['SkinTemplateNavigation::Universal'][] = static function ( $sktemplate,
 // caminho totalmente separado (hook 'SkinEditSectionLinks', chave
 // 'veeditsection' no array de resultado) — por isso sobrevivia mesmo com o
 // hook acima, aparecendo em dobro ("editar | editar código-fonte") em cada
-// seção para quem tem o VE habilitado nas preferências pessoais.
+// seção para quem tem o VE habilitado nas preferências pessoais. Mesma
+// condição rw-ve-optin do hook acima: só remove pra quem está com a
+// preferência desligada.
 $wgHooks['SkinEditSectionLinks'][] = static function ( $skin, $title, $section, $tooltip, &$result, $lang ) {
-	unset( $result['veeditsection'] );
+	$userOptionsLookup = MediaWiki\MediaWikiServices::getInstance()->getUserOptionsLookup();
+	if ( !$userOptionsLookup->getBoolOption( $skin->getUser(), 'visualeditor-enable' ) ) {
+		unset( $result['veeditsection'] );
+	}
 };
 
 // TemplateData: documentação estruturada de templates, usada pelo
