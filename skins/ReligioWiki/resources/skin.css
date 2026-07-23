@@ -794,15 +794,24 @@ input[type="text"], input[type="password"], input[type="email"], input[type="num
    cima (o ícone dele é uma imagem já colorida, não uma máscara, então forçar
    background-color não recolore o ícone, só cria uma caixa atrás dele). Achado
    inspecionando o DOM ao vivo (getComputedStyle + elementsFromPoint), não
-   suposição. */
-.oo-ui-flaggedElement-progressive:not(.tool) > .oo-ui-buttonElement-button,
-.oo-ui-flaggedElement-primary:not(.tool) > .oo-ui-buttonElement-button {
+   suposição.
+   :not(.oo-ui-buttonElement-frameless) exclui os botões SEM moldura (ex.: o
+   "i" de ajuda no cabeçalho do diálogo "Inserir predefinição" -- também é
+   progressive, mas frameless). Sem essa exclusão, esse botão ficava com o
+   MESMO bug de fundo marrom + texto marrom: a regra abaixo (frameless
+   progressive) tem mais classes no seletor, então o color:var(--rw-link)
+   dela vencia sobre o color:#fff daqui, mas o background-color continuava
+   vindo daqui -- fundo e texto marrom, invisível. Achado inspecionando o
+   DOM ao vivo (getComputedStyle no botão real do diálogo). Botões sólidos
+   de verdade (framed) continuam intocados por essa exclusão. */
+.oo-ui-flaggedElement-progressive:not(.tool):not(.oo-ui-buttonElement-frameless) > .oo-ui-buttonElement-button,
+.oo-ui-flaggedElement-primary:not(.tool):not(.oo-ui-buttonElement-frameless) > .oo-ui-buttonElement-button {
 	background-color: var(--rw-link) !important;
 	border-color: var(--rw-link) !important;
 	color: #fff !important;
 }
-.oo-ui-flaggedElement-progressive:not(.tool) > .oo-ui-buttonElement-button:hover,
-.oo-ui-flaggedElement-primary:not(.tool) > .oo-ui-buttonElement-button:hover {
+.oo-ui-flaggedElement-progressive:not(.tool):not(.oo-ui-buttonElement-frameless) > .oo-ui-buttonElement-button:hover,
+.oo-ui-flaggedElement-primary:not(.tool):not(.oo-ui-buttonElement-frameless) > .oo-ui-buttonElement-button:hover {
 	background-color: var(--rw-text) !important;
 	border-color: var(--rw-text) !important;
 }
