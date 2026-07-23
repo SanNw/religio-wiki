@@ -87,6 +87,14 @@ RUN set -eux; \
 		rm -rf "${ext}/.git"; \
 	done
 
+# LinkTitles -- não é mirror do Wikimedia (repositório próprio, distribuído
+# por tags de release, não pelas branches REL1_xx), então clona com tag fixa
+# em vez de --branch "${MW_BRANCH}".
+RUN set -eux; \
+	rm -rf LinkTitles; \
+	git clone --depth 1 --branch v8.1.1 https://github.com/bovender/LinkTitles.git LinkTitles; \
+	rm -rf LinkTitles/.git
+
 WORKDIR /var/www/html
 
 # Extensões instaladas via Composer (Semantic MediaWiki, Page Forms, Cargo,
