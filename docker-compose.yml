@@ -41,6 +41,26 @@ services:
       - ./LocalSettings.php:/var/www/html/LocalSettings.php
       - wiki_images:/var/www/html/images
 
+  # Zotero translation-server: extrai metadados de citação de uma URL de
+  # verdade (usa os "tradutores" do Zotero, específicos por site). Só o
+  # citoid fala com ele -- nenhuma porta publicada pro host/internet.
+  zotero:
+    build: ./zotero
+    restart: unless-stopped
+
+  # Citoid: serviço que o botão de citação do VisualEditor chama
+  # ($wgCitoidServiceUrl no LocalSettings.php) pra gerar uma citação
+  # completa a partir de URL/DOI/ISBN. Depende do zotero acima. Só a porta
+  # 1970 é publicada no HOST (127.0.0.1), pra debug via curl -- não é
+  # exposta na internet (nginx da VPS só repassa a 8080/mediawiki).
+  citoid:
+    build: ./citoid
+    restart: unless-stopped
+    depends_on:
+      - zotero
+    ports:
+      - "127.0.0.1:1970:1970"
+
 volumes:
   db_data:
   wiki_images:

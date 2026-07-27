@@ -197,6 +197,18 @@ $wgHooks['SkinEditSectionLinks'][] = static function ( $skin, $title, $section, 
 // citação) num formulário em vez de wikitexto cru.
 wfLoadExtension( 'TemplateData' );
 
+// Citoid: gera uma citação completa (autor, título, data, editora...) a
+// partir de só uma URL/DOI/ISBN colada na ferramenta "Citar" do
+// VisualEditor -- sem precisar preencher cada campo à mão. Precisa dos
+// serviços "citoid" (Node.js) + "zotero" (translation-server, extrai os
+// metadados de verdade das páginas) definidos no docker-compose.yml deste
+// projeto; NÃO existe um endpoint público compartilhado da Wikimedia pra
+// wikis de terceiros usarem, por isso os dois rodam aqui mesmo.
+// "citoid:1970" é o nome do serviço na rede interna do Docker Compose
+// (resolve sozinho, sem precisar de IP fixo).
+wfLoadExtension( 'Citoid' );
+$wgCitoidServiceUrl = 'http://citoid:1970/api';
+
 // TemplateWizard: adiciona um botão (peça de quebra-cabeça) na barra do
 // WikiEditor que abre um assistente para inserir predefinições (templates)
 // preenchendo seus campos num formulário, em vez de digitar o wikitexto
