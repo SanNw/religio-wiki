@@ -40,6 +40,14 @@ class ReligioWikiTemplate extends BaseTemplate {
 		// Administradores da interface). Usado pra esconder itens só de admin
 		// na lateral e a aba "Discussão" pra quem não é admin.
 		$isAdmin = $skin->getAuthority()->isAllowed( 'editinterface' );
+		// rw-ve-optin (2026-07-23): a aba do VisualEditor ("ve-edit") fica
+		// escondida por padrão (só o editor de código-fonte, renomeado pra
+		// "Editar"), MAS quem ligar a preferência pessoal "visualeditor-enable"
+		// (Special:Preferências → Edição) volta a ver as duas abas separadas.
+		// Ver também os hooks SkinTemplateNavigation::Universal/
+		// SkinEditSectionLinks no LocalSettings-snippet.php (mesma condição).
+		$veEnabled = MediaWiki\MediaWikiServices::getInstance()->getUserOptionsLookup()
+			->getBoolOption( $skin->getUser(), 'visualeditor-enable' );
 		// Itens da lateral (MediaWiki:Sidebar) que só admin deve ver — casados
 		// pelo rótulo exato definido no wikitext da sidebar.
 		// Comparação pelo 'id' (derivado da CHAVE crua do MediaWiki:Sidebar,
@@ -130,30 +138,43 @@ class ReligioWikiTemplate extends BaseTemplate {
 		foreach ( ( $contentNav['namespaces'] ?? [] ) as $key => $tab ) {
 			if ( !$isAdmin && ( $key === 'talk' || substr( (string)$key, -5 ) === '_talk' ) ) { continue; } // aba "Discussão" só para admin
 			$class = 'rw-tab' . ( ( $tab['class'] ?? '' ) === 'selected' ? ' rw-tab-current' : '' );
-			printf( '<a href="%s" class="%s">%s</a>' . "\n",
-				htmlspecialchars( $tab['href'] ), $class, htmlspecialchars( $tab['text'] ) );
+			// id="ca-$key" -- convenção nativa do MediaWiki (BaseTemplate::
+			// makeListItem). Sem isso, scripts do core/extensões que procuram a
+			// aba pelo id padrão (ex.: #ca-ve-edit) nunca encontram nada.
+			printf( '<a id="ca-%s" href="%s" class="%s">%s</a>' . "\n",
+				htmlspecialchars( $key ), htmlspecialchars( $tab['href'] ), $class, htmlspecialchars( $tab['text'] ) );
 		}
 		$views = $contentNav['views'] ?? [];
 		$actions = $contentNav['actions'] ?? [];
 		if ( $views || $actions ) {
 			echo '<span class="rw-tab-group">' . "\n";
 			foreach ( $views as $key => $tab ) {
-				// A aba do VisualEditor ("ve-edit") não é usada — some para
-				// TODO MUNDO (usuário e admin), independente de preferência
-				// salva. Sobra só a de código-fonte, renomeada para "Editar".
-				if ( $key === 've-edit' ) { continue; }
+				// rw-ve-optin: some com a aba "ve-edit" só pra quem NÃO ligou a
+				// preferência pessoal (ver $veEnabled acima). Quem ligou vê as
+				// duas abas ("Editar" = visual, "Editar código-fonte" = normal).
+				if ( $key === 've-edit' && !$veEnabled ) { continue; }
 				$extraClass = $key === 'edit' ? ' rw-tab-edit' : '';
-				$text = ( $key === 'edit' ) ? 'Editar' : ( $tab['text'] ?? '' );
-				printf( '<a href="%s" class="rw-tab%s">%s</a>' . "\n",
-					htmlspecialchars( $tab['href'] ), $extraClass, htmlspecialchars( $text ) );
+				// Só força o rótulo "Editar" na aba de código-fonte quando a aba
+				// do VE está escondida (senão as duas ficariam com o mesmo
+				// texto) -- com o VE visível, cada aba usa o rótulo natural que
+				// o MediaWiki já dá ("Editar" pro VE, "Editar código-fonte" pro
+				// resto).
+				$text = ( $key === 'edit' && !$veEnabled ) ? 'Editar' : ( $tab['text'] ?? '' );
+				// id="ca-$key" -- mesma convenção nativa acima. É esse id
+				// (ca-ve-edit / ca-edit) que o JS do VisualEditor procura no DOM
+				// pra saber que a aba existe e ligar o clique nela / decidir se
+				// auto-ativa ao carregar com ?veaction=edit na URL. Sem ele, o
+				// VE nunca ativava -- nem clicando na aba, nem via URL direta.
+				printf( '<a id="ca-%s" href="%s" class="rw-tab%s">%s</a>' . "\n",
+					htmlspecialchars( $key ), htmlspecialchars( $tab['href'] ), $extraClass, htmlspecialchars( $text ) );
 			}
 			if ( $actions ) {
 				echo '<div class="rw-personal-dropdown rw-tab-more">' . "\n";
 				echo '<button type="button" class="rw-personal-dropdown-toggle rw-tab" aria-expanded="false">Mais <span class="rw-collapse-chevron">▾</span></button>' . "\n";
 				echo '<ul class="rw-personal-dropdown-menu">' . "\n";
 				foreach ( $actions as $key => $tab ) {
-					printf( '<li><a href="%s">%s</a></li>' . "\n",
-						htmlspecialchars( $tab['href'] ), htmlspecialchars( $tab['text'] ) );
+					printf( '<li id="ca-%s"><a href="%s">%s</a></li>' . "\n",
+						htmlspecialchars( $key ), htmlspecialchars( $tab['href'] ), htmlspecialchars( $tab['text'] ) );
 				}
 				echo '</ul></div>' . "\n";
 			}

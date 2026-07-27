@@ -157,12 +157,20 @@ wfLoadExtension( 'Linter' );
 // tópico, assinar tópicos). Depende de VisualEditor + Linter, carregados acima.
 wfLoadExtension( 'DiscussionTools' );
 
-// A aba "Editar" do VisualEditor não é usada na Religio Wiki (a edição fica no
-// editor de código-fonte, que funciona sempre); o VE fica carregado só como
-// dependência do DiscussionTools. Este hook remove a aba do VE da navegação e
-// deixa o único botão de edição como "Editar" (em vez de "Editar código-fonte").
+// A aba "Editar" do VisualEditor não é usada na Religio Wiki por padrão (a
+// edição fica no editor de código-fonte, que funciona sempre); o VE fica
+// carregado principalmente como dependência do DiscussionTools. Este hook
+// remove a aba do VE da navegação, MAS só para quem tem a preferência
+// "visualeditor-enable" desligada (o padrão do site, via
+// $wgDefaultUserOptions acima) — quem ligar a preferência pessoalmente
+// (Special:Preferências → Edição, ou setada direto por um admin) volta a ver
+// a aba normalmente. rw-ve-optin: decisão de 2026-07-23, usuário quis manter
+// o VE ligado só na própria conta, sem mudar o padrão pros outros editores.
 $wgHooks['SkinTemplateNavigation::Universal'][] = static function ( $sktemplate, &$links ) {
-	unset( $links['views']['ve-edit'] );
+	$userOptionsLookup = MediaWiki\MediaWikiServices::getInstance()->getUserOptionsLookup();
+	if ( !$userOptionsLookup->getBoolOption( $sktemplate->getUser(), 'visualeditor-enable' ) ) {
+		unset( $links['views']['ve-edit'] );
+	}
 	if ( isset( $links['views']['edit']['text'] ) ) {
 		$links['views']['edit']['text'] = 'Editar';
 	}
@@ -174,15 +182,32 @@ $wgHooks['SkinTemplateNavigation::Universal'][] = static function ( $sktemplate,
 // caminho totalmente separado (hook 'SkinEditSectionLinks', chave
 // 'veeditsection' no array de resultado) — por isso sobrevivia mesmo com o
 // hook acima, aparecendo em dobro ("editar | editar código-fonte") em cada
-// seção para quem tem o VE habilitado nas preferências pessoais.
+// seção para quem tem o VE habilitado nas preferências pessoais. Mesma
+// condição rw-ve-optin do hook acima: só remove pra quem está com a
+// preferência desligada.
 $wgHooks['SkinEditSectionLinks'][] = static function ( $skin, $title, $section, $tooltip, &$result, $lang ) {
-	unset( $result['veeditsection'] );
+	$userOptionsLookup = MediaWiki\MediaWikiServices::getInstance()->getUserOptionsLookup();
+	if ( !$userOptionsLookup->getBoolOption( $skin->getUser(), 'visualeditor-enable' ) ) {
+		unset( $result['veeditsection'] );
+	}
 };
 
 // TemplateData: documentação estruturada de templates, usada pelo
 // VisualEditor para mostrar os campos de um template (ex.: template de
 // citação) num formulário em vez de wikitexto cru.
 wfLoadExtension( 'TemplateData' );
+
+// Citoid: gera uma citação completa (autor, título, data, editora...) a
+// partir de só uma URL/DOI/ISBN colada na ferramenta "Citar" do
+// VisualEditor -- sem precisar preencher cada campo à mão. Precisa dos
+// serviços "citoid" (Node.js) + "zotero" (translation-server, extrai os
+// metadados de verdade das páginas) definidos no docker-compose.yml deste
+// projeto; NÃO existe um endpoint público compartilhado da Wikimedia pra
+// wikis de terceiros usarem, por isso os dois rodam aqui mesmo.
+// "citoid:1970" é o nome do serviço na rede interna do Docker Compose
+// (resolve sozinho, sem precisar de IP fixo).
+wfLoadExtension( 'Citoid' );
+$wgCitoidServiceUrl = 'http://citoid:1970/api';
 
 // TemplateWizard: adiciona um botão (peça de quebra-cabeça) na barra do
 // WikiEditor que abre um assistente para inserir predefinições (templates)
@@ -692,6 +717,28 @@ $wgGroupPermissions['sysop']['deletebatch'] = true;
 wfLoadExtension( 'AdvancedSearch' );
 $wgAdvancedSearchDeepcategoryEnabled = false;
 
+// ---------- LinkTitles (linka automaticamente títulos de outros artigos) ----------
+// Ao salvar um artigo (namespace principal), procura ocorrências do TÍTULO de
+// outras páginas existentes no texto e transforma a primeira ocorrência em
+// link interno -- sem o editor precisar lembrar de linkar manualmente. Os
+// padrões da extensão já são conservadores o bastante pra este wiki sem
+// precisar sobrescrever nada: só processa NS_MAIN
+// ($wgLinkTitlesSourceNamespaces = [] -> default é só o namespace principal),
+// só a 1ª ocorrência por página-alvo ($wgLinkTitlesFirstOnly = true), e modo
+// "smart" que ignora maiúsculas/minúsculas de sobra
+// ($wgLinkTitlesSmartMode = true).
+// Testado ao vivo: "Jesus Cristo" no texto virou "[[Jesus]] Cristo" em vez de
+// "[[Jesus Cristo]]" inteiro -- a extensão trata redirecionamentos (como
+// "Jesus", criado pelo hook rw-auto-redirect-synonyms) como alvo de link
+// válido igual a um artigo de verdade, e não tem opção nativa pra excluir
+// redirecionamentos da lista de candidatos (só blacklist manual por título).
+// O link final ainda funciona certo (cai no artigo certo via redirect), só
+// fica visualmente fragmentado. Mitigado listando os redirecionamentos de
+// sinônimo conhecidos no blacklist abaixo -- NOVOS sinônimos criados pelo
+// hook automático no futuro não entram aqui sozinhos, é um limite conhecido.
+wfLoadExtension( 'LinkTitles' );
+$wgLinkTitlesBlackList = [ 'Jesus', 'Jesus de Nazaré', 'Islã', 'Maomé' ];
+
 // ---------- E-mail e confirmação de conta ----------
 // A criação de conta já é aberta (ver bloco de acesso no topo). Aqui liga a
 // CONFIRMAÇÃO de e-mail: quem cria conta e informa e-mail recebe um link de
@@ -777,52 +824,4 @@ $wgHooks['ParserFirstCallInit'][] = static function ( Parser $parser ) {
 			->fetchField();
 		return (string)$count;
 	} );
-};
-
-
-// rw-auto-redirect-synonyms: toda vez que um artigo é salvo (criado ou
-// editado), procura pelo padrão "'''Título''' (ou Sinônimo)" -- ou
-// "também conhecido/chamado como/de" -- logo no início do texto (convenção
-// já usada nos artigos, ex.: "'''Jesus Cristo''' (ou Jesus de Nazaré)") e
-// cria o(s) redirecionamento(s) pro(s) sinônimo(s) detectado(s) AUTOMATICAMENTE,
-// sem precisar de nenhum passo manual. Só cria se o título ainda não existir
-// (nunca sobrescreve conteúdo/redirecionamento já existente). Roda só em
-// artigos de verdade: namespace principal, não a home, não subpágina
-// (traduções/widgets), não um redirecionamento em si (evita reagir à
-// criação dos próprios redirecionamentos que ele mesmo gera).
-$wgHooks['PageSaveComplete'][] = static function ( $wikiPage, $user, $summary, $flags, $revisionRecord, $editResult ) {
-	$title = $wikiPage->getTitle();
-	if ( !$title->inNamespace( NS_MAIN ) || $title->isMainPage() || $title->isSubpage() || $wikiPage->isRedirect() ) {
-		return;
-	}
-	$content = $wikiPage->getContent();
-	if ( !$content instanceof WikitextContent ) {
-		return;
-	}
-	$text = $content->getText();
-	$pattern = '/^\s*\'{3}[^\']+\'{3}\s*\((?:ou|também conhecido como|também conhecida como|também chamado de|também chamada de)\s+([^)]+)\)/iu';
-	if ( !preg_match( $pattern, $text, $m ) ) {
-		return;
-	}
-	$namesRaw = preg_split( '/,\s*| e (?=\p{Lu})/u', $m[1] );
-	$wikiPageFactory = MediaWiki\MediaWikiServices::getInstance()->getWikiPageFactory();
-	foreach ( $namesRaw as $rawName ) {
-		$name = trim( preg_replace( '/\'{2,}|\[\[|\]\]/', '', $rawName ) );
-		if ( $name === '' || mb_strlen( $name ) > 80 ) {
-			continue;
-		}
-		$altTitle = Title::newFromText( $name, NS_MAIN );
-		if ( !$altTitle || $altTitle->equals( $title ) || $altTitle->exists() ) {
-			continue;
-		}
-		$altPage = $wikiPageFactory->newFromTitle( $altTitle );
-		$redirectContent = new WikitextContent( '#REDIRECT [[' . $title->getPrefixedText() . ']]' );
-		$updater = $altPage->newPageUpdater( $user );
-		$updater->setContent( MediaWiki\Revision\SlotRecord::MAIN, $redirectContent );
-		$updater->saveRevision(
-			CommentStoreComment::newUnsavedComment(
-				'rw-auto-redirect: sinônimo detectado automaticamente em ' . $title->getPrefixedText()
-			)
-		);
-	}
 };

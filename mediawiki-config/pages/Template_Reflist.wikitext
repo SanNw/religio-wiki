@@ -1,0 +1,16 @@
+<includeonly><div class="rw-reflist"{{#if:{{{colunas|}}}| style="column-count:{{{colunas}}};"}}><references /></div></includeonly><noinclude>
+Lista de referências (as notas criadas com <code>&lt;ref&gt;...&lt;/ref&gt;</code> no texto do artigo), inserida no fim dele — sem esta predefinição as notas ficam registradas mas não aparecem em lugar nenhum. Uso: {{Reflist}} ou {{Reflist|colunas=2}}.
+<templatedata>
+{
+	"description": "Lista de referências/notas de rodapé (criadas com <ref>...</ref> no texto), como a seção \"Referências\" da Wikipédia.",
+	"format": "block",
+	"params": {
+		"colunas": {
+			"label": "Colunas",
+			"description": "Número de colunas pra dividir a lista em telas largas (opcional; padrão: 1 coluna).",
+			"type": "number"
+		}
+	}
+}
+</templatedata>
+</noinclude>

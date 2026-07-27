@@ -407,6 +407,21 @@
 	padding: 4px 6px 0;
 }
 
+/* Lista de referências (Predefinição:Reflist -- <references/> do Cite). */
+.rw-reflist {
+	font-size: 0.85rem;
+	border-top: 1px solid var(--rw-border);
+	padding-top: 8px;
+	margin-top: 12px;
+}
+.rw-reflist ol.references { margin: 0; padding-left: 1.6em; }
+.rw-reflist li { margin-bottom: 4px; }
+/* column-count (parâmetro "colunas") quebra linha estranho em telas
+   estreitas -- força 1 coluna no mesmo breakpoint estrutural do skin. */
+@media (max-width: 851px) {
+	.rw-reflist { column-count: 1 !important; }
+}
+
 /* ---- Predefinições de navegação/formatação/aviso (Fase 2.4) ---- */
 
 /* Lista horizontal (Predefinição:Lista horizontal). */

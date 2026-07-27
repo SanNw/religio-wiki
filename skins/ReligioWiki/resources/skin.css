@@ -794,15 +794,24 @@ input[type="text"], input[type="password"], input[type="email"], input[type="num
    cima (o ícone dele é uma imagem já colorida, não uma máscara, então forçar
    background-color não recolore o ícone, só cria uma caixa atrás dele). Achado
    inspecionando o DOM ao vivo (getComputedStyle + elementsFromPoint), não
-   suposição. */
-.oo-ui-flaggedElement-progressive:not(.tool) > .oo-ui-buttonElement-button,
-.oo-ui-flaggedElement-primary:not(.tool) > .oo-ui-buttonElement-button {
+   suposição.
+   :not(.oo-ui-buttonElement-frameless) exclui os botões SEM moldura (ex.: o
+   "i" de ajuda no cabeçalho do diálogo "Inserir predefinição" -- também é
+   progressive, mas frameless). Sem essa exclusão, esse botão ficava com o
+   MESMO bug de fundo marrom + texto marrom: a regra abaixo (frameless
+   progressive) tem mais classes no seletor, então o color:var(--rw-link)
+   dela vencia sobre o color:#fff daqui, mas o background-color continuava
+   vindo daqui -- fundo e texto marrom, invisível. Achado inspecionando o
+   DOM ao vivo (getComputedStyle no botão real do diálogo). Botões sólidos
+   de verdade (framed) continuam intocados por essa exclusão. */
+.oo-ui-flaggedElement-progressive:not(.tool):not(.oo-ui-buttonElement-frameless) > .oo-ui-buttonElement-button,
+.oo-ui-flaggedElement-primary:not(.tool):not(.oo-ui-buttonElement-frameless) > .oo-ui-buttonElement-button {
 	background-color: var(--rw-link) !important;
 	border-color: var(--rw-link) !important;
 	color: #fff !important;
 }
-.oo-ui-flaggedElement-progressive:not(.tool) > .oo-ui-buttonElement-button:hover,
-.oo-ui-flaggedElement-primary:not(.tool) > .oo-ui-buttonElement-button:hover {
+.oo-ui-flaggedElement-progressive:not(.tool):not(.oo-ui-buttonElement-frameless) > .oo-ui-buttonElement-button:hover,
+.oo-ui-flaggedElement-primary:not(.tool):not(.oo-ui-buttonElement-frameless) > .oo-ui-buttonElement-button:hover {
 	background-color: var(--rw-text) !important;
 	border-color: var(--rw-text) !important;
 }
@@ -818,6 +827,27 @@ input[type="text"], input[type="password"], input[type="email"], input[type="num
 .oo-ui-buttonElement-frameless.oo-ui-flaggedElement-progressive:not(.tool) > .oo-ui-buttonElement-button .oo-ui-iconElement-icon,
 .oo-ui-image-progressive:not(.tool) {
 	background-color: var(--rw-link) !important;
+}
+/* rw-toolbar-icon-no-brown: o :not(.tool) acima só exclui o PRÓPRIO elemento
+   com classe "tool" -- não os descendentes de .oo-ui-tool (a classe "tool"
+   fica num ancestral do ícone, não no <span> em si). Resultado ao vivo:
+   dentro de qualquer toolbar OOUI (WikiEditor clássico, VisualEditor), ao
+   ATIVAR uma ferramenta (ex.: abrir o dropdown "+" do VE, ou qualquer botão
+   marcado progressive enquanto pressionado), o ícone/indicador ganhava um
+   fundo marrom SÓLIDO preenchendo a altura inteira do botão (~48px), não só
+   o desenho do ícone -- visual de "o botão inteiro vira um retângulo
+   marrom", reportado como bug. Reseta pra transparente especificamente
+   dentro de toolbars; ícones de DIÁLOGO (TemplateWizard, upload etc., fora
+   de .oo-ui-toolbar) continuam recoloridos normalmente pela regra acima.
+   Também cobre .tool (wrapper de botão do WikiEditor CLÁSSICO, ex.: o
+   toggle "Mostrar previsão" -- ext-WikiEditor-realtimepreview-button --
+   mesmo botão do bug antigo "marrom/ilegível" já corrigido uma vez pro
+   fundo/texto, mas o ÍCONE dele continuava sendo pego por esta regra
+   porque :not(.tool) nunca funcionou pra ele: a classe "tool" fica no
+   ancestral do ícone, nunca no próprio <span> do ícone). */
+.oo-ui-toolbar .oo-ui-image-progressive,
+.tool .oo-ui-image-progressive {
+	background-color: transparent !important;
 }
 /* Diálogos OOUI em geral (cabeçalho do TemplateWizard/upload) na identidade. */
 .oo-ui-processDialog-location .oo-ui-labelElement-label,

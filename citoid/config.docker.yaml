@@ -1,0 +1,46 @@
+# Config do serviço Citoid pra este docker-compose -- baseada no
+# config.dev.yaml oficial do próprio repositório (ver Dockerfile), só
+# trocando o endereço do Zotero (nome do serviço no compose, não
+# localhost/127.0.0.1) e alguns valores de identificação/produção.
+num_workers: 0
+
+logging:
+  level: info
+  streams:
+    - type: stdout
+
+services:
+  - name: citoid
+    module: ./app.js
+    conf:
+      port: 1970
+      cors: "*"
+      wayback: false
+      pubmed: false
+      # Zotero translation-server roda no serviço "zotero" do MESMO
+      # docker-compose (rede interna do Docker resolve pelo nome do
+      # serviço) -- nunca exposto pra fora, só o mediawiki/citoid falam
+      # com ele.
+      zotero: true
+      zoteroInterface: zotero
+      zoteroPort: 1969
+      zoteroUseProxy: false
+      allowPrivateAddresses: false
+      maxRedirects: 5
+      user_agent: "ReligioWikiCitoid/1.0 (https://religiowiki.com)"
+      # E-mail de contato exigido pela CrossRef/PubMed pra identificar quem
+      # está fazendo as requisições (boa prática das próprias APIs, não é
+      # usado pra nenhum outro fim).
+      mailto: "no-reply@religiowiki.com"
+      mwapi_req:
+        method: post
+        uri: https://{{domain}}/w/api.php
+        headers:
+          user-agent: "{{user-agent}}"
+        body: "{{ default(request.query, {}) }}"
+      restbase_req:
+        method: "{{request.method}}"
+        uri: https://{{domain}}/api/rest_v1/{+path}
+        query: "{{ default(request.query, {}) }}"
+        headers: "{{request.headers}}"
+        body: "{{request.body}}"
