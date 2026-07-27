@@ -37,6 +37,11 @@ services:
       # aceita Boleto normalmente, só o Pix que não estava ativado na
       # conta Stripe atual).
       RW_MERCADOPAGO_ACCESS_TOKEN: ${RW_MERCADOPAGO_ACCESS_TOKEN:-}
+      # Segredo do Webhooks do Mercado Pago (painel > Webhooks -- diferente
+      # do access token acima), pra validar a assinatura X-Signature em
+      # Special:DonateMercadoPagoWebhook. Enquanto vazio, o webhook aceita
+      # notificações sem validar assinatura (só loga um aviso).
+      RW_MERCADOPAGO_WEBHOOK_SECRET: ${RW_MERCADOPAGO_WEBHOOK_SECRET:-}
     volumes:
       - ./LocalSettings.php:/var/www/html/LocalSettings.php
       - wiki_images:/var/www/html/images

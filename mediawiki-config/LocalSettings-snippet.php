@@ -786,6 +786,17 @@ $wgSpecialPages['DonateCheckout'] = SpecialDonateCheckout::class;
 require_once __DIR__ . '/mediawiki-config/includes/SpecialDonatePix.php';
 $wgSpecialPages['DonatePix'] = SpecialDonatePix::class;
 
+// rw-donate-mp-webhook: Special:DonateMercadoPagoWebhook recebe a
+// notificação assíncrona do Mercado Pago quando o status de um pagamento
+// muda (URL cadastrada como notification_url na criação do pagamento em
+// SpecialDonatePix.php). Cobre o caso do doador fechar a aba antes do
+// polling confirmar -- só registra em log, não substitui o polling nem
+// grava em banco (não existe tabela de doações). Segredo do webhook
+// (diferente do access token) só existe como variável de ambiente
+// (RW_MERCADOPAGO_WEBHOOK_SECRET), nunca em código.
+require_once __DIR__ . '/mediawiki-config/includes/SpecialDonateMercadoPagoWebhook.php';
+$wgSpecialPages['DonateMercadoPagoWebhook'] = SpecialDonateMercadoPagoWebhook::class;
+
 
 // rw-real-article-count: {{#artigosreais:}} conta só artigos DE VERDADE no
 // namespace principal -- {{NUMBEROFARTICLES}} nativo (via

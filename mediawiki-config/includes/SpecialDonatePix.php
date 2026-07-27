@@ -105,6 +105,10 @@ class SpecialDonatePix extends SpecialPage {
 			'payer' => [
 				'email' => $email,
 			],
+			// Chama Special:DonateMercadoPagoWebhook quando o status mudar --
+			// registro server-side independente do polling do front-end (ver
+			// SpecialDonateMercadoPagoWebhook.php).
+			'notification_url' => SpecialPage::getTitleFor( 'DonateMercadoPagoWebhook' )->getFullURL(),
 		];
 
 		try {
