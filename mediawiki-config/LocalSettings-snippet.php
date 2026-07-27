@@ -775,6 +775,13 @@ if ( getenv( 'RW_SMTP_HOST' ) ) {
 // pelo próprio Stripe (nenhum dado de cartão passa por aqui). Chave secreta
 // só existe como variável de ambiente (RW_STRIPE_SECRET_KEY, ver
 // docker-compose.yml / .env), nunca em código.
+// rw-donate-log: sem isso, wfDebugLog('religio-donate', ...) -- usado pelos
+// erros do Stripe/Pix abaixo e pelo webhook do Mercado Pago -- é descartado
+// em silêncio (MediaWiki moderno não tem mais fallback automático pra
+// error_log quando o grupo de log não está configurado). Aponta pro stderr
+// do próprio container, capturado normalmente por `docker compose logs`.
+$wgDebugLogGroups['religio-donate'] = '/dev/stderr';
+
 require_once __DIR__ . '/mediawiki-config/includes/SpecialDonateCheckout.php';
 $wgSpecialPages['DonateCheckout'] = SpecialDonateCheckout::class;
 
