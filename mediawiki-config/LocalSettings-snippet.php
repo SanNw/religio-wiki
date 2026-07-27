@@ -779,8 +779,13 @@ if ( getenv( 'RW_SMTP_HOST' ) ) {
 // erros do Stripe/Pix abaixo e pelo webhook do Mercado Pago -- é descartado
 // em silêncio (MediaWiki moderno não tem mais fallback automático pra
 // error_log quando o grupo de log não está configurado). Aponta pro stderr
-// do próprio container, capturado normalmente por `docker compose logs`.
-$wgDebugLogGroups['religio-donate'] = '/dev/stderr';
+// do próprio container -- tentativa inicial com '/dev/stderr' falhou
+// ("Failed to open stream", confirmado ao vivo: error_log() com destino de
+// arquivo não escreve nesse caminho aqui dentro, diferente do ErrorLog do
+// Apache, que trata /dev/stderr de forma especial). Usa um arquivo de
+// verdade, montado do host (ver docker-compose.yml) pra sobreviver a
+// rebuild/recreate do container.
+$wgDebugLogGroups['religio-donate'] = '/var/log/religio/donate.log';
 
 require_once __DIR__ . '/mediawiki-config/includes/SpecialDonateCheckout.php';
 $wgSpecialPages['DonateCheckout'] = SpecialDonateCheckout::class;

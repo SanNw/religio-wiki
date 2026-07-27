@@ -45,6 +45,10 @@ services:
     volumes:
       - ./LocalSettings.php:/var/www/html/LocalSettings.php
       - wiki_images:/var/www/html/images
+      # Log do canal 'religio-donate' (wfDebugLog em Stripe/Pix/webhook) --
+      # montado do host pra sobreviver a rebuild/recreate do container
+      # (diferente de um arquivo dentro da imagem, que some).
+      - ./logs:/var/log/religio
 
   # Zotero translation-server: extrai metadados de citação de uma URL de
   # verdade (usa os "tradutores" do Zotero, específicos por site). Só o
