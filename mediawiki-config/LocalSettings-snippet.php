@@ -810,6 +810,34 @@ require_once __DIR__ . '/mediawiki-config/includes/SpecialDonateMercadoPagoWebho
 $wgSpecialPages['DonateMercadoPagoWebhook'] = SpecialDonateMercadoPagoWebhook::class;
 
 
+// rw-antibot-signup: Fase 1 do sistema anti-bot ("Trust Gateway", ver
+// scratch/religio-antibot-trust-gateway.html). Barra criação de conta por
+// automação SEM captcha visível e SEM atrito pro humano legítimo. Três sinais
+// invisíveis, validados por um PreAuthenticationProvider -- o MESMO ponto de
+// extensão do AuthManager (MW 1.43) que o ConfirmEdit usa; NÃO o hook
+// AbortNewAccount, que foi REMOVIDO no MediaWiki 1.33:
+//   1. honeypot (rw_hp): campo escondido por CSS (ver common.css/.mw-antibot-hp)
+//      que humano nunca vê nem preenche -- se vier preenchido, é bot.
+//   2. timestamp assinado (rw_ts, HMAC com $wgSecretKey): mede o tempo de
+//      preenchimento; submissão < 3s ou token forjado/velho = bot.
+// A Fase 2 (serviço Trust Gateway completo: fingerprint, bot score, trust,
+// Turnstile, painel) continua pendente -- ver o doc de design em scratch/.
+require_once __DIR__ . '/mediawiki-config/includes/AntiBotAuthenticationRequest.php';
+require_once __DIR__ . '/mediawiki-config/includes/AntiBotPreAuthenticationProvider.php';
+$wgAuthManagerAutoConfig['preauth']['AntiBotPreAuthenticationProvider'] = [
+	'class' => AntiBotPreAuthenticationProvider::class,
+	'sort' => 10,
+];
+// Throttles nativos endurecidos (§05 do design, sem Redis): no máximo 5
+// cadastros por IP por hora. $wgAccountCreationThrottle barra a criação em si;
+// $wgRateLimits['createaccount'] é a defesa geral de rate limit do core.
+$wgAccountCreationThrottle = [ [ 'count' => 5, 'seconds' => 3600 ] ];
+$wgRateLimits['createaccount']['ip'] = [ 5, 3600 ];
+// Canal de log dedicado -- toda rejeição do provider cai aqui (mesmo volume
+// ./logs montado no docker-compose.yml, mesmo padrão do religio-donate).
+$wgDebugLogGroups['religio-antibot'] = '/var/log/religio/antibot.log';
+
+
 // rw-real-article-count: {{#artigosreais:}} conta só artigos DE VERDADE no
 // namespace principal -- {{NUMBEROFARTICLES}} nativo (via
 // $wgArticleCountMethod='any', ver rw-article-count-any) conta QUALQUER

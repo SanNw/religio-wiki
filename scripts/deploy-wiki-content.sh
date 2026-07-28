@@ -755,6 +755,35 @@ PHPEOF
   echo "  Link de editar direitos adicionado em Special:ListUsers (rw-listusers-editrights-gear)."
 fi
 
+# Fase 1 do sistema anti-bot no cadastro ("Trust Gateway", ver
+# scratch/religio-antibot-trust-gateway.html). Bloco à parte com marcador
+# PRÓPRIO porque o snippet inteiro só é colado uma vez (pelo MARKER lá em cima);
+# num wiki já deployado o MARKER já existe e o snippet não é re-anexado, então
+# esta adição posterior precisa do próprio grep -q pra pegar. As classes PHP
+# (includes/AntiBot*.php) já vão pra imagem pelo COPY do Dockerfile; aqui só o
+# registro no LocalSettings.php. Idempotente pelo marcador rw-antibot-signup.
+if ! grep -q "rw-antibot-signup" LocalSettings.php; then
+  cat >> LocalSettings.php << 'PHPEOF'
+
+// Religio Wiki — rw-antibot-signup: barra criação de conta por automação SEM
+// captcha visível e SEM atrito pro humano (honeypot + timestamp assinado HMAC),
+// via PreAuthenticationProvider (AuthManager MW 1.43 — NÃO o hook AbortNewAccount,
+// removido no MW 1.33) + throttles nativos. Ver LocalSettings-snippet.php e
+// mediawiki-config/includes/AntiBot*.php. Fase 2 (serviço completo) pendente —
+// ver scratch/religio-antibot-trust-gateway.html.
+require_once __DIR__ . '/mediawiki-config/includes/AntiBotAuthenticationRequest.php';
+require_once __DIR__ . '/mediawiki-config/includes/AntiBotPreAuthenticationProvider.php';
+$wgAuthManagerAutoConfig['preauth']['AntiBotPreAuthenticationProvider'] = [
+	'class' => AntiBotPreAuthenticationProvider::class,
+	'sort' => 10,
+];
+$wgAccountCreationThrottle = [ [ 'count' => 5, 'seconds' => 3600 ] ];
+$wgRateLimits['createaccount']['ip'] = [ 5, 3600 ];
+$wgDebugLogGroups['religio-antibot'] = '/var/log/religio/antibot.log';
+PHPEOF
+  echo "  Anti-bot no cadastro (honeypot + timestamp + throttles) ligado (rw-antibot-signup)."
+fi
+
 echo "== 2/4: rebuild da imagem + subindo/reiniciando o container =="
 # Rebuild explícito: "up -d" sozinho NÃO reconstrói a imagem quando só o
 # Dockerfile muda (ex.: skin novo copiado em skins/ReligioWiki, extensões
