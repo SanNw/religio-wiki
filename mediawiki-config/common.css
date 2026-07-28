@@ -816,3 +816,28 @@ html body .rw-toc #toc li.rw-toc-has-children.rw-toc-item-collapsed > ul {
 	html body .rw-toc.rw-toc-expanded > *:not(.rw-toc-fab) { display: block; }
 	html body .rw-toc.rw-toc-expanded .rw-toc-fab { margin-bottom: 8px; }
 }
+
+/* ---------- Anti-bot: honeypot do cadastro (rw-antibot-signup) ----------
+   Esconde o campo isca rw_hp (declarado por AntiBotAuthenticationRequest) do
+   HUMANO, mantendo-o no DOM pro BOT preencher. Um humano nunca vê nem digita
+   nele; qualquer valor que chegue no POST denuncia automação (validado por
+   AntiBotPreAuthenticationProvider). Fica AQUI, e não no skin, de propósito:
+   Special:CreateAccount usa o form genérico do AuthManager, e o Common.css é o
+   único ponto que pega esse form em qualquer skin.
+
+   Tirado da viewport com position/left (NÃO display:none nem visibility:hidden)
+   — o objetivo é justamente não parecer uma armadilha óbvia pra um bot que lê
+   CSS e pularia campos display:none. Alvo pelo name="rw_hp" (descritor de campo
+   do AuthManager não aceita cssclass própria); o :has() esconde também o rótulo
+   "Website" arrastando o wrapper OOUI/HTMLForm inteiro pra fora da tela. */
+input[name="rw_hp"],
+.mw-htmlform-field-HTMLTextField:has( input[name="rw_hp"] ),
+.oo-ui-fieldLayout:has( input[name="rw_hp"] ) {
+	position: absolute !important;
+	left: -9999px !important;
+	top: auto !important;
+	width: 1px !important;
+	height: 1px !important;
+	overflow: hidden !important;
+	opacity: 0 !important;
+}
