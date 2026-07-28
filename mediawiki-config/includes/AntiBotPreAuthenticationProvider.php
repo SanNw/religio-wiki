@@ -139,7 +139,7 @@ class AntiBotPreAuthenticationProvider extends AbstractPreAuthenticationProvider
 	 * @return string
 	 */
 	private function signTimestamp( int $ts ): string {
-		$secret = (string)$this->getConfig()->get( 'SecretKey' );
+		$secret = (string)$this->config->get( 'SecretKey' );
 		return hash_hmac( 'sha256', (string)$ts, $secret );
 	}
 
