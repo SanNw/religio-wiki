@@ -24,6 +24,7 @@ on:
       - "Dockerfile"
       - "skins/**"
       - "composer.local.json"
+      - "trust-gateway/**"
   workflow_dispatch: {}
 
 # Nunca deixa dois deploys rodarem ao mesmo tempo na VPS. Sem isto, um push em

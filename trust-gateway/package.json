@@ -1,0 +1,23 @@
+{
+  "name": "trust-gateway",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Religio Wiki - Fase 2 do sistema anti-bot (bot score, fingerprint, trust). Ver scratch/religio-antibot-trust-gateway.html.",
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/main.js",
+    "dev": "ts-node src/main.ts"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "ioredis": "^5.4.1",
+    "pg": "^8.12.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.14.0",
+    "@types/pg": "^8.11.6",
+    "typescript": "^5.5.4"
+  }
+}

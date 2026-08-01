@@ -784,12 +784,33 @@ PHPEOF
   echo "  Anti-bot no cadastro (honeypot + timestamp + throttles) ligado (rw-antibot-signup)."
 fi
 
+# Fase 2 do anti-bot: registra a URL do serviço trust-gateway (nome do
+# serviço Docker, porta interna 3001 — nunca publicada pro host, mesmo
+# padrão do zotero/citoid). AntiBotPreAuthenticationProvider::
+# trustGatewayBlocks() faz fail-open se esta config estiver vazia, então
+# não há risco de travar cadastro caso o serviço não suba por algum motivo.
+# Idempotente pelo marcador rw-trust-gateway-hooks.
+if ! grep -q "rw-trust-gateway-hooks" LocalSettings.php; then
+  cat >> LocalSettings.php << 'PHPEOF'
+
+// Religio Wiki — rw-trust-gateway-hooks: URL do serviço trust-gateway (Fase 2
+// do anti-bot). Ver docker-compose.yml e
+// mediawiki-config/includes/AntiBotPreAuthenticationProvider.php.
+$wgTrustGatewayUrl = 'http://trust-gateway:3001';
+PHPEOF
+  echo "  URL do trust-gateway registrada (rw-trust-gateway-hooks)."
+fi
+
 echo "== 2/4: rebuild da imagem + subindo/reiniciando o container =="
 # Rebuild explícito: "up -d" sozinho NÃO reconstrói a imagem quando só o
 # Dockerfile muda (ex.: skin novo copiado em skins/ReligioWiki, extensões
 # via Composer) — sem isso, o container continuava rodando a imagem antiga
 # depois do deploy.
 $COMPOSE build "$SERVICE"
+# Mesmo motivo do build acima, mas pro trust-gateway (Fase 2 do anti-bot) --
+# ele também tem Dockerfile próprio (build: ./trust-gateway), então "up -d"
+# sozinho não pega mudança de código dele depois da primeira subida.
+$COMPOSE build trust-gateway
 # Um deploy anterior interrompido (ex.: timeout de SSH no meio do "up") pode
 # deixar um container renomeado/órfão do serviço mediawiki para trás — algo
 # como "<hash>_religio-wiki-mediawiki-1". Nesse caso o "compose up" seguinte
@@ -801,6 +822,9 @@ docker ps -a --filter "label=com.docker.compose.service=$SERVICE" -q \
   | xargs -r docker rm -f >/dev/null 2>&1 || true
 $COMPOSE up -d --remove-orphans
 $COMPOSE restart "$SERVICE"
+# Idem pro trust-gateway -- "up -d" não reinicia um serviço já rodando só
+# porque a imagem foi rebuildada, precisa do restart explícito.
+$COMPOSE restart trust-gateway
 
 # Cria/atualiza a tabela do ReligiowikiCustomizer (e qualquer outra pendência
 # de schema de extensão) — seguro rodar sempre, update.php é idempotente.

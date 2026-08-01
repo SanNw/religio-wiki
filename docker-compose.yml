@@ -70,6 +70,44 @@ services:
     ports:
       - "127.0.0.1:1970:1970"
 
+  # Redis: rate limiting (sliding window) e dedupe de fingerprint (TTL 1h)
+  # do trust-gateway abaixo. Sem persistência AOF/RDS de propósito -- todo
+  # dado aqui é efêmero por natureza (janela de rate limit, cache de
+  # fingerprint); perder o conteúdo num restart não é um problema.
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+
+  # Postgres dedicado ao trust-gateway (Fase 2 do sistema anti-bot -- ver
+  # scratch/religio-antibot-trust-gateway.html). Nome "trust-postgres" (não
+  # "db", que já é o MariaDB do MediaWiki) pra deixar claro que são dois
+  # bancos completamente separados, sem relação entre si.
+  trust-postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: trust_gateway
+      POSTGRES_USER: trust_gateway
+      POSTGRES_PASSWORD: ${TRUST_DB_PASSWORD}
+    volumes:
+      - trust_db_data:/var/lib/postgresql/data
+
+  # Trust Gateway: Fase 2 do sistema anti-bot. Bot score ponderado (honeypot
+  # + timing + fingerprint + velocidade de cadastro) chamado pelo
+  # AntiBotPreAuthenticationProvider.php via HTTP no cadastro
+  # (POST /trust/signup-risk). Só porta interna (nome de serviço Docker) --
+  # nunca exposta pra internet, mesmo padrão do zotero.
+  trust-gateway:
+    build: ./trust-gateway
+    restart: unless-stopped
+    depends_on:
+      - redis
+      - trust-postgres
+    environment:
+      REDIS_URL: redis://redis:6379
+      DATABASE_URL: postgres://trust_gateway:${TRUST_DB_PASSWORD}@trust-postgres:5432/trust_gateway
+
 volumes:
   db_data:
   wiki_images:
+  trust_db_data:

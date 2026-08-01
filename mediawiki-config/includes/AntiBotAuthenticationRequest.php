@@ -1,7 +1,7 @@
 <?php
 /**
  * AntiBotAuthenticationRequest -- Fase 1 do sistema anti-bot ("Trust Gateway",
- * ver scratch/religio-antibot-trust-gateway.html). Declara dois campos extras
+ * ver scratch/religio-antibot-trust-gateway.html). Declara três campos extras
  * no formulário de CRIAÇÃO DE CONTA (Special:CreateAccount), usados de forma
  * INVISÍVEL pra distinguir humano de bot sem adicionar atrito nenhum ao
  * usuário legítimo:
@@ -13,9 +13,15 @@
  *            O HMAC (chave = $wgSecretKey) impede forjar/reusar o valor. Serve
  *            pra medir quanto tempo o preenchimento levou -- submissão quase
  *            instantânea nunca é humana.
+ *   - rw_fp  (fingerprint hash, Fase 2): hash SHA-256 calculado no NAVEGADOR
+ *            por public/js/fingerprint.client.ts (MediaWiki:Common.js) a
+ *            partir de canvas/WebGL/AudioContext/timezone/hardwareConcurrency.
+ *            Só o hash sai do cliente -- nunca os atributos brutos (LGPD,
+ *            minimização). Repassado pelo provider ao serviço trust-gateway
+ *            (POST /trust/signup-risk) pra medir reuso entre contas.
  *
  * A VALIDAÇÃO fica em AntiBotPreAuthenticationProvider::testForAccountCreation()
- * -- esta classe só carrega os campos do formulário. Ambos os campos são
+ * -- esta classe só carrega os campos do formulário. Todos os campos são
  * 'optional' de propósito: assim, um form sem eles (JS/CSS à parte) ainda
  * carrega o request, e o provider decide o que fazer com a ausência do valor
  * (em vez de o request inteiro ser descartado silenciosamente por
@@ -37,6 +43,9 @@ class AntiBotAuthenticationRequest extends AuthenticationRequest {
 
 	/** @var string|null Timestamp assinado "{tempo}:{hmac}" gerado no render. */
 	public $rw_ts = null;
+
+	/** @var string|null Hash SHA-256 do fingerprint, calculado no navegador (Fase 2). */
+	public $rw_fp = null;
 
 	/**
 	 * Valor a injetar no campo rw_ts quando o formulário é RENDERIZADO. O
@@ -76,6 +85,14 @@ class AntiBotAuthenticationRequest extends AuthenticationRequest {
 			'rw_ts' => [
 				'type' => 'hidden',
 				'value' => $this->tsToRender,
+				'optional' => true,
+			],
+			// Fingerprint hash (Fase 2). Vazio no render -- MediaWiki:Common.js
+			// preenche via JS antes do submit (fingerprint.client.ts). 'hidden'
+			// porque não há valor nenhum pra mostrar no render, só no POST.
+			'rw_fp' => [
+				'type' => 'hidden',
+				'value' => '',
 				'optional' => true,
 			],
 		];

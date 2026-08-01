@@ -717,3 +717,116 @@
 	setTimeout( setup, 300 );
 	setTimeout( setup, 1000 );
 }() );
+
+/* ===== rw-antibot-fingerprint: fingerprint do cadastro (Fase 2) =====
+ * Só roda em Special:CreateAccount. Calcula um hash SHA-256 a partir de
+ * canvas/WebGL/AudioContext/timezone/hardwareConcurrency (mesma lógica de
+ * trust-gateway/public/js/fingerprint.client.ts -- mantenha as duas em
+ * sincronia se uma mudar) e preenche o campo oculto rw_fp (declarado por
+ * AntiBotAuthenticationRequest.php) antes do submit. O SERVIDOR nunca recebe
+ * os atributos brutos, só este hash (LGPD, minimização de dados) --
+ * AntiBotPreAuthenticationProvider repassa rw_fp ao serviço trust-gateway
+ * (POST /trust/signup-risk) pra medir reuso entre contas.
+ *
+ * Silenciosamente não faz nada se crypto.subtle ou o campo rw_fp não
+ * existirem (navegador antigo sem WebCrypto, ou provider ainda não
+ * registrado num deploy pela metade) -- degradar pra "sem fingerprint" é
+ * preferível a travar o cadastro do humano.
+ */
+( function () {
+	'use strict';
+
+	function isCreateAccountPage() {
+		return ( typeof mw !== 'undefined' && mw.config ) ?
+			mw.config.get( 'wgCanonicalSpecialPageName' ) === 'CreateAccount' :
+			false;
+	}
+
+	function collectFingerprint() {
+		var parts = [];
+
+		try {
+			var canvas = document.createElement( 'canvas' );
+			var ctx = canvas.getContext( '2d' );
+			if ( ctx ) {
+				ctx.textBaseline = 'top';
+				ctx.font = '14px Arial';
+				ctx.fillText( 'Religio Wiki fingerprint', 2, 2 );
+				parts.push( canvas.toDataURL() );
+			}
+		} catch ( e ) { /* ignora -- reduz precisão, não quebra o fluxo */ }
+
+		try {
+			var gl = document.createElement( 'canvas' ).getContext( 'webgl' );
+			var dbg = gl && gl.getExtension( 'WEBGL_debug_renderer_info' );
+			if ( gl && dbg ) {
+				parts.push( String( gl.getParameter( dbg.UNMASKED_RENDERER_WEBGL ) ) );
+			}
+		} catch ( e ) { /* ignora */ }
+
+		parts.push( screen.width + 'x' + screen.height + '@' + window.devicePixelRatio );
+		try {
+			parts.push( Intl.DateTimeFormat().resolvedOptions().timeZone );
+		} catch ( e ) { /* ignora */ }
+		parts.push( navigator.language || '' );
+		parts.push( String( navigator.hardwareConcurrency || '' ) );
+		parts.push( String( navigator.deviceMemory || '' ) );
+
+		return audioFingerprint().then( function ( audioPart ) {
+			if ( audioPart ) {
+				parts.push( audioPart );
+			}
+			var enc = new TextEncoder().encode( parts.join( '|' ) );
+			return crypto.subtle.digest( 'SHA-256', enc );
+		} ).then( function ( digest ) {
+			return Array.prototype.map.call( new Uint8Array( digest ), function ( b ) {
+				return ( '0' + b.toString( 16 ) ).slice( -2 );
+			} ).join( '' );
+		} );
+	}
+
+	function audioFingerprint() {
+		return new Promise( function ( resolve ) {
+			try {
+				var AudioCtx = window.AudioContext || window.webkitAudioContext;
+				if ( !AudioCtx ) {
+					resolve( null );
+					return;
+				}
+				var ac = new AudioCtx();
+				var osc = ac.createOscillator();
+				var comp = ac.createDynamicsCompressor();
+				osc.connect( comp );
+				comp.connect( ac.destination );
+				osc.start( 0 );
+				var sampleRate = String( ac.sampleRate );
+				ac.close().then( function () {
+					resolve( sampleRate );
+				} ).catch( function () {
+					resolve( sampleRate );
+				} );
+			} catch ( e ) {
+				resolve( null );
+			}
+		} );
+	}
+
+	function setup() {
+		if ( !isCreateAccountPage() || typeof crypto === 'undefined' || !crypto.subtle ) {
+			return;
+		}
+		var field = document.querySelector( 'input[name="rw_fp"]' );
+		if ( !field ) {
+			return;
+		}
+		collectFingerprint().then( function ( hash ) {
+			field.value = hash;
+		} ).catch( function () { /* deixa rw_fp vazio -- fail-open no servidor */ } );
+	}
+
+	if ( document.readyState === 'loading' ) {
+		document.addEventListener( 'DOMContentLoaded', setup );
+	} else {
+		setup();
+	}
+}() );

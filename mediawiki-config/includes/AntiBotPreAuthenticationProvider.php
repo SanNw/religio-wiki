@@ -11,22 +11,33 @@
  * MESMO ponto de extensão que o ConfirmEdit usa internamente. Substitui o hook
  * AbortNewAccount, que foi REMOVIDO no MediaWiki 1.33.
  *
- * Três checagens, todas de baixo custo e alta precisão (praticamente impossível
- * um humano real disparar qualquer uma por acidente):
+ * Três checagens locais, todas de baixo custo e alta precisão (praticamente
+ * impossível um humano real disparar qualquer uma por acidente):
  *   1. Honeypot preenchido      -> bot preencheu campo escondido por CSS.
  *   2. Timestamp ausente/forjado -> form adulterado (assinatura HMAC não bate).
  *   3. Preenchido rápido demais  -> submissão abaixo do piso humano plausível.
+ * Essas três são stateless -- o timestamp assinado carrega a própria prova,
+ * sem depender de nenhum serviço externo.
  *
- * Qualquer uma que dispare aborta com uma mensagem GENÉRICA (não conta ao bot
- * qual regra pegou) e registra o motivo real no log religio-antibot (mesmo
- * canal/volume do religio-donate). Não há banco nem estado: é stateless, o
- * timestamp assinado carrega a própria prova.
+ * Fase 2 (ver trust-gateway/ e scratch/religio-antibot-trust-gateway.html)
+ * soma uma quarta checagem, com estado: uma chamada HTTP síncrona e curta ao
+ * serviço trust-gateway (POST /trust/signup-risk), que pondera fingerprint,
+ * IP e velocidade de cadastro num bot score. Só entra em jogo se as três
+ * checagens locais já passaram. Fail-open por design: se o serviço estiver
+ * fora do ar ou não configurado ($wgTrustGatewayUrl vazio), o cadastro segue
+ * normalmente -- nunca trava um humano legítimo por uma falha interna nossa.
+ *
+ * Qualquer checagem que dispare aborta com uma mensagem GENÉRICA (não conta
+ * ao bot qual regra pegou) e registra o motivo real no log religio-antibot
+ * (mesmo canal/volume do religio-donate).
  */
 
 use MediaWiki\Auth\AbstractPreAuthenticationProvider;
 use MediaWiki\Auth\AuthenticationRequest;
 use MediaWiki\Auth\AuthManager;
 use MediaWiki\Language\RawMessage;
+use MediaWiki\MediaWikiServices;
+use RequestContext;
 use StatusValue;
 
 class AntiBotPreAuthenticationProvider extends AbstractPreAuthenticationProvider {
@@ -46,6 +57,14 @@ class AntiBotPreAuthenticationProvider extends AbstractPreAuthenticationProvider
 	 * e ainda limita reuso.
 	 */
 	private const MAX_TOKEN_AGE_SECONDS = 3600;
+
+	/**
+	 * Timeout, em segundos, pra chamada HTTP ao trust-gateway. Curto de
+	 * propósito: essa checagem roda no caminho síncrono do cadastro, então um
+	 * serviço lento não pode virar um cadastro lento (ou travado) pro usuário.
+	 * Se estourar, cai no fail-open (ver chamada em testForAccountCreation()).
+	 */
+	private const TRUST_GATEWAY_TIMEOUT_SECONDS = 2;
 
 	/**
 	 * Injeta o request só na criação de conta, já com o timestamp assinado
@@ -89,7 +108,97 @@ class AntiBotPreAuthenticationProvider extends AbstractPreAuthenticationProvider
 			return $this->reject( $verdict, $user );
 		}
 
+		// 4. Trust Gateway (Fase 2): bot score com estado (fingerprint, IP,
+		// velocidade de cadastro). Só chamado depois das checagens locais
+		// passarem -- elas são de graça, esta tem custo de rede.
+		if ( $this->trustGatewayBlocks( $req, $user ) ) {
+			return $this->reject( 'trust-gateway-block', $user );
+		}
+
 		return StatusValue::newGood();
+	}
+
+	/**
+	 * Consulta o serviço trust-gateway (POST /trust/signup-risk) e devolve
+	 * true só quando ele responde explicitamente com veredito de bloqueio.
+	 * Fail-open em qualquer outro caso -- config vazia, timeout, erro de
+	 * rede, corpo malformado -- porque a indisponibilidade de um serviço
+	 * interno auxiliar nunca deve impedir um cadastro humano legítimo (a
+	 * Fase 1, já passada neste ponto, continua sendo a defesa de base).
+	 * @param AntiBotAuthenticationRequest $req
+	 * @param mixed $user
+	 * @return bool
+	 */
+	private function trustGatewayBlocks( AntiBotAuthenticationRequest $req, $user ): bool {
+		$baseUrl = (string)$this->config->get( 'TrustGatewayUrl' );
+		if ( $baseUrl === '' ) {
+			return false;
+		}
+
+		$elapsedSeconds = null;
+		if ( strpos( (string)$req->rw_ts, ':' ) !== false ) {
+			[ $tsPart ] = explode( ':', (string)$req->rw_ts, 2 );
+			if ( ctype_digit( $tsPart ) ) {
+				$elapsedSeconds = (int)wfTimestamp( TS_UNIX ) - (int)$tsPart;
+			}
+		}
+
+		$name = is_object( $user ) && method_exists( $user, 'getName' )
+			? $user->getName() : '?';
+		$ip = RequestContext::getMain()->getRequest()->getIP();
+
+		$payload = [
+			'username' => $name,
+			'ip' => $ip,
+			// Chegou até aqui = honeypot vazio (já teria rejeitado antes).
+			'honeypotHit' => false,
+			'fingerprintHash' => $req->rw_fp !== null && $req->rw_fp !== ''
+				? (string)$req->rw_fp : null,
+			'elapsedSeconds' => $elapsedSeconds,
+		];
+
+		try {
+			$httpFactory = MediaWikiServices::getInstance()->getHttpRequestFactory();
+			$httpRequest = $httpFactory->create(
+				rtrim( $baseUrl, '/' ) . '/trust/signup-risk',
+				[
+					'method' => 'POST',
+					'postData' => json_encode( $payload ),
+					'timeout' => self::TRUST_GATEWAY_TIMEOUT_SECONDS,
+				],
+				__METHOD__
+			);
+			$httpRequest->setHeader( 'Content-Type', 'application/json' );
+			$status = $httpRequest->execute();
+
+			if ( !$status->isOK() ) {
+				// Serviço fora do ar, timeout, DNS etc. -- fail-open.
+				wfDebugLog( 'religio-antibot',
+					"trust-gateway indisponível usuario={$name}: " . (string)$status );
+				return false;
+			}
+
+			$body = json_decode( $httpRequest->getContent(), true );
+			if ( !is_array( $body ) || !isset( $body['verdict'] ) ) {
+				// Corpo inesperado -- trata como indisponível, não como bloqueio.
+				wfDebugLog( 'religio-antibot',
+					"trust-gateway resposta malformada usuario={$name}" );
+				return false;
+			}
+
+			wfDebugLog( 'religio-antibot',
+				"trust-gateway veredito={$body['verdict']} score=" .
+				( $body['score'] ?? '?' ) . " banda=" . ( $body['band'] ?? '?' ) .
+				" usuario={$name}" );
+
+			return $body['verdict'] === 'block';
+		} catch ( \Throwable $e ) {
+			// Qualquer exceção inesperada -- nunca deixa o cadastro travar
+			// por um bug/instabilidade do serviço auxiliar.
+			wfDebugLog( 'religio-antibot',
+				"trust-gateway erro usuario={$name}: " . $e->getMessage() );
+			return false;
+		}
 	}
 
 	/**

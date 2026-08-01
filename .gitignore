@@ -1,3 +1,5 @@
 .env
 LocalSettings.php
 backups/
+node_modules/
+trust-gateway/dist/
